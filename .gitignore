@@ -21,3 +21,23 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# Mac Mac
+.DS_Store
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.ipr
+**/target
+*.iml
+**.iml
+
+### VS Code ###
+.vscode/
+.classpath
+.factorypath
+.project
+.settings
+.idea
+.java-version
