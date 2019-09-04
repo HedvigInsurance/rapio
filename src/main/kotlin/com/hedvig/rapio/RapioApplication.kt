@@ -7,10 +7,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients
 @SpringBootApplication
 @EnableFeignClients
 class RapioApplication {
-  companion object {
-    @JvmStatic
-    fun main(args: Array<String>) {
-      SpringApplication.run(RapioApplication::class.java, *args)
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) {
+            SpringApplication.run(RapioApplication::class.java, *args)
+        }
     }
-  }
 }
