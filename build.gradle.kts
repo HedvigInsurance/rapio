@@ -22,19 +22,23 @@ dependencies {
     implementation("org.springframework.security:spring-security-test")
     implementation("org.liquibase:liquibase-core:3.6.3")
     implementation("com.vladmihalcea:hibernate-types-52:2.6.1")
-    implementation("org.springframework.boot:spring-boot-starter-web:2.1.7.RELEASE")
-    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:2.1.2.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.3.31")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.31")
     implementation("io.springfox:springfox-swagger2:2.7.0")
     implementation("io.springfox:springfox-swagger-ui:2.7.0")
-    implementation("org.springframework.cloud:spring-cloud-openfeign-core:2.1.2.RELEASE")
+    implementation("org.springframework.cloud:spring-cloud-openfeign-core")
+
     api("org.postgresql:postgresql:42.2.6")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:2.1.7.RELEASE")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.2.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.2.0")
     testImplementation( "org.junit.jupiter:junit-jupiter-engine:5.2.0")
+    testImplementation("com.ninja-squad:springmockk:1.1.2")
+    testImplementation("io.mockk:mockk:1.9")
 }
 
 group = "com.hedvig"

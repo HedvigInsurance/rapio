@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @TestPropertySource(properties = [
     "hedvig.rapio.apikeys={mrInsplanetUser:'insplanet'}"
 ])
-class AcceptanceTest {
+class ApiKeysTest {
     @Autowired
     lateinit var mvc: MockMvc
 
