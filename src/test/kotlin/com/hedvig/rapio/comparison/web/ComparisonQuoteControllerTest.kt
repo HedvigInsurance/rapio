@@ -1,14 +1,15 @@
 package com.hedvig.rapio.comparison.web
 
+import com.hedvig.rapio.comparison.ComparisonQuoteController
 import com.hedvig.rapio.comparison.QuoteService
-import com.hedvig.rapio.comparison.domain.ComparisonQuoteRequest
+import com.hedvig.rapio.comparison.domain.ComparisonQuote
+import com.hedvig.rapio.comparison.domain.QuoteData
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers.any
-import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user
 import org.springframework.test.web.servlet.MockMvc
@@ -23,7 +24,7 @@ internal class ComparisonQuoteControllerTest {
     @Autowired
     lateinit var mockMvc: MockMvc;
 
-    @MockBean
+    @MockkBean
     lateinit var quoteService:QuoteService;
 
     val createRequestJson = """
@@ -45,6 +46,20 @@ internal class ComparisonQuoteControllerTest {
 
     @Test
     fun create_quote(){
+
+        val response = ComparisonQuote(
+                id = UUID.fromString("c0e4fd6e-d951-11e9-8b49-ef7f36d0f00d"),
+                quoteData = QuoteData(
+                        "Street 1",
+                        "1234",
+                        "Stockholm",
+                        45,
+                        "19121212121221",
+                        "07012341234",
+                        3,
+                        false
+                ))
+        every { quoteService.createQuote(any()) } returns(response)
 
         val request = post("/v1/quote")
                 .with(user("compricer"))
@@ -75,10 +90,6 @@ internal class ComparisonQuoteControllerTest {
     fun sign_quote(){
 
         val id = "123"
-
-        val response = ComparisonQuoteRequest()
-        response.id = UUID.fromString("c0e4fd6e-d951-11e9-8b49-ef7f36d0f00d")
-        given(quoteService.createQuote(any())).willReturn(response)
 
         val request = post("/v1/quote/$id/sign")
                 .with(user("compricer"))

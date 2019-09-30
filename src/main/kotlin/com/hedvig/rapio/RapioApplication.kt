@@ -6,6 +6,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients
 
 @SpringBootApplication()
 class RapioApplication {
+
+
+
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {

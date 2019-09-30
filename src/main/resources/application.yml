@@ -16,3 +16,11 @@ spring:
     username: postgres
     password: hedvig
     platform: POSTGRESQL
+
+
+
+server:
+  servlet:
+    session:
+      persistent: false
+      timeout: 0

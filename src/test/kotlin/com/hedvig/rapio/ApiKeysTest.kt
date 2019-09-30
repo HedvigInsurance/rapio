@@ -1,5 +1,7 @@
 package com.hedvig.rapio
 
+import com.hedvig.rapio.comparison.QuoteService
+import com.ninjasquad.springmockk.MockkBean
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -15,11 +17,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @ActiveProfiles("auth")
 @TestPropertySource(properties = [
-    "hedvig.rapio.apikeys={mrInsplanetUser:'insplanet'}"
+    "hedvig.rapio.apikeys.mrInsplanetUser=insplanet}",
+    "hedvig.rapio.apikeys.mrInsplanetUser2=insplanet}"
 ])
 class ApiKeysTest {
     @Autowired
     lateinit var mvc: MockMvc
+
+    @MockkBean
+    lateinit var quoteService: QuoteService
 
     @Test
     fun apikey_with_basic_auth() {

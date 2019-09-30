@@ -1,5 +1,7 @@
 package com.hedvig.rapio.comparison.web.dto
 
+import java.util.*
+
 data class SignResponseDTO(
-        val id: String
+        val id: UUID
 )

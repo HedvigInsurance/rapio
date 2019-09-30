@@ -11,19 +11,20 @@ import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.provisioning.InMemoryUserDetailsManager
 
-@Profile("auth")
+@Profile("noauth")
 @Configuration
 @EnableWebSecurity
-class SecurityConfig : WebSecurityConfigurerAdapter() {
+class UnSecureConfig : WebSecurityConfigurerAdapter() {
 
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
-        http.httpBasic().and()
-                .authorizeRequests()
-                .antMatchers("/v1/quote").hasAnyRole("COMPARISON")
-                .anyRequest()
-                .authenticated()
+        http.antMatcher("/").securityContext().disable()
+                //.authorizeRequests()
+                //.antMatchers("/v1/quote")
+                //.anyRequest().authenticated()
+                //.and()
+                //.httpBasic()
                 //.realmName("hedvig")
                 //.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
