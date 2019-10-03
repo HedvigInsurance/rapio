@@ -4,9 +4,11 @@ import com.hedvig.rapio.comparison.ComparisonQuoteController
 import com.hedvig.rapio.comparison.QuoteService
 import com.hedvig.rapio.comparison.domain.ComparisonQuote
 import com.hedvig.rapio.comparison.domain.QuoteData
+import com.hedvig.rapio.comparison.web.dto.QuoteResponseDTO
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.hamcrest.Matchers
+import org.javamoney.moneta.Money
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -16,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.Instant
 import java.util.*
 
 @WebMvcTest(controllers = [ComparisonQuoteController::class], secure = false)
@@ -47,18 +50,12 @@ internal class ComparisonQuoteControllerTest {
     @Test
     fun create_quote(){
 
-        val response = ComparisonQuote(
-                id = UUID.fromString("c0e4fd6e-d951-11e9-8b49-ef7f36d0f00d"),
-                quoteData = QuoteData(
-                        "Street 1",
-                        "1234",
-                        "Stockholm",
-                        45,
-                        "19121212121221",
-                        "07012341234",
-                        3,
-                        false
-                ))
+        val response = QuoteResponseDTO(
+                requestId = "adads",
+                price = Money.of(123,"SEK"),
+                quoteId = UUID.randomUUID(),
+                validUntil = Instant.now().epochSecond
+                )
         every { quoteService.createQuote(any()) } returns(response)
 
         val request = post("/v1/quote")

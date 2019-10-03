@@ -1,4 +1,4 @@
-package com.hedvig.productPricing.config
+package com.hedvig.rapio.config
 
 import com.fasterxml.jackson.databind.Module
 import org.springframework.context.annotation.Bean

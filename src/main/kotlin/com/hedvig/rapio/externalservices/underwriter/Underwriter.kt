@@ -3,9 +3,11 @@ package com.hedvig.rapio.externalservices.underwriter
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
+import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
+import javax.money.MonetaryAmount
 
 interface Underwriter {
 
@@ -13,9 +15,10 @@ interface Underwriter {
             productType: ProductType,
             lineOfBusiness: LineOfBusiness,
             quoteData: IncompleteHomeQuoteDataDto,
-            sourceId: UUID): IncompleteQuoteReference
+            sourceId: UUID,
+            ssn:String): IncompleteQuoteReference
     fun updateQuote(quoteId:String, quoteData: IncompleteQuoteDto): IncompleteQuoteDto
-    fun completeQuote(quoteId: String): CompleteQuoteDto
+    fun completeQuote(quoteId: String): CompleteQuoteReference
     fun signQuote(id: UUID, email: String, startsAt: LocalDate?) : SignQuoteResponse?
 }
 
@@ -90,14 +93,9 @@ enum class LineOfBusiness {
     UNKNOWN
 } */
 
-data class CompleteQuoteDto (
-        val quoteState: QuoteState,
-        val quoteCreatedAt: Instant,
-        val productType: ProductType,
-        val lineOfBusiness: LineOfBusiness,
-        val completeQuoteData: CompleteQuoteData,
-        val price: Int,
-        val quoteInitiatedFrom: QuoteInitiatedFrom
+data class CompleteQuoteReference (
+        val id: String,
+        val price: MonetaryAmount
 )
 
 sealed class CompleteQuoteData {}
