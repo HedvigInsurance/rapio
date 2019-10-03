@@ -7,10 +7,10 @@ import com.hedvig.rapio.comparison.web.dto.QuoteRequestDTO
 import com.hedvig.rapio.comparison.web.dto.QuoteResponseDTO
 import com.hedvig.rapio.comparison.web.dto.SignRequestDTO
 import com.hedvig.rapio.comparison.web.dto.SignResponseDTO
-import com.hedvig.rapio.externalservices.underwriter.IncompleteHomeQuoteDataDto
-import com.hedvig.rapio.externalservices.underwriter.LineOfBusiness
-import com.hedvig.rapio.externalservices.underwriter.ProductType
 import com.hedvig.rapio.externalservices.underwriter.Underwriter
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
+import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
 import org.javamoney.moneta.Money
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.sqlobject.kotlin.attach
@@ -37,10 +37,12 @@ class QuoteServiceImpl(
                 ProductType.HOME,
                 lineOfBusiness = if (request.quoteData.brf) LineOfBusiness.BRF else LineOfBusiness.RENT,
                 quoteData = IncompleteHomeQuoteDataDto(
-                        personalNumber = request.quoteData.personalNumber,
-                        address = request.quoteData.street,
+                        street = request.quoteData.street,
                         zipCode = request.quoteData.zipCode,
-                        livingSpace =  request.quoteData.livingSpace
+                        city = request.quoteData.city,
+                        livingSpace =  request.quoteData.livingSpace,
+                        houseHoldSize = request.quoteData.householdSize,
+                        isStudent = null
                 ),
                 sourceId = request.id)
 

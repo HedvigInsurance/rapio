@@ -6,5 +6,5 @@ import org.springframework.context.annotation.Profile
 
 @Profile("runtime")
 @Configuration
-@EnableFeignClients
+@EnableFeignClients("com.hedvig")
 class FeignClients()

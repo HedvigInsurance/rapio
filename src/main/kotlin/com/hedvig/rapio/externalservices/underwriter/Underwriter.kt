@@ -1,6 +1,8 @@
 package com.hedvig.rapio.externalservices.underwriter
 
-import com.hedvig.rapio.comparison.web.dto.Date
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
+import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
@@ -12,7 +14,7 @@ interface Underwriter {
             productType: ProductType,
             lineOfBusiness: LineOfBusiness,
             quoteData: IncompleteHomeQuoteDataDto,
-            sourceId: UUID): QuoteCreateResult
+            sourceId: UUID): Quote
     fun updateQuote(quoteId:String, quoteData: IncompleteQuoteDto): IncompleteQuoteDto
     fun completeQuote(quoteId: String): CompleteQuoteDto
     fun signQuote(id: UUID, email: String, startsAt: LocalDate?) : SignQuoteResponse?
@@ -22,7 +24,7 @@ data class SignQuoteResponse (
         val id : String
 )
 
-data class QuoteCreateResult (
+data class PostIncompleteQuoteResult (
         val id: String,
         val price: MonetaryAmount
 )
@@ -55,25 +57,18 @@ data class IncompleteHouseQuoteDataDto(
         val householdSize: Int?
 )
 
-data class IncompleteHomeQuoteDataDto(
-        val personalNumber: String?,
-        val address: String?,
-        val livingSpace: Int?,
-        val zipCode: String?
-)
-
 enum class QuoteInitiatedFrom {
     PARTNER,
     WEBONBOARDING,
     APP
 }
 
-enum class ProductType {
-    HOME,
-    HOUSE,
-    OBJECT,
-    UNKNOWN
-}
+//enum class ProductType {
+//    HOME,
+//    HOUSE,
+//    OBJECT,
+//    UNKNOWN
+//}
 
 enum class QuoteState {
     INCOMPLETE,
@@ -82,6 +77,7 @@ enum class QuoteState {
     EXPIRED
 }
 
+/*
 enum class LineOfBusiness {
     BRF,
     RENT,
@@ -92,7 +88,7 @@ enum class LineOfBusiness {
     STUDENT_RENT,
     LODGER,
     UNKNOWN
-}
+} */
 
 data class CompleteQuoteDto (
         val quoteState: QuoteState,

@@ -1,13 +1,20 @@
 package com.hedvig.rapio.externalservices.underwriter
 
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
+import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
 import org.javamoney.moneta.Money
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
 
-@Component
-class FakeUnderwriter():Underwriter {
+@Profile("fakes")
+@Component()
+class FakeUnderwriter(
+) : Underwriter {
+
     override fun signQuote(id: UUID, email: String, startsAt: LocalDate?): SignQuoteResponse? {
         return SignQuoteResponse(id.toString())
     }
@@ -27,7 +34,7 @@ class FakeUnderwriter():Underwriter {
                 quoteInitiatedFrom = QuoteInitiatedFrom.PARTNER)
     }
 
-    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID): QuoteCreateResult {
-        return QuoteCreateResult("someId", Money.of(133, "SEK"))
+    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID): Quote {
+        return Quote("someId", Money.of(133, "SEK"))
     }
 }
