@@ -29,12 +29,12 @@ class FakeUnderwriter(
                 Instant.now(),
                 productType = ProductType.HOME,
                 lineOfBusiness = LineOfBusiness.BRF,
-                completeQuoteData = completeQuoteDataDto(completeHomeQuoteDataDto = completeHomeQuoteDataDto("Somewhere!", 3), completeHouseQuoteDataDto = null),
+                completeQuoteData = CompleteHomeQuoteData("Somewhere!", "3", "", 3, 3, "", 3),
                 price = 134,
                 quoteInitiatedFrom = QuoteInitiatedFrom.PARTNER)
     }
 
-    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID): Quote {
-        return Quote("someId", Money.of(133, "SEK"))
+    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID): IncompleteQuoteReference {
+        return IncompleteQuoteReference("someId")
     }
 }

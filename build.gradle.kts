@@ -29,6 +29,7 @@ dependencies {
 
     implementation("org.javamoney", "moneta", "1.3", ext = "pom")
     implementation("org.javamoney", "moneta", "1.3")
+    implementation("org.zalando", "jackson-datatype-money", "1.1.1")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")

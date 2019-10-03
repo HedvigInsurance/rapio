@@ -7,22 +7,22 @@ import java.util.*
 import com.hedvig.rapio.externalservices.underwriter.transport.*
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import javax.money.MonetaryAmount
+import java.time.Instant
 
-data class Quote(
-        val id: String,
-        val price: MonetaryAmount
+data class IncompleteQuoteReference(
+        val id: String
 )
 
 @Profile("!fakes")
 @Component
 class ConcreteUnderwriter(private val client:UnderwriterClient) :Underwriter {
-    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID): Quote {
+    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID): IncompleteQuoteReference {
 
         val result = client.postIncompleteQuote(PostIncompleteQuoteRequest(productType, lineOfBusiness, ssn = "", incompleteQuoteDataDto = quoteData))
         val body = result.body!!
 
-        return Quote(id = body.id, price = body.price)
+        return IncompleteQuoteReference(
+                id = body.id)
     }
 
     override fun updateQuote(quoteId: String, quoteData: IncompleteQuoteDto): IncompleteQuoteDto {
@@ -30,7 +30,23 @@ class ConcreteUnderwriter(private val client:UnderwriterClient) :Underwriter {
     }
 
     override fun completeQuote(quoteId: String): CompleteQuoteDto {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+        return CompleteQuoteDto(
+                quoteState =  QuoteState.QUOTED,
+                quoteCreatedAt = Instant.now(),
+                productType = ProductType.HOME,
+                lineOfBusiness = LineOfBusiness.BRF,
+                quoteInitiatedFrom = QuoteInitiatedFrom.PARTNER,
+                price = 123,
+                completeQuoteData = CompleteHomeQuoteData(
+                        street = "",
+                        householdSize = 1,
+                        livingSpace = 122,
+                        zipCode = "12345",
+                        city = "Stokholm",
+                        personalNumber = "",
+                        numberOfRooms = 3
+                ))
     }
 
     override fun signQuote(id: UUID, email: String, startsAt: LocalDate?): SignQuoteResponse? {

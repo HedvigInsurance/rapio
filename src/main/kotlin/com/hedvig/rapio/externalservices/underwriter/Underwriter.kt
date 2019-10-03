@@ -6,7 +6,6 @@ import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
-import javax.money.MonetaryAmount
 
 interface Underwriter {
 
@@ -14,7 +13,7 @@ interface Underwriter {
             productType: ProductType,
             lineOfBusiness: LineOfBusiness,
             quoteData: IncompleteHomeQuoteDataDto,
-            sourceId: UUID): Quote
+            sourceId: UUID): IncompleteQuoteReference
     fun updateQuote(quoteId:String, quoteData: IncompleteQuoteDto): IncompleteQuoteDto
     fun completeQuote(quoteId: String): CompleteQuoteDto
     fun signQuote(id: UUID, email: String, startsAt: LocalDate?) : SignQuoteResponse?
@@ -26,7 +25,8 @@ data class SignQuoteResponse (
 
 data class PostIncompleteQuoteResult (
         val id: String,
-        val price: MonetaryAmount
+        val productType: ProductType,
+        val quoteInitiatedFrom: String
 )
 
 data class IncompleteQuoteDto(
@@ -95,26 +95,28 @@ data class CompleteQuoteDto (
         val quoteCreatedAt: Instant,
         val productType: ProductType,
         val lineOfBusiness: LineOfBusiness,
-        val completeQuoteData: completeQuoteDataDto,
+        val completeQuoteData: CompleteQuoteData,
         val price: Int,
         val quoteInitiatedFrom: QuoteInitiatedFrom
 )
 
-data class completeQuoteDataDto(
-        val completeHouseQuoteDataDto: completeHouseQuoteDataDto?,
-        val completeHomeQuoteDataDto: completeHomeQuoteDataDto
-)
+sealed class CompleteQuoteData {}
 
-data class completeHouseQuoteDataDto(
+data class CompleteHouseQuoteData(
         val street: String,
         val zipcode: String,
         val city: String,
         val livingSpace: Int,
         val personalNumber: String,
         val householdSize: Int
-)
+) : CompleteQuoteData()
 
-data class completeHomeQuoteDataDto(
-        val address: String,
-        val numberOfRooms: Int
-)
+data class CompleteHomeQuoteData(
+        val street: String,
+        val zipCode: String,
+        val city: String,
+        val numberOfRooms: Int,
+        val livingSpace: Int,
+        val personalNumber: String,
+        val householdSize: Int
+) : CompleteQuoteData()
