@@ -4,15 +4,18 @@ spring:
   main:
     allow-bean-definition-overriding: true
   jpa:
-    generate-ddl: true
+    generate-ddl: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         order_by.default_null_ordering: last
     hibernate:
-      ddl-auto: update
-  datasource:
-    url: jdbc:postgresql://localhost:5432/rapio
-    username: postgres
-    password: iambatman
-    platform: POSTGRESQL
+      ddl-auto: validate
+
+
+
+server:
+  servlet:
+    session:
+      persistent: false
+      timeout: 0

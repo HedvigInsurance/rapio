@@ -41,3 +41,5 @@ hs_err_pid*
 .settings
 .idea
 .java-version
+build
+.gradle
