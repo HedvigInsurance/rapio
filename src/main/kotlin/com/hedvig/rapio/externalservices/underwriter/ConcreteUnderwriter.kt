@@ -38,8 +38,11 @@ class ConcreteUnderwriter(private val client:UnderwriterClient) :Underwriter {
         throw RuntimeException("Could not complete incomplete quote with id $quoteId")
     }
 
-    override fun signQuote(id: UUID, email: String, startsAt: LocalDate?): SignQuoteResponse? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String): SignQuoteResponse? {
+
+        val response = this.client.signQuote(id, SignQuoteRequest(Name(firstName, lastName), null, email))
+
+        return SignQuoteResponse(id)
     }
 
 }

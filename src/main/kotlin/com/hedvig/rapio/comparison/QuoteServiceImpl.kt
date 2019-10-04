@@ -47,7 +47,7 @@ class QuoteServiceImpl(
                 ssn = request.quoteData.personalNumber)
 
         val completeQuote = underwriter.completeQuote(quoteId = quote.id)
-        val cq = request.copy(underwriterQuoteId = quote.id)
+        val cq = request.copy(underwriterQuoteId = completeQuote.id)
 
 
         inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
@@ -67,7 +67,12 @@ class QuoteServiceImpl(
             repo -> repo.loadQuoteRequest(quoteId)
         }
 
-        val response = this.underwriter.signQuote(quote.id, request.email, request.startsAt.date)
+        val response = this.underwriter.signQuote(
+                quote.underwriterQuoteId!!,
+                request.email,
+                request.startsAt.date,
+                request.firstName,
+                request.lastName)
 
         if(response != null ){
 

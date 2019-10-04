@@ -3,7 +3,6 @@ package com.hedvig.rapio.externalservices.underwriter
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
-import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
@@ -19,7 +18,7 @@ interface Underwriter {
             ssn:String): IncompleteQuoteReference
     fun updateQuote(quoteId:String, quoteData: IncompleteQuoteDto): IncompleteQuoteDto
     fun completeQuote(quoteId: String): CompleteQuoteReference
-    fun signQuote(id: UUID, email: String, startsAt: LocalDate?) : SignQuoteResponse?
+    fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String) : SignQuoteResponse?
 }
 
 data class SignQuoteResponse (

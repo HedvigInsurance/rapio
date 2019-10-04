@@ -1,4 +1,8 @@
 databaseChangeLog:
+  - logicalFilePath: changelog.xml
   - include:
       file: ./migrations/20190904-1056-create-start.sql
+      relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20191004-0902-update-quote-request-table.sql
       relativeToChangelogFile: true

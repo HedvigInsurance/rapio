@@ -13,7 +13,7 @@ import java.util.*
 @Component
 class FakeUnderwriter : Underwriter {
 
-    override fun signQuote(id: UUID, email: String, startsAt: LocalDate?): SignQuoteResponse? {
+    override fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String): SignQuoteResponse? {
         return SignQuoteResponse(id.toString())
     }
 

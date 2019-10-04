@@ -1,5 +1,8 @@
 package com.hedvig.rapio.externalservices.underwriter.transport
 
-data class SignQuoteResponse (
-        val success: Boolean
+import java.time.Instant
+
+data class SignedQuoteResponseDto(
+        val id: String,
+        val signedAt: Instant
 )
