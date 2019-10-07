@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.liquibase.gradle.Activity
 
 plugins {
     id("java")
@@ -6,6 +7,7 @@ plugins {
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
     kotlin("jvm") version "1.3.31"
     kotlin("plugin.spring") version "1.3.31"
+    id("org.liquibase.gradle") version "2.0.1"
 }
 
 extra["springCloudVersion"] = "Greenwich.SR3"
@@ -66,6 +68,12 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.2.0")
     testImplementation("com.ninja-squad:springmockk:1.1.2")
     testImplementation("io.mockk:mockk:1.9.1")
+
+
+    liquibaseRuntime("org.liquibase:liquibase-core:3.6.1")
+    liquibaseRuntime("org.postgresql:postgresql:42.2.6")
+    liquibaseRuntime("ch.qos.logback:logback-core:1.2.3")
+    liquibaseRuntime("ch.qos.logback:logback-classic:1.2.3")
 }
 
 group = "com.hedvig"
@@ -81,4 +89,20 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+liquibase {
+    activities.register("main") {
+        this.arguments =
+                        mapOf(
+                                "logLevel" to "info",
+                                "changeLogFile" to "src/main/resources/db/changelog/db.changelog-master.yaml",
+                                "url" to "jdbc:postgresql://localhost:5432/rapio",
+                                "username" to "postgres",
+                                "password" to "hedvig"
+                        )
+
+
+        }
+    runList = "main"
 }

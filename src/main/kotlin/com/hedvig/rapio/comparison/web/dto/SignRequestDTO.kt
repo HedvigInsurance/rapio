@@ -6,7 +6,9 @@ import java.time.ZoneId
 data class SignRequestDTO(
         val requestId:String,
         val startsAt: Date,
-        val email:String
+        val email:String,
+        val firstName: String,
+        val lastName: String
         )
 
 data class Date(

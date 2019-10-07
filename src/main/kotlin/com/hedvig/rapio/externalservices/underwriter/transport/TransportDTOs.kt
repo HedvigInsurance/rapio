@@ -3,6 +3,7 @@ package com.hedvig.rapio.externalservices.underwriter.transport
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.rapio.externalservices.underwriter.IncompleteHouseQuoteDataDto
+import java.math.BigDecimal
 import java.util.*
 
 enum class ProductType {
@@ -51,10 +52,10 @@ data class IncompleteHomeQuoteDataDto(
         val zipCode: String?,
         val isStudent: Boolean?,
         val livingSpace: Int?,
-        val houseHoldSize: Int?
+        val householdSize: Int?
 ) : QuoteData()
 
-data class CompleteQuoteResponseDto (
-        val id: UUID,
-        val price: Int
+data class CompleteQuoteResponse (
+        val id: String,
+        val price: BigDecimal
 )

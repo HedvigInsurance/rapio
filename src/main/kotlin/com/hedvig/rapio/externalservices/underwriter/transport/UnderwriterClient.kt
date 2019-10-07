@@ -1,7 +1,7 @@
 package com.hedvig.rapio.externalservices.underwriter.transport
 
 import com.hedvig.rapio.externalservices.underwriter.PostIncompleteQuoteResult
-import feign.Param
+import com.hedvig.rapio.externalservices.underwriter.SignQuoteResponse
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
@@ -22,10 +22,10 @@ interface UnderwriterClient {
     fun updateIncomplete(@PathVariable("id") id: String, @RequestBody body: Any)
 
     @RequestMapping(value = ["/_/v1/incompleteQuote/{quoteId}/completeQuote"], method = [RequestMethod.POST])
-    fun createCompleteQuote(@PathVariable("quoteId") quoteId: String) : ResponseEntity<*>
+    fun createCompleteQuote(@PathVariable("quoteId") quoteId: String) : ResponseEntity<CompleteQuoteResponse>
 
     @RequestMapping(value = ["/_/v1/quote/{quoteId}/sign"], method = [RequestMethod.POST])
-    fun signQuote(@PathVariable("quoteId") quoteId: String) : ResponseEntity<SignQuoteResponse>
+    fun signQuote(@PathVariable("quoteId") quoteId: String, @RequestBody body:SignQuoteRequest) : ResponseEntity<SignQuoteResponse>
 
     @RequestMapping(value = ["/_/v1/quote/{quoteId}"], method = [RequestMethod.GET])
     fun getQuote(@PathVariable("quoteId") quoteId: String) : ResponseEntity<GetQuoteResponse>
