@@ -19,13 +19,19 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
-        http.httpBasic().and()
+        http
+                .csrf().disable()
+                .httpBasic().and()
                 .authorizeRequests()
-                .antMatchers("/v1/quote").hasAnyRole("COMPARISON")
-                .anyRequest()
-                .authenticated()
+                .antMatchers("/actuator/health/**").permitAll()
+                .antMatchers("/**").authenticated()
+
+
+
+                //.and()
+
                 //.realmName("hedvig")
-                //.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
     }
 }
