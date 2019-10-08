@@ -11,6 +11,8 @@ spring:
         order_by.default_null_ordering: last
     hibernate:
       ddl-auto: validate
+  datasource.url: jdbc:postgresql://localhost:5432/rapio
+  datasource.username: postgres
 
   liquibase:
     enabled: false
