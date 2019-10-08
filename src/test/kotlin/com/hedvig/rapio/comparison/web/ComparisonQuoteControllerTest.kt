@@ -5,6 +5,7 @@ import com.hedvig.rapio.comparison.QuoteService
 import com.hedvig.rapio.comparison.domain.ComparisonQuote
 import com.hedvig.rapio.comparison.domain.QuoteData
 import com.hedvig.rapio.comparison.web.dto.QuoteResponseDTO
+import com.hedvig.rapio.comparison.web.dto.SignResponseDTO
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.hamcrest.Matchers
@@ -39,11 +40,8 @@ internal class ComparisonQuoteControllerTest {
             "zipCode": "12345",
             "city": "Stockholm",
             "livingSpace": 42,
-            "householdSize": 2,
-            "includeBrfCoverage": false,
-            "isStudent": false
-         },
-         "phoneNumber":"07012123131"
+            "householdSize": 2
+         }
         }
     """.trimIndent()
 
@@ -68,7 +66,7 @@ internal class ComparisonQuoteControllerTest {
 
         result
                 .andExpect(status().is2xxSuccessful)
-                .andExpect(jsonPath("$.id", Matchers.any(String::class.java)))
+                .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
 
     }
 
@@ -79,14 +77,17 @@ internal class ComparisonQuoteControllerTest {
                 "date": "2019-11-01",
                 "timezone": "Europe/Stockholm"
             },
-            "email": "some@test.com"
+            "email": "some@test.com",
+            "firstName": "test",
+            "lastName": "Tolvansson"
         }
     """.trimIndent()
 
     @Test
     fun sign_quote(){
 
-        val id = "123"
+        val id = UUID.randomUUID()
+        every { quoteService.signQuote(id, any()) } returns SignResponseDTO(id)
 
         val request = post("/v1/quote/$id/sign")
                 .with(user("compricer"))
@@ -98,7 +99,7 @@ internal class ComparisonQuoteControllerTest {
 
         result
                 .andExpect(status().is2xxSuccessful)
-                .andExpect(jsonPath("$.id", Matchers.equalTo(id)))
+                .andExpect(jsonPath("$.id", Matchers.equalTo(id.toString())))
 
     }
 
