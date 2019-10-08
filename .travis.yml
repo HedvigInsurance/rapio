@@ -3,7 +3,7 @@ jdk: openjdk11
 sudo: required
 
 before_script:
-  - psql -c 'create database underwriter;' -U postgres
+  - psql -c 'create database rapio;' -U postgres
 
 script:
   - ./gradlew build
