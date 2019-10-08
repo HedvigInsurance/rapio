@@ -60,9 +60,9 @@ dependencies {
     implementation("org.jdbi:jdbi3-jackson2")
 
     api("org.postgresql:postgresql:42.2.6")
-    api("org.springframework.cloud:spring-cloud-starter-kubernetes")
-    api("org.springframework.cloud:spring-cloud-starter-kubernetes-config")
-    api("org.springframework.cloud:spring-cloud-starter-kubernetes-ribbon")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-config")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-ribbon")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
