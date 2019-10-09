@@ -11,7 +11,8 @@ import javax.money.MonetaryAmount
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "object")
 data class QuoteResponseDTO(
         val requestId: String,
-        val quoteId: UUID,
+        val quoteId: String,
         val validUntil:Long,
-        val price:MonetaryAmount
-        )
+        val price:MonetaryAmount,
+        val reasonQuoteCannotBeCompleted: List<String>?
+)

@@ -11,14 +11,16 @@ import com.hedvig.rapio.externalservices.underwriter.Underwriter
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
+import org.javamoney.moneta.Money
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.sqlobject.kotlin.attach
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
 
 @Service
-class QuoteServiceImpl(
+class QuoteServiceImpl (
         val jdbi: Jdbi,
         val underwriter:Underwriter
 ) : QuoteService {
@@ -56,9 +58,12 @@ class QuoteServiceImpl(
 
         return QuoteResponseDTO(
                 cq.requestId,
-                cq.id,
+                cq.id.toString(),
                 cq.getValidTo().epochSecond,
-                completeQuote.price)
+                completeQuote.price,
+                completeQuote.reasonQuoteCannotBeCompleted
+        )
+
     }
 
     override fun signQuote(quoteId: UUID, request: SignRequestDTO): SignResponseDTO {
@@ -72,7 +77,8 @@ class QuoteServiceImpl(
                 request.email,
                 request.startsAt.date,
                 request.firstName,
-                request.lastName)
+                request.lastName
+        )
 
         if(response != null ){
 
@@ -80,10 +86,8 @@ class QuoteServiceImpl(
             inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
                 repo.updateQuoteRequest(signedQuote)
             }
-
-            return SignResponseDTO(quote.id)
+            return SignResponseDTO(quote.id.toString(), response.signedAt)
         }
-
         throw RuntimeException("Could not sign quote")
     }
 
