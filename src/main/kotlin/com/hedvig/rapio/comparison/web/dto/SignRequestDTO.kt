@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import javax.validation.Valid
 import javax.validation.constraints.Email
+import javax.validation.constraints.FutureOrPresent
 import javax.validation.constraints.NotBlank
 
 data class SignRequestDTO(
@@ -17,6 +18,6 @@ data class SignRequestDTO(
         )
 
 data class Date(
-        val date: LocalDate,
+        @FutureOrPresent val date: LocalDate,
         val timezone: ZoneId
 )
