@@ -51,18 +51,27 @@ class QuoteServiceImpl (
         val completeQuote = underwriter.completeQuote(quoteId = quote.id)
         val cq = request.copy(underwriterQuoteId = completeQuote.id)
 
-
         inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
             repo.updateQuoteRequest(cq)
         }
 
-        return QuoteResponseDTO(
-                cq.requestId,
-                cq.id.toString(),
-                cq.getValidTo().epochSecond,
-                completeQuote.price,
-                completeQuote.reasonQuoteCannotBeCompleted
-        )
+        if(completeQuote.id != "Cannot complete quote") {
+            return QuoteResponseDTO(
+                    cq.requestId,
+                    cq.id.toString(),
+                    cq.getValidTo().epochSecond,
+                    completeQuote.price,
+                    completeQuote.reasonQuoteCannotBeCompleted
+            )
+        } else {
+            return QuoteResponseDTO(
+                    cq.requestId,
+                    "Not able to complete quote",
+                    null,
+                    completeQuote.price,
+                    completeQuote.reasonQuoteCannotBeCompleted
+            )
+        }
 
     }
 

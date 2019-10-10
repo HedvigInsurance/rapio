@@ -58,5 +58,5 @@ data class IncompleteHomeQuoteDataDto(
 data class CompleteQuoteResponse (
         val id: String,
         val price: BigDecimal,
-        val reasonQuoteCannotBeCompleted: List<String>?
+        val reasonQuoteCannotBeCompleted: String?
 )

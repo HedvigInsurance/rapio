@@ -12,7 +12,7 @@ import javax.money.MonetaryAmount
 data class QuoteResponseDTO(
         val requestId: String,
         val quoteId: String,
-        val validUntil:Long,
+        val validUntil:Long?,
         val price:MonetaryAmount,
-        val reasonQuoteCannotBeCompleted: List<String>?
+        val reasonQuoteCannotBeCompleted: String?
 )

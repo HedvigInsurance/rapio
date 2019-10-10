@@ -92,7 +92,7 @@ enum class LineOfBusiness {
 data class CompleteQuoteReference (
         val id: String,
         val price: MonetaryAmount,
-        val reasonQuoteCannotBeCompleted: List<String>?
+        val reasonQuoteCannotBeCompleted: String?
 )
 
 sealed class CompleteQuoteData {}
