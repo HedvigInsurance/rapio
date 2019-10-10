@@ -40,7 +40,8 @@ internal class ComparisonQuoteControllerTest {
             "zipCode": "12345",
             "city": "Stockholm",
             "livingSpace": 42,
-            "householdSize": 2
+            "householdSize": 2,
+            "productSubType": "RENT"
          }
         }
     """.trimIndent()
@@ -56,7 +57,7 @@ internal class ComparisonQuoteControllerTest {
                 )
         every { quoteService.createQuote(any()) } returns(response)
 
-        val request = post("/v1/quote")
+        val request = post("/v1/quotes")
                 .with(user("compricer"))
                 .content(createRequestJson)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -89,7 +90,7 @@ internal class ComparisonQuoteControllerTest {
         val id = UUID.randomUUID()
         every { quoteService.signQuote(id, any()) } returns SignResponseDTO(id)
 
-        val request = post("/v1/quote/$id/sign")
+        val request = post("/v1/quotes/$id/sign")
                 .with(user("compricer"))
                 .content(signRequestJson)
                 .contentType(MediaType.APPLICATION_JSON)
