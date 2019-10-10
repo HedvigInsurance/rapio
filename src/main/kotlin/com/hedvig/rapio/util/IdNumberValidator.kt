@@ -1,17 +1,20 @@
 package com.hedvig.rapio.util
 
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 
 
 class IdNumberValidator {
 
 
     companion object {
-        fun validate(idNumber: String): IdNumberValidatorResult {
+        fun validate(idNumber: String): Option<ValidIdNumber> {
             var value = idNumber
 
             // Check for nulls and false lengths
             if (value.isEmpty() || value.length < 10) {
-                return IdNumberValidatorInvalid
+                return None
             }
 
             try {
@@ -27,7 +30,7 @@ class IdNumberValidator {
                 } else if (value.length == 10) {
                     value = value.substring(0, 10)
                 } else {
-                    return IdNumberValidatorInvalid
+                    return None
                 }
                 // Remove check number
                 val check = Integer.parseInt(value.substring(9, 10))
@@ -59,17 +62,14 @@ class IdNumberValidator {
                 val isMale = Integer.parseInt(value.substring(8, 9)) % 2 != 0
                 val isCompany = Integer.parseInt(value.substring(2, 4), 10) >= 20
 
-                return IdNumberValidatorValid(if (isSSN) century + value else value, isValid, isSSN, isCoOrdinationNumber, isMale, isCompany)
+                return Some(ValidIdNumber(if (isSSN) century + value else value, isValid, isSSN, isCoOrdinationNumber, isMale, isCompany))
             } catch (ex: NumberFormatException) {
                 ex.printStackTrace()
             }
 
-            return IdNumberValidatorInvalid
+            return None
         }
     }
 }
 
-sealed class IdNumberValidatorResult
-
-data class IdNumberValidatorValid ( val idno:String, val valid:Boolean, val ssn: Boolean, val coOrdinationNumber:Boolean, val male:Boolean, val company: Boolean):IdNumberValidatorResult()
-object IdNumberValidatorInvalid : IdNumberValidatorResult()
+data class ValidIdNumber (val idno:String, val valid:Boolean, val ssn: Boolean, val coOrdinationNumber:Boolean, val male:Boolean, val company: Boolean)

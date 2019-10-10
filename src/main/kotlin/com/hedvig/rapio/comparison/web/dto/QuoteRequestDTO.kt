@@ -1,16 +1,21 @@
 package com.hedvig.rapio.comparison.web.dto
 
+import arrow.optics.optics
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import javax.validation.Valid
 import javax.validation.constraints.*
 
+@optics
 data class QuoteRequestDTO(
         val requestId :String,
         @get:Valid val quoteData: QuoteRequestData,
         @get:NotBlank val productType: String
-)
+) {
+    companion object
+}
 
+@optics
 data class QuoteRequestData(
         @get:NotBlank val street: String,
 
@@ -28,9 +33,11 @@ data class QuoteRequestData(
         val householdSize: Int,
 
         val productSubType: ProductSubType
-)
+) {
+    companion object
+}
 
-enum class ProductSubType {
+    enum class ProductSubType {
     BRF,
     RENT
 }

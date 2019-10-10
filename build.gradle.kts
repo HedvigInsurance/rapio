@@ -70,6 +70,7 @@ dependencies {
 
     api("io.arrow-kt:arrow-core:${property("arrowVerions")}")
     api("io.arrow-kt:arrow-syntax:${property("arrowVerions")}")
+    api("io.arrow-kt:arrow-optics:${property("arrowVerions")}")
     kapt("io.arrow-kt:arrow-meta:${property("arrowVerions")}")
             
 
