@@ -3,6 +3,7 @@ package com.hedvig.rapio.externalservices.underwriter
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
+import com.hedvig.rapio.externalservices.underwriter.transport.SignedQuoteResponseDto
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
@@ -18,12 +19,8 @@ interface Underwriter {
             ssn:String): IncompleteQuoteReference
     fun updateQuote(quoteId:String, quoteData: IncompleteQuoteDto): IncompleteQuoteDto
     fun completeQuote(quoteId: String): CompleteQuoteReference
-    fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String) : SignQuoteResponse?
+    fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String) : SignedQuoteResponseDto
 }
-
-data class SignQuoteResponse (
-        val id : String
-)
 
 data class PostIncompleteQuoteResult (
         val id: String,
@@ -94,7 +91,8 @@ enum class LineOfBusiness {
 
 data class CompleteQuoteReference (
         val id: String,
-        val price: MonetaryAmount
+        val price: MonetaryAmount,
+        val reasonQuoteCannotBeCompleted: String?
 )
 
 sealed class CompleteQuoteData {}

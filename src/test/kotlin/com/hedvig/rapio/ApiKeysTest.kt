@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-@ActiveProfiles("auth")
+@ActiveProfiles("auth",  "testing")
 @TestPropertySource(properties = [
     "hedvig.rapio.apikeys.mrInsplanetUser=insplanet}",
     "hedvig.rapio.apikeys.mrInsplanetUser2=insplanet}"

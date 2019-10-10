@@ -1,5 +1,6 @@
 package com.hedvig.rapio.comparison.web
 
+import arrow.core.Right
 import com.hedvig.rapio.comparison.ComparisonQuoteController
 import com.hedvig.rapio.comparison.QuoteService
 import com.hedvig.rapio.comparison.domain.ComparisonQuote
@@ -52,10 +53,10 @@ internal class ComparisonQuoteControllerTest {
         val response = QuoteResponseDTO(
                 requestId = "adads",
                 price = Money.of(123,"SEK"),
-                quoteId = UUID.randomUUID(),
+                quoteId = UUID.randomUUID().toString(),
                 validUntil = Instant.now().epochSecond
                 )
-        every { quoteService.createQuote(any()) } returns(response)
+        every { quoteService.createQuote(any()) } returns(Right(response))
 
         val request = post("/v1/quotes")
                 .with(user("compricer"))
@@ -88,7 +89,7 @@ internal class ComparisonQuoteControllerTest {
     fun sign_quote(){
 
         val id = UUID.randomUUID()
-        every { quoteService.signQuote(id, any()) } returns SignResponseDTO(id)
+        every { quoteService.signQuote(id, any()) } returns SignResponseDTO(id.toString(), Instant.now())
 
         val request = post("/v1/quotes/$id/sign")
                 .with(user("compricer"))
