@@ -32,17 +32,18 @@ class ConcreteUnderwriter(private val client:UnderwriterClient) :Underwriter {
         if (response.statusCode.is2xxSuccessful) {
             return CompleteQuoteReference(
                     id = response.body!!.id,
-                    price = Money.of(response.body!!.price, "SEK")
+                    price = Money.of(response.body!!.price, "SEK"),
+                    reasonQuoteCannotBeCompleted = response.body!!.reasonQuoteCannotBeCompleted
             )
         }
         throw RuntimeException("Could not complete incomplete quote with id $quoteId")
     }
 
-    override fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String): SignQuoteResponse? {
+    override fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String): SignedQuoteResponseDto {
 
         val response = this.client.signQuote(id, SignQuoteRequest(Name(firstName, lastName), null, email))
 
-        return SignQuoteResponse(id)
+        return SignedQuoteResponseDto(id, response.body!!.signedAt)
     }
 
 }

@@ -52,8 +52,9 @@ internal class ComparisonQuoteControllerTest {
         val response = QuoteResponseDTO(
                 requestId = "adads",
                 price = Money.of(123,"SEK"),
-                quoteId = UUID.randomUUID(),
-                validUntil = Instant.now().epochSecond
+                quoteId = UUID.randomUUID().toString(),
+                validUntil = Instant.now().epochSecond,
+                reasonQuoteCannotBeCompleted = null
                 )
         every { quoteService.createQuote(any()) } returns(response)
 
@@ -88,7 +89,7 @@ internal class ComparisonQuoteControllerTest {
     fun sign_quote(){
 
         val id = UUID.randomUUID()
-        every { quoteService.signQuote(id, any()) } returns SignResponseDTO(id)
+        every { quoteService.signQuote(id, any()) } returns SignResponseDTO(id.toString(), Instant.now())
 
         val request = post("/v1/quotes/$id/sign")
                 .with(user("compricer"))
