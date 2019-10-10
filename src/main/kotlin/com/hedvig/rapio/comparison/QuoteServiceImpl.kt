@@ -1,5 +1,6 @@
 package com.hedvig.rapio.comparison
 
+import arrow.core.Either
 import com.hedvig.rapio.comparison.domain.ComparisonQuote
 import com.hedvig.rapio.comparison.domain.QuoteData
 import com.hedvig.rapio.comparison.domain.QuoteRequestRepository
@@ -23,7 +24,7 @@ class QuoteServiceImpl(
         val underwriter:Underwriter
 ) : QuoteService {
 
-    override fun createQuote(requestDTO: QuoteRequestDTO): QuoteResponseDTO {
+    override fun createQuote(requestDTO: QuoteRequestDTO): Either<String, QuoteResponseDTO> {
 
         val request = ComparisonQuote(UUID.randomUUID(), Instant.now(), requestDTO.requestId, QuoteData.from(requestDTO))
 
@@ -54,14 +55,14 @@ class QuoteServiceImpl(
             repo.updateQuoteRequest(cq)
         }
 
-        return QuoteResponseDTO(
+        return Either.Right(QuoteResponseDTO(
                 cq.requestId,
                 cq.id,
                 cq.getValidTo().epochSecond,
-                completeQuote.price)
+                completeQuote.price))
     }
 
-    override fun signQuote(quoteId: UUID, request: SignRequestDTO): SignResponseDTO {
+    override fun signQuote(quoteId: UUID, request: SignRequestDTO): SignResponseDTO? {
 
         val quote = inTransaction<QuoteRequestRepository, ComparisonQuote, RuntimeException> {
             repo -> repo.loadQuoteRequest(quoteId)
@@ -84,7 +85,7 @@ class QuoteServiceImpl(
             return SignResponseDTO(quote.id)
         }
 
-        throw RuntimeException("Could not sign quote")
+        return null;
     }
 
 
