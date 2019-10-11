@@ -18,11 +18,13 @@ data class ComparisonQuote(
         @param:Json
         val quoteData: QuoteData,
         val underwriterQuoteId: String? = null,
-        val signed:Boolean = false) {
+        val signed:Boolean = false,
+        val validTo:Instant? = null) {
 
+    /*
     fun getValidTo():Instant {
         return requestTime.atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
-    }
+    }*/
 }
 
 

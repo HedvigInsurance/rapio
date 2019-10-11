@@ -1,5 +1,7 @@
 package com.hedvig.rapio.externalservices.underwriter
 
+import arrow.core.Option
+import arrow.core.Some
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
@@ -9,14 +11,15 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.*
 
 @Profile("fakes")
 @Component
 class FakeUnderwriter : Underwriter {
 
-    override fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String): SignedQuoteResponseDto {
-        return SignedQuoteResponseDto(id.toString(), Instant.now())
+    override fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String): Option<SignedQuoteResponseDto> {
+        return Some(SignedQuoteResponseDto(id.toString(), Instant.now()))
     }
 
     override fun updateQuote(quoteId: String, quoteData: IncompleteQuoteDto): IncompleteQuoteDto {
@@ -27,9 +30,8 @@ class FakeUnderwriter : Underwriter {
         return CompleteQuoteReference(
                 "",
                 Money.of(123, "SEK"),
-                null
+                Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
         )
-
     }
 
     override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID, ssn:String): IncompleteQuoteReference {

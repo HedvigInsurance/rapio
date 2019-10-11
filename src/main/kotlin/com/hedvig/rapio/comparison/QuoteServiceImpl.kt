@@ -3,6 +3,7 @@ package com.hedvig.rapio.comparison
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.Some
 import com.hedvig.rapio.comparison.domain.ComparisonQuote
 import com.hedvig.rapio.comparison.domain.QuoteData
 import com.hedvig.rapio.comparison.domain.QuoteRequestRepository
@@ -51,20 +52,20 @@ class QuoteServiceImpl (
                 ssn = request.quoteData.personalNumber)
 
         val completeQuote = underwriter.completeQuote(quoteId = quote.id)
-        val cq = request.copy(underwriterQuoteId = completeQuote.id)
+        val cq = request.copy(underwriterQuoteId = completeQuote.id, validTo = completeQuote.validTo)
 
         inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
             repo.updateQuoteRequest(cq)
         }
 
 
-        if(completeQuote.id != "Cannot create quote") {
-            return Either.Left("Cannot create quote")
+        return if(completeQuote == null) {
+            Either.Left("Cannot create quote")
         } else {
-            return Either.Right(QuoteResponseDTO(
+            Either.Right(QuoteResponseDTO(
                     cq.requestId,
                     cq.id.toString(),
-                    cq.getValidTo().epochSecond,
+                    cq.validTo!!.epochSecond,
                     completeQuote.price))
         }
     }
@@ -83,16 +84,16 @@ class QuoteServiceImpl (
                 request.lastName
         )
 
-        if(response != null ){
-
-            val signedQuote = quote.copy(signed = true)
-            inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
-                repo.updateQuoteRequest(signedQuote)
+        return when (response) {
+            is Some -> {
+                val signedQuote = quote.copy(signed = true)
+                inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
+                    repo.updateQuoteRequest(signedQuote)
+                }
+                Right(SignResponseDTO(quote.id.toString(), response.t.signedAt))
             }
-            return Right(SignResponseDTO(quote.id.toString(), response.signedAt))
+            else -> Left("Could not sign quote")
         }
-
-        return Left("Could not sign quote");
     }
 
 

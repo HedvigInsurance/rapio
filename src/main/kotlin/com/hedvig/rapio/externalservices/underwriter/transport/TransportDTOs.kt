@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.rapio.externalservices.underwriter.IncompleteHouseQuoteDataDto
 import java.math.BigDecimal
+import java.time.Instant
 import java.util.*
 
 enum class ProductType {
@@ -58,5 +59,5 @@ data class IncompleteHomeQuoteDataDto(
 data class CompleteQuoteResponse (
         val id: String,
         val price: BigDecimal,
-        val reasonQuoteCannotBeCompleted: String?
+        val validTo: Instant?
 )

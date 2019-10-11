@@ -68,6 +68,13 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-config")
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-ribbon")
 
+    implementation("io.github.microutils:kotlin-logging:1.7.6")
+
+    implementation("io.sentry:sentry-spring:1.7.27")
+    implementation("io.sentry:sentry-logback:1.7.27")
+    implementation("net.logstash.logback:logstash-logback-encoder:6.2")
+    implementation("ch.qos.logback:logback-access")
+
     api("io.arrow-kt:arrow-core:${property("arrowVerions")}")
     api("io.arrow-kt:arrow-syntax:${property("arrowVerions")}")
     api("io.arrow-kt:arrow-optics:${property("arrowVerions")}")
