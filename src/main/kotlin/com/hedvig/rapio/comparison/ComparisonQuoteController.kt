@@ -65,15 +65,13 @@ class ComparisonQuoteController @Autowired constructor(
     }
 
     @PostMapping("{quoteId}/sign")
-    fun signQuote(@Valid @PathVariable quoteId : UUID, @Valid @RequestBody request: SignRequestDTO): ResponseEntity<Any> {
+    fun signQuote(@Valid @PathVariable quoteId : UUID, @Valid @RequestBody request: SignRequestDTO): ResponseEntity<out Any> {
 
         val response = quoteService.signQuote(quoteId, request)
 
-        return if(response != null) {
-            ok(response)
-        }
-        else {
-            ResponseEntity.status(402).body(ErrorResponse("Could not create quote"))
-        }
+        return response.bimap(
+                {left -> ResponseEntity.status(500).body(ErrorResponse(left))},
+                {right -> ok(right)}
+        ).getOrHandle { it }
     }
 }

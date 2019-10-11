@@ -10,5 +10,5 @@ import java.util.*
 
 interface QuoteService {
     fun createQuote(requestDTO: QuoteRequestDTO) : Either<String, QuoteResponseDTO>
-    fun signQuote(quoteId: UUID, request: SignRequestDTO): SignResponseDTO?
+    fun signQuote(quoteId: UUID, request: SignRequestDTO): Either<String, SignResponseDTO>
 }

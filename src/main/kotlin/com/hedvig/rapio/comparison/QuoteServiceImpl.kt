@@ -1,6 +1,8 @@
 package com.hedvig.rapio.comparison
 
 import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
 import com.hedvig.rapio.comparison.domain.ComparisonQuote
 import com.hedvig.rapio.comparison.domain.QuoteData
 import com.hedvig.rapio.comparison.domain.QuoteRequestRepository
@@ -67,7 +69,7 @@ class QuoteServiceImpl (
         }
     }
 
-    override fun signQuote(quoteId: UUID, request: SignRequestDTO): SignResponseDTO? {
+    override fun signQuote(quoteId: UUID, request: SignRequestDTO): Either<String, SignResponseDTO> {
 
         val quote = inTransaction<QuoteRequestRepository, ComparisonQuote, RuntimeException> {
             repo -> repo.loadQuoteRequest(quoteId)
@@ -87,10 +89,10 @@ class QuoteServiceImpl (
             inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
                 repo.updateQuoteRequest(signedQuote)
             }
-            return SignResponseDTO(quote.id.toString(), response.signedAt)
+            return Right(SignResponseDTO(quote.id.toString(), response.signedAt))
         }
 
-        return null;
+        return Left("Could not sign quote");
     }
 
 
