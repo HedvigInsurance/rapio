@@ -14,12 +14,13 @@ interface QuoteRequestRepository {
         quote_data = :quoteData ,
         request_id = :requestId,
         underwriter_quote_id = :underwriterQuoteId,
-        signed = :signed
+        signed = :signed,
+        valid_to = :validTo
         where id = :id""")
     fun updateQuoteRequest(@BindBean quote: ComparisonQuote)
 
     @SqlUpdate("""INSERT INTO comparison_quote_request 
-        (id, request_time, quote_data, request_id, underwriter_quote_id, signed) values 
-        (:id, :requestTime, :quoteData, :requestId, :underwriterQuoteId, :signed)""")
+        (id, request_time, quote_data, request_id, underwriter_quote_id, signed, valid_to) values 
+        (:id, :requestTime, :quoteData, :requestId, :underwriterQuoteId, :signed, :validTo)""")
     fun insert(@BindBean quote: ComparisonQuote)
 }
