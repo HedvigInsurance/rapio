@@ -1,7 +1,6 @@
 package com.hedvig.rapio.comparison
 
 import arrow.core.*
-import arrow.core.extensions.fx
 import com.hedvig.rapio.comparison.web.dto.*
 import com.hedvig.rapio.util.IdNumberValidator
 import org.springframework.beans.factory.annotation.Autowired

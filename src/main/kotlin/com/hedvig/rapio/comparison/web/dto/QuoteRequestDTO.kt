@@ -1,8 +1,6 @@
 package com.hedvig.rapio.comparison.web.dto
 
 import arrow.optics.optics
-import com.fasterxml.jackson.databind.PropertyNamingStrategy
-import com.fasterxml.jackson.databind.annotation.JsonNaming
 import javax.validation.Valid
 import javax.validation.constraints.*
 

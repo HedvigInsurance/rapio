@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.rapio.externalservices.underwriter.IncompleteHouseQuoteDataDto
 import java.math.BigDecimal
 import java.time.Instant
-import java.util.*
 
 enum class ProductType {
     HOME,

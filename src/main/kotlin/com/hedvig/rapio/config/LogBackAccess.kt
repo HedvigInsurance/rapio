@@ -1,12 +1,12 @@
 package com.hedvig.rapio.config
 
 import ch.qos.logback.access.tomcat.LogbackValve
-import javax.servlet.Filter
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
+import javax.servlet.Filter
 
 @Profile("runtime")
 @Configuration
