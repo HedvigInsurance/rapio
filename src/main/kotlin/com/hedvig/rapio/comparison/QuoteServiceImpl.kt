@@ -1,5 +1,9 @@
 package com.hedvig.rapio.comparison
 
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.Some
 import com.hedvig.rapio.comparison.domain.ComparisonQuote
 import com.hedvig.rapio.comparison.domain.QuoteData
 import com.hedvig.rapio.comparison.domain.QuoteRequestRepository
@@ -11,10 +15,8 @@ import com.hedvig.rapio.externalservices.underwriter.Underwriter
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
-import org.javamoney.moneta.Money
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.sqlobject.kotlin.attach
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -25,14 +27,13 @@ class QuoteServiceImpl (
         val underwriter:Underwriter
 ) : QuoteService {
 
-    override fun createQuote(requestDTO: QuoteRequestDTO): QuoteResponseDTO {
+    override fun createQuote(requestDTO: QuoteRequestDTO): Either<String, QuoteResponseDTO> {
 
         val request = ComparisonQuote(UUID.randomUUID(), Instant.now(), requestDTO.requestId, QuoteData.from(requestDTO))
 
         inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
             repo.insert(request)
         }
-
 
         val quote = underwriter.createQuote(
                 ProductType.HOME,
@@ -49,33 +50,25 @@ class QuoteServiceImpl (
                 ssn = request.quoteData.personalNumber)
 
         val completeQuote = underwriter.completeQuote(quoteId = quote.id)
-        val cq = request.copy(underwriterQuoteId = completeQuote.id)
+        val cq = request.copy(underwriterQuoteId = completeQuote.id, validTo = completeQuote.validTo)
 
         inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
             repo.updateQuoteRequest(cq)
         }
 
-        if(completeQuote.id != "Cannot complete quote") {
-            return QuoteResponseDTO(
+
+        return if(completeQuote == null) {
+            Either.Left("Cannot create quote")
+        } else {
+            Either.Right(QuoteResponseDTO(
                     cq.requestId,
                     cq.id.toString(),
-                    cq.getValidTo().epochSecond,
-                    completeQuote.price,
-                    completeQuote.reasonQuoteCannotBeCompleted
-            )
-        } else {
-            return QuoteResponseDTO(
-                    cq.requestId,
-                    "Not able to complete quote",
-                    null,
-                    completeQuote.price,
-                    completeQuote.reasonQuoteCannotBeCompleted
-            )
+                    cq.validTo!!.epochSecond,
+                    completeQuote.price))
         }
-
     }
 
-    override fun signQuote(quoteId: UUID, request: SignRequestDTO): SignResponseDTO {
+    override fun signQuote(quoteId: UUID, request: SignRequestDTO): Either<String, SignResponseDTO> {
 
         val quote = inTransaction<QuoteRequestRepository, ComparisonQuote, RuntimeException> {
             repo -> repo.loadQuoteRequest(quoteId)
@@ -89,15 +82,16 @@ class QuoteServiceImpl (
                 request.lastName
         )
 
-        if(response != null ){
-
-            val signedQuote = quote.copy(signed = true)
-            inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
-                repo.updateQuoteRequest(signedQuote)
+        return when (response) {
+            is Some -> {
+                val signedQuote = quote.copy(signed = true)
+                inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
+                    repo.updateQuoteRequest(signedQuote)
+                }
+                Right(SignResponseDTO(quote.id.toString(), response.t.signedAt))
             }
-            return SignResponseDTO(quote.id.toString(), response.signedAt)
+            else -> Left("Could not sign quote")
         }
-        throw RuntimeException("Could not sign quote")
     }
 
 

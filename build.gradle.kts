@@ -1,5 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.liquibase.gradle.Activity
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
 plugins {
     id("java")
@@ -7,15 +7,19 @@ plugins {
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
     kotlin("jvm") version "1.3.31"
     kotlin("plugin.spring") version "1.3.31"
+    kotlin("kapt") version "1.3.31"
     id("org.liquibase.gradle") version "2.0.1"
 }
 
 extra["springCloudVersion"] = "Greenwich.SR3"
 extra["jdbiVersion"] = "3.8.2"
+extra["arrowVerions"] = "0.10.0"
 
 repositories {
     jcenter()
     mavenCentral()
+    maven("https://dl.bintray.com/arrow-kt/arrow-kt/")
+    //maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' } // for SNAPSHOT builds
 }
 
 dependencies {
@@ -63,6 +67,19 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes")
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-config")
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-ribbon")
+
+    implementation("io.github.microutils:kotlin-logging:1.7.6")
+
+    implementation("io.sentry:sentry-spring:1.7.27")
+    implementation("io.sentry:sentry-logback:1.7.27")
+    implementation("net.logstash.logback:logstash-logback-encoder:6.2")
+    implementation("ch.qos.logback:logback-access")
+
+    api("io.arrow-kt:arrow-core:${property("arrowVerions")}")
+    api("io.arrow-kt:arrow-syntax:${property("arrowVerions")}")
+    api("io.arrow-kt:arrow-optics:${property("arrowVerions")}")
+    kapt("io.arrow-kt:arrow-meta:${property("arrowVerions")}")
+            
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")

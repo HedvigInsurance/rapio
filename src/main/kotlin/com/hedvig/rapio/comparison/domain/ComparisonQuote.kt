@@ -2,10 +2,8 @@ package com.hedvig.rapio.comparison.domain
 
 import com.hedvig.rapio.comparison.web.dto.QuoteRequestDTO
 import org.jdbi.v3.json.Json
-import org.postgresql.util.PGmoney
 import org.springframework.format.number.money.MonetaryAmountFormatter
 import java.time.Instant
-import java.time.ZoneId
 import java.util.*
 import javax.money.MonetaryAmount
 
@@ -18,11 +16,13 @@ data class ComparisonQuote(
         @param:Json
         val quoteData: QuoteData,
         val underwriterQuoteId: String? = null,
-        val signed:Boolean = false) {
+        val signed:Boolean = false,
+        val validTo:Instant? = null) {
 
+    /*
     fun getValidTo():Instant {
         return requestTime.atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
-    }
+    }*/
 }
 
 
