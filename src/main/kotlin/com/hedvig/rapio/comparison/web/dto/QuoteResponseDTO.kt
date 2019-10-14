@@ -10,5 +10,5 @@ data class QuoteResponseDTO(
         val requestId: String,
         val quoteId: String,
         val validUntil:Long?,
-        val price:MonetaryAmount
+        val monthlyPremium:MonetaryAmount
 )

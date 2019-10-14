@@ -3,8 +3,6 @@ package com.hedvig.rapio.comparison.web
 import arrow.core.Right
 import com.hedvig.rapio.comparison.ComparisonQuoteController
 import com.hedvig.rapio.comparison.QuoteService
-import com.hedvig.rapio.comparison.domain.ComparisonQuote
-import com.hedvig.rapio.comparison.domain.QuoteData
 import com.hedvig.rapio.comparison.web.dto.QuoteResponseDTO
 import com.hedvig.rapio.comparison.web.dto.SignResponseDTO
 import com.ninjasquad.springmockk.MockkBean
@@ -52,7 +50,7 @@ internal class ComparisonQuoteControllerTest {
 
         val response = QuoteResponseDTO(
                 requestId = "adads",
-                price = Money.of(123,"SEK"),
+                monthlyPremium = Money.of(123,"SEK"),
                 quoteId = UUID.randomUUID().toString(),
                 validUntil = Instant.now().epochSecond
                 )
