@@ -52,7 +52,7 @@ class ConcreteUnderwriter(private val client:UnderwriterClient,
         }catch (ex:FeignException) {
             logger.error("Got error calling underwriter: ", ex)
 
-            if(ex.status() == 402) {
+            if(ex.status() == 422) {
                 val error = objectMapper.readValue<ErrorResponse>(ex.contentUTF8())
                 return Either.Left(error)
             }
@@ -66,7 +66,7 @@ class ConcreteUnderwriter(private val client:UnderwriterClient,
             val response = this.client.signQuote(id, SignQuoteRequest(Name(firstName, lastName), null, email))
                 return Either.right(response.body!!)
         } catch (ex: FeignException) {
-            if (ex.status() == 402) {
+            if (ex.status() == 422) {
                 val error = objectMapper.readValue<ErrorResponse>(ex.contentUTF8())
                 return Either.left(error)
             }
