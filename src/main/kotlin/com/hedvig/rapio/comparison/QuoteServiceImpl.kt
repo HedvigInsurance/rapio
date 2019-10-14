@@ -88,7 +88,8 @@ class QuoteServiceImpl (
                 inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
                     repo.updateQuoteRequest(signedQuote)
                 }
-                Right(SignResponseDTO(quote.id.toString(), response.t.signedAt))
+                Right(SignResponseDTO(requestId = request.requestId,
+                        quoteId = quote.id.toString(), signedAt =  response.t.signedAt.epochSecond))
             }
             else -> Left("Could not sign quote")
         }

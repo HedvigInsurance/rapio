@@ -87,7 +87,7 @@ internal class ComparisonQuoteControllerTest {
     fun sign_quote(){
 
         val id = UUID.randomUUID()
-        every { quoteService.signQuote(id, any()) } returns Right(SignResponseDTO(id.toString(), Instant.now()))
+        every { quoteService.signQuote(id, any()) } returns Right(SignResponseDTO("jl", id.toString(), Instant.now().epochSecond))
 
         val request = post("/v1/quotes/$id/sign")
                 .with(user("compricer"))
@@ -99,7 +99,7 @@ internal class ComparisonQuoteControllerTest {
 
         result
                 .andExpect(status().is2xxSuccessful)
-                .andExpect(jsonPath("$.id", Matchers.equalTo(id.toString())))
+                .andExpect(jsonPath("$.quoteId", Matchers.equalTo(id.toString())))
 
     }
 

@@ -1,8 +1,7 @@
 package com.hedvig.rapio.comparison.web.dto
 
-import java.time.Instant
-
 data class SignResponseDTO(
-        val id: String,
-        val signedAt: Instant
+        val requestId: String,
+        val quoteId: String,
+        val signedAt: Long
 )
