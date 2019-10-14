@@ -1,10 +1,10 @@
-package com.hedvig.rapio.comparison.web
+package com.hedvig.rapio.quotes.web
 
 import arrow.core.Right
-import com.hedvig.rapio.comparison.ComparisonQuoteController
-import com.hedvig.rapio.comparison.QuoteService
-import com.hedvig.rapio.comparison.web.dto.QuoteResponseDTO
-import com.hedvig.rapio.comparison.web.dto.SignResponseDTO
+import com.hedvig.rapio.quotes.QuotesController
+import com.hedvig.rapio.quotes.QuoteService
+import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
+import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.hamcrest.Matchers
@@ -21,8 +21,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.Instant
 import java.util.*
 
-@WebMvcTest(controllers = [ComparisonQuoteController::class], secure = false)
-internal class ComparisonQuoteControllerTest {
+@WebMvcTest(controllers = [QuotesController::class], secure = false)
+internal class QuotesControllerTest {
 
     @Autowired
     lateinit var mockMvc: MockMvc;
