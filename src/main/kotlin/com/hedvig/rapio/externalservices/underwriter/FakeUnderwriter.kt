@@ -1,7 +1,10 @@
 package com.hedvig.rapio.externalservices.underwriter
 
+import arrow.core.Either
 import arrow.core.Option
+import arrow.core.Right
 import arrow.core.Some
+import com.hedvig.rapio.comparison.web.dto.ErrorResponse
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
@@ -18,20 +21,20 @@ import java.util.*
 @Component
 class FakeUnderwriter : Underwriter {
 
-    override fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String): Option<SignedQuoteResponseDto> {
-        return Some(SignedQuoteResponseDto(id.toString(), Instant.now()))
+    override fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String): Either<ErrorResponse, SignedQuoteResponseDto> {
+        return Right(SignedQuoteResponseDto(id.toString(), Instant.now()))
     }
 
     override fun updateQuote(quoteId: String, quoteData: IncompleteQuoteDto): IncompleteQuoteDto {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun completeQuote(quoteId: String): CompleteQuoteReference {
-        return CompleteQuoteReference(
-                "",
-                Money.of(123, "SEK"),
-                Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
-        )
+    override fun completeQuote(quoteId: String): Either<ErrorResponse, CompleteQuoteReference> {
+            return Either.Right(CompleteQuoteReference(
+                    "",
+                    Money.of(123, "SEK"),
+                    Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant())
+            )
     }
 
     override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID, ssn:String): IncompleteQuoteReference {

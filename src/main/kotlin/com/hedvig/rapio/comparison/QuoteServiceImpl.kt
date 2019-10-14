@@ -50,21 +50,23 @@ class QuoteServiceImpl (
                 ssn = request.quoteData.personalNumber)
 
         val completeQuote = underwriter.completeQuote(quoteId = quote.id)
-        val cq = request.copy(underwriterQuoteId = completeQuote.id, validTo = completeQuote.validTo)
 
-        inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
-            repo.updateQuoteRequest(cq)
-        }
+        return when(completeQuote) {
+            is Either.Left -> Either.Left(completeQuote.a.errorMessage)
+            is Either.Right -> {
+                val cq = request.copy(underwriterQuoteId = completeQuote.b.id, validTo = completeQuote.b.validTo)
 
+                inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
+                    repo.updateQuoteRequest(cq)
+                }
 
-        return if(completeQuote == null) {
-            Either.Left("Cannot create quote")
-        } else {
-            Either.Right(QuoteResponseDTO(
-                    cq.requestId,
-                    cq.id.toString(),
-                    cq.validTo!!.epochSecond,
-                    completeQuote.price))
+                Either.Right(QuoteResponseDTO(
+                        cq.requestId,
+                        cq.id.toString(),
+                        cq.validTo!!.epochSecond,
+                        completeQuote.b.price)
+                )
+            }
         }
     }
 
@@ -83,18 +85,17 @@ class QuoteServiceImpl (
         )
 
         return when (response) {
-            is Some -> {
+            is Either.Right -> {
                 val signedQuote = quote.copy(signed = true)
                 inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
                     repo.updateQuoteRequest(signedQuote)
                 }
                 Right(SignResponseDTO(requestId = request.requestId,
-                        quoteId = quote.id.toString(), signedAt =  response.t.signedAt.epochSecond))
+                        quoteId = quote.id.toString(), signedAt =  response.b.signedAt.epochSecond))
             }
             else -> Left("Could not sign quote")
         }
     }
-
 
     private inline fun <reified T : Any, R, E : Exception> inTransaction(crossinline f: (T) -> R) : R {
         return jdbi.inTransaction<R, E> { h ->
