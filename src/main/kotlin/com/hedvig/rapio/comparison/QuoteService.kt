@@ -1,10 +1,7 @@
 package com.hedvig.rapio.comparison
 
 import arrow.core.Either
-import com.hedvig.rapio.comparison.web.dto.QuoteRequestDTO
-import com.hedvig.rapio.comparison.web.dto.QuoteResponseDTO
-import com.hedvig.rapio.comparison.web.dto.SignRequestDTO
-import com.hedvig.rapio.comparison.web.dto.SignResponseDTO
+import com.hedvig.rapio.comparison.web.dto.*
 import java.util.*
 
 interface QuoteService {

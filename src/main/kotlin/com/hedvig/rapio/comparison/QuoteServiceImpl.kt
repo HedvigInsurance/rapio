@@ -7,10 +7,7 @@ import arrow.core.Some
 import com.hedvig.rapio.comparison.domain.ComparisonQuote
 import com.hedvig.rapio.comparison.domain.QuoteData
 import com.hedvig.rapio.comparison.domain.QuoteRequestRepository
-import com.hedvig.rapio.comparison.web.dto.QuoteRequestDTO
-import com.hedvig.rapio.comparison.web.dto.QuoteResponseDTO
-import com.hedvig.rapio.comparison.web.dto.SignRequestDTO
-import com.hedvig.rapio.comparison.web.dto.SignResponseDTO
+import com.hedvig.rapio.comparison.web.dto.*
 import com.hedvig.rapio.externalservices.underwriter.Underwriter
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
@@ -25,6 +22,7 @@ import java.util.*
 class QuoteServiceImpl (
         val jdbi: Jdbi,
         val underwriter:Underwriter
+
 ) : QuoteService {
 
     override fun createQuote(requestDTO: QuoteRequestDTO): Either<String, QuoteResponseDTO> {
@@ -90,10 +88,16 @@ class QuoteServiceImpl (
                 inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
                     repo.updateQuoteRequest(signedQuote)
                 }
-                Right(SignResponseDTO(requestId = request.requestId,
+                Either.Right(SignResponseDTO(requestId = request.requestId,
                         quoteId = quote.id.toString(), signedAt =  response.b.signedAt.epochSecond))
             }
-            else -> Left("Could not sign quote")
+            is Either.Left -> {
+                return when (response.a.errorCode) {
+                    ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> Either.Left("Cannot sign quote, breaches underwriting guidelines")
+                    ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED -> Either.Left("Cannot sign quote, quote has expired")
+                    ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> Either.Left("Cannot sign quote, already a Hedvig member")
+                }
+            }
         }
     }
 
