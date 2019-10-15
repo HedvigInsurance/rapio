@@ -3,6 +3,7 @@ package com.hedvig.rapio.externalservices.underwriter.transport
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.rapio.externalservices.underwriter.IncompleteHouseQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.QuoteInitiatedFrom
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -29,7 +30,8 @@ data class PostIncompleteQuoteRequest (
         val productType: ProductType,
         val lineOfBusiness: LineOfBusiness?,
         val ssn: String?,
-        val incompleteQuoteDataDto: QuoteData?
+        val incompleteQuoteDataDto: QuoteData?,
+        val quoteInitiatedFrom: QuoteInitiatedFrom = QuoteInitiatedFrom.PARTNER
 )
 
 
