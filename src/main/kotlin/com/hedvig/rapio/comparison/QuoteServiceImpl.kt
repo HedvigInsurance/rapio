@@ -1,17 +1,12 @@
 package com.hedvig.rapio.comparison
 
 import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
-import arrow.core.Some
 import com.hedvig.rapio.comparison.domain.ComparisonQuote
 import com.hedvig.rapio.comparison.domain.QuoteData
 import com.hedvig.rapio.comparison.domain.QuoteRequestRepository
-import com.hedvig.rapio.comparison.web.dto.QuoteRequestDTO
-import com.hedvig.rapio.comparison.web.dto.QuoteResponseDTO
-import com.hedvig.rapio.comparison.web.dto.SignRequestDTO
-import com.hedvig.rapio.comparison.web.dto.SignResponseDTO
+import com.hedvig.rapio.comparison.web.dto.*
 import com.hedvig.rapio.externalservices.underwriter.Underwriter
+import com.hedvig.rapio.externalservices.underwriter.transport.ErrorCodes
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
@@ -25,6 +20,7 @@ import java.util.*
 class QuoteServiceImpl (
         val jdbi: Jdbi,
         val underwriter:Underwriter
+
 ) : QuoteService {
 
     override fun createQuote(requestDTO: QuoteRequestDTO): Either<String, QuoteResponseDTO> {
@@ -50,21 +46,23 @@ class QuoteServiceImpl (
                 ssn = request.quoteData.personalNumber)
 
         val completeQuote = underwriter.completeQuote(quoteId = quote.id)
-        val cq = request.copy(underwriterQuoteId = completeQuote.id, validTo = completeQuote.validTo)
 
-        inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
-            repo.updateQuoteRequest(cq)
-        }
+        return when(completeQuote) {
+            is Either.Left -> Either.Left(completeQuote.a.errorMessage)
+            is Either.Right -> {
+                val cq = request.copy(underwriterQuoteId = completeQuote.b.id, validTo = completeQuote.b.validTo)
 
+                inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
+                    repo.updateQuoteRequest(cq)
+                }
 
-        return if(completeQuote == null) {
-            Either.Left("Cannot create quote")
-        } else {
-            Either.Right(QuoteResponseDTO(
-                    cq.requestId,
-                    cq.id.toString(),
-                    cq.validTo!!.epochSecond,
-                    completeQuote.price))
+                Either.Right(QuoteResponseDTO(
+                        cq.requestId,
+                        cq.id.toString(),
+                        cq.validTo!!.epochSecond,
+                        completeQuote.b.price)
+                )
+            }
         }
     }
 
@@ -83,18 +81,24 @@ class QuoteServiceImpl (
         )
 
         return when (response) {
-            is Some -> {
+            is Either.Right -> {
                 val signedQuote = quote.copy(signed = true)
                 inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
                     repo.updateQuoteRequest(signedQuote)
                 }
-                Right(SignResponseDTO(requestId = request.requestId,
-                        quoteId = quote.id.toString(), signedAt =  response.t.signedAt.epochSecond))
+                Either.Right(SignResponseDTO(requestId = request.requestId,
+                        quoteId = quote.id.toString(), signedAt =  response.b.signedAt.epochSecond))
             }
-            else -> Left("Could not sign quote")
+            is Either.Left -> {
+                return when (response.a.errorCode) {
+                    ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> Either.Left("Cannot sign quote, breaches underwriting guidelines")
+                    ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED -> Either.Left("Cannot sign quote, quote has expired")
+                    ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> Either.Left("Cannot sign quote, already a Hedvig member")
+                    ErrorCodes.UNKNOWN_ERROR_CODE -> Either.Left("Something went wrong..")
+                }
+            }
         }
     }
-
 
     private inline fun <reified T : Any, R, E : Exception> inTransaction(crossinline f: (T) -> R) : R {
         return jdbi.inTransaction<R, E> { h ->

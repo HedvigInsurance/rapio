@@ -16,9 +16,15 @@ spring:
 
   liquibase:
     enabled: false
+  jackson.deserialization.read-unknown-enum-values-using-default-value: true
+
+
 
 server:
   servlet:
     session:
       persistent: false
       timeout: 0
+
+
+

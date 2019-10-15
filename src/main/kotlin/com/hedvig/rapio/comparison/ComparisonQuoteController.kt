@@ -11,9 +11,9 @@ import java.util.*
 import javax.validation.Valid
 
 
-fun notAccepted(error:String) = ResponseEntity.status(402).body(ErrorResponse(error))
+fun notAccepted(error:String) = ResponseEntity.status(422).body(ExternalErrorResponseDTO(error))
 
-fun badRequest(error:String) = ResponseEntity.badRequest().body(ErrorResponse(error))
+fun badRequest(error:String) = ResponseEntity.badRequest().body(ExternalErrorResponseDTO(error))
 
 @RestController
 @RequestMapping("v1/quotes")
@@ -69,7 +69,7 @@ class ComparisonQuoteController @Autowired constructor(
         val response = quoteService.signQuote(quoteId, request)
 
         return response.bimap(
-                {left -> ResponseEntity.status(500).body(ErrorResponse(left))},
+                {left -> ResponseEntity.status(500).body(ExternalErrorResponseDTO(left))},
                 {right -> ok(right)}
         ).getOrHandle { it }
     }

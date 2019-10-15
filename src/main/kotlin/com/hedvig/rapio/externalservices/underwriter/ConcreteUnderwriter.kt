@@ -1,7 +1,9 @@
 package com.hedvig.rapio.externalservices.underwriter
 
-import arrow.core.Option
-import arrow.core.Some
+import arrow.core.Either
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import com.hedvig.rapio.externalservices.underwriter.transport.ErrorResponse
 import com.hedvig.rapio.externalservices.underwriter.transport.*
 import feign.FeignException
 import mu.KotlinLogging
@@ -21,7 +23,8 @@ private val logger = KotlinLogging.logger{}
 
 @Profile("!fakes")
 @Component
-class ConcreteUnderwriter(private val client:UnderwriterClient) :Underwriter {
+class ConcreteUnderwriter(private val client:UnderwriterClient,
+                          private val objectMapper:ObjectMapper) :Underwriter {
     override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID, ssn:String): IncompleteQuoteReference {
 
         val result = client.postIncompleteQuote(PostIncompleteQuoteRequest(productType, lineOfBusiness, ssn = ssn, incompleteQuoteDataDto = quoteData))
@@ -35,28 +38,39 @@ class ConcreteUnderwriter(private val client:UnderwriterClient) :Underwriter {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun completeQuote(quoteId: String): CompleteQuoteReference {
-
+    override fun completeQuote(quoteId: String): Either<ErrorResponse, CompleteQuoteReference> {
         try {
             val response = this.client.createCompleteQuote(quoteId)
             if (response.statusCode.is2xxSuccessful) {
-                return CompleteQuoteReference(
+                return Either.Right(CompleteQuoteReference(
                         id = response.body!!.id,
                         price = Money.of(response.body!!.price, "SEK"),
                         validTo = response.body!!.validTo ?: Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
-                )
+                ))
             }
+
         }catch (ex:FeignException) {
-                logger.error("Got error calling underwriter: ", ex)
+            logger.error("Got error calling underwriter: ", ex)
+
+            if(ex.status() == 422) {
+                val error = objectMapper.readValue<ErrorResponse>(ex.contentUTF8())
+                return Either.Left(error)
+            }
+
         }
         throw RuntimeException("Could not complete incomplete quote with id $quoteId")
     }
 
-    override fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String): Option<SignedQuoteResponseDto> {
-
-        val response = this.client.signQuote(id, SignQuoteRequest(Name(firstName, lastName), null, email))
-
-        return Some(SignedQuoteResponseDto(id, response.body!!.signedAt))
+    override fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String): Either<ErrorResponse, SignedQuoteResponseDto> {
+        try {
+            val response = this.client.signQuote(id, SignQuoteRequest(Name(firstName, lastName), null, email))
+                return Either.right(response.body!!)
+        } catch (ex: FeignException) {
+            if (ex.status() == 422) {
+                val error = objectMapper.readValue<ErrorResponse>(ex.contentUTF8())
+                return Either.left(error)
+            }
+        }
+        throw RuntimeException("Couldn't sign member")
     }
-
 }
