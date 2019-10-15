@@ -11,7 +11,7 @@ import java.util.*
 import javax.validation.Valid
 
 
-fun notAccepted(error:String) = ResponseEntity.status(402).body(ExternalErrorResponseDTO(error))
+fun notAccepted(error:String) = ResponseEntity.status(422).body(ExternalErrorResponseDTO(error))
 
 fun badRequest(error:String) = ResponseEntity.badRequest().body(ExternalErrorResponseDTO(error))
 
