@@ -3,7 +3,7 @@ package com.hedvig.rapio.externalservices.underwriter
 import arrow.core.Either
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.hedvig.rapio.comparison.web.dto.ErrorResponse
+import com.hedvig.rapio.externalservices.underwriter.transport.ErrorResponse
 import com.hedvig.rapio.externalservices.underwriter.transport.*
 import feign.FeignException
 import mu.KotlinLogging
@@ -73,5 +73,4 @@ class ConcreteUnderwriter(private val client:UnderwriterClient,
         }
         throw RuntimeException("Couldn't sign member")
     }
-
 }

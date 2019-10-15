@@ -1,10 +1,8 @@
 package com.hedvig.rapio.externalservices.underwriter
 
 import arrow.core.Either
-import arrow.core.Option
 import arrow.core.Right
-import arrow.core.Some
-import com.hedvig.rapio.comparison.web.dto.ErrorResponse
+import com.hedvig.rapio.externalservices.underwriter.transport.ErrorResponse
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType

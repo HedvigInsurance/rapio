@@ -1,14 +1,12 @@
 package com.hedvig.rapio.comparison
 
 import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
-import arrow.core.Some
 import com.hedvig.rapio.comparison.domain.ComparisonQuote
 import com.hedvig.rapio.comparison.domain.QuoteData
 import com.hedvig.rapio.comparison.domain.QuoteRequestRepository
 import com.hedvig.rapio.comparison.web.dto.*
 import com.hedvig.rapio.externalservices.underwriter.Underwriter
+import com.hedvig.rapio.externalservices.underwriter.transport.ErrorCodes
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
@@ -96,6 +94,7 @@ class QuoteServiceImpl (
                     ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> Either.Left("Cannot sign quote, breaches underwriting guidelines")
                     ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED -> Either.Left("Cannot sign quote, quote has expired")
                     ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> Either.Left("Cannot sign quote, already a Hedvig member")
+                    ErrorCodes.UNKNOWN_ERROR_CODE -> Either.Left("Something went wrong..")
                 }
             }
         }
