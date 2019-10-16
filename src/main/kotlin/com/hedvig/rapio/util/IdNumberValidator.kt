@@ -62,7 +62,9 @@ class IdNumberValidator {
                 val isMale = Integer.parseInt(value.substring(8, 9)) % 2 != 0
                 val isCompany = Integer.parseInt(value.substring(2, 4), 10) >= 20
 
-                return Some(ValidIdNumber(if (isSSN) century + value else value, isValid, isSSN, isCoOrdinationNumber, isMale, isCompany))
+                return if (isValid)
+                    Some(ValidIdNumber(if (isSSN) century + value else value, isValid, isSSN, isCoOrdinationNumber, isMale, isCompany))
+                else None
             } catch (ex: NumberFormatException) {
                 ex.printStackTrace()
             }
