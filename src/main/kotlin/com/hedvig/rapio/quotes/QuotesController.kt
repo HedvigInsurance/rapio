@@ -1,6 +1,7 @@
 package com.hedvig.rapio.quotes
 
 import arrow.core.*
+import com.hedvig.rapio.comparison.web.dto.ExternalErrorResponseDTO
 import com.hedvig.rapio.quotes.web.dto.*
 import com.hedvig.rapio.util.IdNumberValidator
 import mu.KotlinLogging
@@ -13,9 +14,9 @@ import java.util.*
 import javax.validation.Valid
 
 
-fun notAccepted(error:String) = ResponseEntity.status(402).body(ErrorResponse(error))
+fun notAccepted(error:String) = ResponseEntity.status(422).body(ExternalErrorResponseDTO(error))
 
-fun badRequest(error:String) = ResponseEntity.badRequest().body(ErrorResponse(error))
+fun badRequest(error:String) = ResponseEntity.badRequest().body(ExternalErrorResponseDTO(error))
 
 private val logger = KotlinLogging.logger {}
 @RestController
@@ -76,8 +77,8 @@ class QuotesController @Autowired constructor(
             val response = quoteService.signQuote(quoteId, request)
 
             return@logRequestId response.bimap(
-                    { left -> ResponseEntity.status(500).body(ErrorResponse(left)) },
-                    { right -> ok(right) }
+                    {left -> ResponseEntity.status(500).body(ExternalErrorResponseDTO(left))},
+                    {right -> ok(right)}
             ).getOrHandle { it }
         }
     }
@@ -86,8 +87,7 @@ class QuotesController @Autowired constructor(
         try {
             MDC.put("requestId", requestId)
             return fn()
-        }
-        finally {
+        } finally {
             MDC.remove("requestId")
         }
     }

@@ -1,6 +1,7 @@
 package com.hedvig.rapio.externalservices.underwriter
 
-import arrow.core.Option
+import arrow.core.Either
+import com.hedvig.rapio.externalservices.underwriter.transport.ErrorResponse
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
@@ -19,8 +20,8 @@ interface Underwriter {
             sourceId: UUID,
             ssn:String): IncompleteQuoteReference
     fun updateQuote(quoteId:String, quoteData: IncompleteQuoteDto): IncompleteQuoteDto
-    fun completeQuote(quoteId: String): CompleteQuoteReference
-    fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String) : Option<SignedQuoteResponseDto>
+    fun completeQuote(quoteId: String): Either<ErrorResponse, CompleteQuoteReference>
+    fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String) : Either<ErrorResponse, SignedQuoteResponseDto>
 }
 
 data class PostIncompleteQuoteResult (
