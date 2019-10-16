@@ -1,4 +1,4 @@
-package com.hedvig.rapio.comparison.web.dto
+package com.hedvig.rapio.quotes.web.dto
 
 data class SignResponseDTO(
         val requestId: String,

@@ -1,6 +1,6 @@
-package com.hedvig.rapio.comparison.domain
+package com.hedvig.rapio.quotes.domain
 
-import com.hedvig.rapio.comparison.web.dto.QuoteRequestDTO
+import com.hedvig.rapio.quotes.web.dto.QuoteRequestDTO
 import org.jdbi.v3.json.Json
 import org.springframework.format.number.money.MonetaryAmountFormatter
 import java.time.Instant

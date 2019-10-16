@@ -1,4 +1,4 @@
-package com.hedvig.rapio.comparison.web.dto
+package com.hedvig.rapio.quotes.web.dto
 
 import arrow.optics.optics
 import javax.validation.Valid

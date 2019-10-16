@@ -1,6 +1,6 @@
 package com.hedvig.rapio
 
-import com.hedvig.rapio.comparison.QuoteService
+import com.hedvig.rapio.quotes.QuoteService
 import com.hedvig.rapio.externalservices.underwriter.transport.UnderwriterClient
 import com.ninjasquad.springmockk.MockkBean
 import org.junit.Ignore

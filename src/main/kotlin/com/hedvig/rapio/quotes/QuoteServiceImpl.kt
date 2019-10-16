@@ -1,10 +1,13 @@
-package com.hedvig.rapio.comparison
+package com.hedvig.rapio.quotes
 
 import arrow.core.Either
-import com.hedvig.rapio.comparison.domain.ComparisonQuote
-import com.hedvig.rapio.comparison.domain.QuoteData
-import com.hedvig.rapio.comparison.domain.QuoteRequestRepository
-import com.hedvig.rapio.comparison.web.dto.*
+import com.hedvig.rapio.quotes.domain.ComparisonQuote
+import com.hedvig.rapio.quotes.domain.QuoteData
+import com.hedvig.rapio.quotes.domain.QuoteRequestRepository
+import com.hedvig.rapio.quotes.web.dto.QuoteRequestDTO
+import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
+import com.hedvig.rapio.quotes.web.dto.SignRequestDTO
+import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
 import com.hedvig.rapio.externalservices.underwriter.Underwriter
 import com.hedvig.rapio.externalservices.underwriter.transport.ErrorCodes
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto

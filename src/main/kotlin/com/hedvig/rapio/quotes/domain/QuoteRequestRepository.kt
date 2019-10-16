@@ -1,4 +1,4 @@
-package com.hedvig.rapio.comparison.domain
+package com.hedvig.rapio.quotes.domain
 
 import org.jdbi.v3.sqlobject.customizer.BindBean
 import org.jdbi.v3.sqlobject.statement.SqlQuery
