@@ -9,7 +9,11 @@ import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.ok
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
+import java.security.Principal
 import java.util.*
 import javax.validation.Valid
 
@@ -26,6 +30,8 @@ class QuotesController @Autowired constructor(
 ) {
     @PostMapping()
     fun createQuote(@Valid @RequestBody request: QuoteRequestDTO): ResponseEntity<out Any> {
+
+        val authentication = SecurityContextHolder.getContext().getAuthentication()
 
         return logRequestId(request.requestId) {
 
