@@ -26,7 +26,7 @@ private val logger = KotlinLogging.logger{}
 @Component
 class ConcreteUnderwriter(private val client:UnderwriterClient,
                           private val objectMapper:ObjectMapper) :Underwriter {
-    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID, source: Partners, ssn:String): IncompleteQuoteReference {
+    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, source: Partners, ssn:String): IncompleteQuoteReference {
 
         val result = client.postIncompleteQuote(PostIncompleteQuoteRequest(productType, lineOfBusiness, ssn = ssn, incompleteQuoteDataDto = quoteData))
         val body = result.body!!

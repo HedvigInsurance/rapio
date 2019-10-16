@@ -1,7 +1,6 @@
 package com.hedvig.rapio.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.hedvig.rapio.quotes.domain.ComparisonQuote
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.KotlinMapper
 import org.jdbi.v3.core.kotlin.KotlinPlugin
@@ -30,8 +29,6 @@ class JDBIConfig{
         jdbi.installPlugin(KotlinPlugin())
         jdbi.installPlugin(Jackson2Plugin())
         jdbi.getConfig(Jackson2Config::class.java).mapper = myObjectMapper
-
-        jdbi.registerRowMapper(ComparisonQuote::class.java, KotlinMapper(ComparisonQuote::class.java));
 
         return jdbi;
     }

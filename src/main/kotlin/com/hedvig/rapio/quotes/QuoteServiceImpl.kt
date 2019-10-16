@@ -2,83 +2,61 @@ package com.hedvig.rapio.quotes
 
 import arrow.core.Either
 import com.hedvig.rapio.apikeys.Partners
-import com.hedvig.rapio.quotes.domain.ComparisonQuote
-import com.hedvig.rapio.quotes.domain.QuoteData
-import com.hedvig.rapio.quotes.domain.QuoteRequestRepository
-import com.hedvig.rapio.quotes.web.dto.QuoteRequestDTO
-import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
-import com.hedvig.rapio.quotes.web.dto.SignRequestDTO
-import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
 import com.hedvig.rapio.externalservices.underwriter.Underwriter
 import com.hedvig.rapio.externalservices.underwriter.transport.ErrorCodes
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
-import org.jdbi.v3.core.Jdbi
-import org.jdbi.v3.sqlobject.kotlin.attach
+import com.hedvig.rapio.quotes.web.dto.*
 import org.springframework.stereotype.Service
-import java.time.Instant
 import java.util.*
 
-@Service
-class QuoteServiceImpl (
-        val jdbi: Jdbi,
-        val underwriter:Underwriter
 
+@Service
+class QuoteServiceImpl(
+        val underwriter: Underwriter
 ) : QuoteService {
 
     override fun createQuote(requestDTO: QuoteRequestDTO, partner: Partners): Either<String, QuoteResponseDTO> {
 
-        val request = ComparisonQuote(UUID.randomUUID(), Instant.now(), requestDTO.requestId, QuoteData.from(requestDTO))
+        val productType = ProductType.valueOf(requestDTO.productType.name)
 
-        inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
-            repo.insert(request)
-        }
+        val lineOfBusiness = if (requestDTO.quoteData.productSubType == ProductSubType.RENT) LineOfBusiness.RENT else LineOfBusiness.BRF
+
+        val quoteData = IncompleteHomeQuoteDataDto(
+                street = requestDTO.quoteData.street,
+                zipCode = requestDTO.quoteData.zipCode,
+                city = requestDTO.quoteData.city,
+                livingSpace = requestDTO.quoteData.livingSpace,
+                householdSize = requestDTO.quoteData.householdSize,
+                isStudent = false
+        )
 
         val quote = underwriter.createQuote(
-                ProductType.HOME,
-                lineOfBusiness = if (request.quoteData.brf) LineOfBusiness.BRF else LineOfBusiness.RENT,
-                quoteData = IncompleteHomeQuoteDataDto(
-                        street = request.quoteData.street,
-                        zipCode = request.quoteData.zipCode,
-                        city = request.quoteData.city,
-                        livingSpace =  request.quoteData.livingSpace,
-                        householdSize = request.quoteData.householdSize,
-                        isStudent = null
-                ),
-                sourceId = request.id,
-                ssn = request.quoteData.personalNumber,
-                source = partner)
+                productType = productType,
+                lineOfBusiness = lineOfBusiness,
+                quoteData = quoteData,
+                source = partner,
+                ssn = requestDTO.quoteData.personalNumber)
 
         val completeQuote = underwriter.completeQuote(quoteId = quote.id)
 
-        return when(completeQuote) {
-            is Either.Left -> Either.Left(completeQuote.a.errorMessage)
-            is Either.Right -> {
-                val cq = request.copy(underwriterQuoteId = completeQuote.b.id, validTo = completeQuote.b.validTo)
-
-                inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
-                    repo.updateQuoteRequest(cq)
-                }
-
-                Either.Right(QuoteResponseDTO(
-                        cq.requestId,
-                        cq.id.toString(),
-                        cq.validTo!!.epochSecond,
-                        completeQuote.b.price)
-                )
-            }
-        }
+        return completeQuote.bimap(
+                { it.errorMessage },
+                {
+                    QuoteResponseDTO(
+                            requestDTO.requestId,
+                            it.id,
+                            it.validTo.epochSecond,
+                            it.price)
+                })
     }
 
     override fun signQuote(quoteId: UUID, request: SignRequestDTO): Either<String, SignResponseDTO> {
 
-        val quote = inTransaction<QuoteRequestRepository, ComparisonQuote, RuntimeException> {
-            repo -> repo.loadQuoteRequest(quoteId)
-        }
 
         val response = this.underwriter.signQuote(
-                quote.underwriterQuoteId!!,
+                quoteId.toString(),
                 request.email,
                 request.startsAt.date,
                 request.firstName,
@@ -87,12 +65,9 @@ class QuoteServiceImpl (
 
         return when (response) {
             is Either.Right -> {
-                val signedQuote = quote.copy(signed = true)
-                inTransaction<QuoteRequestRepository, Unit, RuntimeException> { repo ->
-                    repo.updateQuoteRequest(signedQuote)
-                }
+
                 Either.Right(SignResponseDTO(requestId = request.requestId,
-                        quoteId = quote.id.toString(), signedAt =  response.b.signedAt.epochSecond))
+                        quoteId = response.b.id, signedAt = response.b.signedAt.epochSecond))
             }
             is Either.Left -> {
                 return when (response.a.errorCode) {
@@ -102,13 +77,6 @@ class QuoteServiceImpl (
                     ErrorCodes.UNKNOWN_ERROR_CODE -> Either.Left("Something went wrong..")
                 }
             }
-        }
-    }
-
-    private inline fun <reified T : Any, R, E : Exception> inTransaction(crossinline f: (T) -> R) : R {
-        return jdbi.inTransaction<R, E> { h ->
-            val repository: T = h.attach()
-            f(repository)
         }
     }
 }

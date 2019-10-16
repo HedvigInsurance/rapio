@@ -8,7 +8,7 @@ import javax.validation.constraints.*
 data class QuoteRequestDTO(
         val requestId :String,
         @get:Valid val quoteData: QuoteRequestData,
-        @get:NotBlank val productType: String
+        val productType: ProductType
 ) {
     companion object
 }
@@ -38,4 +38,9 @@ data class QuoteRequestData(
     enum class ProductSubType {
     BRF,
     RENT
-}
+    }
+
+    enum class ProductType {
+        HOME,
+        HOUSE
+    }

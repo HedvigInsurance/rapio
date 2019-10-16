@@ -27,7 +27,7 @@ class QuotesController @Autowired constructor(
         val quoteService: QuoteService
 ) {
     @PostMapping()
-    fun createQuote(@Valid @RequestBody request: QuoteRequestDTO): ResponseEntity<out Any> {
+    fun createQuote(@Valid @RequestBody request: QuoteRequestDTO): ResponseEntity<*> {
 
         val authentication = SecurityContextHolder.getContext().authentication
 

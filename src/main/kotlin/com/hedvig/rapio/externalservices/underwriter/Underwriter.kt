@@ -18,7 +18,6 @@ interface Underwriter {
             productType: ProductType,
             lineOfBusiness: LineOfBusiness,
             quoteData: IncompleteHomeQuoteDataDto,
-            sourceId: UUID,
             source: Partners,
             ssn:String): IncompleteQuoteReference
     fun updateQuote(quoteId:String, quoteData: IncompleteQuoteDto): IncompleteQuoteDto
