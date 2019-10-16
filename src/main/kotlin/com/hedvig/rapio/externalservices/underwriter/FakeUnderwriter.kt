@@ -2,6 +2,7 @@ package com.hedvig.rapio.externalservices.underwriter
 
 import arrow.core.Either
 import arrow.core.Right
+import com.hedvig.rapio.apikeys.Partners
 import com.hedvig.rapio.externalservices.underwriter.transport.ErrorResponse
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
@@ -35,7 +36,7 @@ class FakeUnderwriter : Underwriter {
             )
     }
 
-    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID, ssn:String): IncompleteQuoteReference {
+    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID, source: Partners, ssn:String): IncompleteQuoteReference {
         return IncompleteQuoteReference("someId")
     }
 }

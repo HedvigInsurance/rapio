@@ -1,6 +1,7 @@
 package com.hedvig.rapio.quotes
 
 import arrow.core.Either
+import com.hedvig.rapio.apikeys.Partners
 import com.hedvig.rapio.quotes.domain.ComparisonQuote
 import com.hedvig.rapio.quotes.domain.QuoteData
 import com.hedvig.rapio.quotes.domain.QuoteRequestRepository
@@ -26,7 +27,7 @@ class QuoteServiceImpl (
 
 ) : QuoteService {
 
-    override fun createQuote(requestDTO: QuoteRequestDTO): Either<String, QuoteResponseDTO> {
+    override fun createQuote(requestDTO: QuoteRequestDTO, partner: Partners): Either<String, QuoteResponseDTO> {
 
         val request = ComparisonQuote(UUID.randomUUID(), Instant.now(), requestDTO.requestId, QuoteData.from(requestDTO))
 
@@ -46,7 +47,8 @@ class QuoteServiceImpl (
                         isStudent = null
                 ),
                 sourceId = request.id,
-                ssn = request.quoteData.personalNumber)
+                ssn = request.quoteData.personalNumber,
+                source = partner)
 
         val completeQuote = underwriter.completeQuote(quoteId = quote.id)
 
