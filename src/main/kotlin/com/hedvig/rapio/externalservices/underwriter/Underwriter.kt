@@ -27,7 +27,7 @@ interface Underwriter {
 data class PostIncompleteQuoteResult (
         val id: String,
         val productType: ProductType,
-        val quoteInitiatedFrom: String
+        val quoteInitiatedFrom: QuoteInitiatedFrom
 )
 
 data class IncompleteQuoteDto(
