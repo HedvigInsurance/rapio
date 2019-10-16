@@ -10,7 +10,6 @@ import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.ok
-import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -32,7 +31,12 @@ class QuotesController @Autowired constructor(
 
         val authentication = SecurityContextHolder.getContext().authentication
 
-        val currentUserName = authentication.getName()
+        val currentUserName = authentication.name
+
+        if(!Partners.values().map { it.name }.contains(currentUserName)) {
+            logger.error("Could not find any partner named $currentUserName")
+        }
+
         val partner = Partners.valueOf(currentUserName)
 
         return logRequestId(request.requestId) {

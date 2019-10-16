@@ -1,6 +1,7 @@
 package com.hedvig.rapio.quotes.web
 
 import arrow.core.Right
+import com.hedvig.rapio.apikeys.Partners
 import com.hedvig.rapio.quotes.QuotesController
 import com.hedvig.rapio.quotes.QuoteService
 import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -25,10 +27,10 @@ import java.util.*
 internal class QuotesControllerTest {
 
     @Autowired
-    lateinit var mockMvc: MockMvc;
+    lateinit var mockMvc: MockMvc
 
     @MockkBean
-    lateinit var quoteService:QuoteService;
+    lateinit var quoteService:QuoteService
 
     val createRequestJson = """
         {"requestId":"adads",
@@ -46,6 +48,7 @@ internal class QuotesControllerTest {
     """.trimIndent()
 
     @Test
+    @WithMockUser("COMPRICER")
     fun create_quote(){
 
         val response = QuoteResponseDTO(
@@ -54,7 +57,7 @@ internal class QuotesControllerTest {
                 quoteId = UUID.randomUUID().toString(),
                 validUntil = Instant.now().epochSecond
                 )
-        every { quoteService.createQuote(any()) } returns(Right(response))
+        every { quoteService.createQuote(any(), any()) } returns(Right(response))
 
         val request = post("/v1/quotes")
                 .with(user("compricer"))
