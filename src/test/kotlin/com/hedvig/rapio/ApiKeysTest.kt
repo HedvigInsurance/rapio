@@ -19,8 +19,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @ActiveProfiles("auth",  "testing")
 @TestPropertySource(properties = [
-    "hedvig.rapio.apikeys.mrInsplanetUser=insplanet}",
-    "hedvig.rapio.apikeys.mrInsplanetUser2=insplanet}"
+    "hedvig.rapio.apikeys.mrInsplanetUser=INSPLANET",
+    "hedvig.rapio.apikeys.mrInsplanetUser2=INSPLANET"
 ])
 class ApiKeysTest {
     @Autowired

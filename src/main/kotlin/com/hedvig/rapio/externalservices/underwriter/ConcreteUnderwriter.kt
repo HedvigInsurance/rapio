@@ -3,6 +3,7 @@ package com.hedvig.rapio.externalservices.underwriter
 import arrow.core.Either
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.hedvig.rapio.apikeys.Partners
 import com.hedvig.rapio.externalservices.underwriter.transport.ErrorResponse
 import com.hedvig.rapio.externalservices.underwriter.transport.*
 import feign.FeignException
@@ -25,7 +26,7 @@ private val logger = KotlinLogging.logger{}
 @Component
 class ConcreteUnderwriter(private val client:UnderwriterClient,
                           private val objectMapper:ObjectMapper) :Underwriter {
-    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID, ssn:String): IncompleteQuoteReference {
+    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID, source: Partners, ssn:String): IncompleteQuoteReference {
 
         val result = client.postIncompleteQuote(PostIncompleteQuoteRequest(productType, lineOfBusiness, ssn = ssn, incompleteQuoteDataDto = quoteData))
         val body = result.body!!

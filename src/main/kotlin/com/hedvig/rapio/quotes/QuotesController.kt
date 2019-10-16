@@ -1,6 +1,7 @@
 package com.hedvig.rapio.quotes
 
 import arrow.core.*
+import com.hedvig.rapio.apikeys.Partners
 import com.hedvig.rapio.comparison.web.dto.ExternalErrorResponseDTO
 import com.hedvig.rapio.quotes.web.dto.*
 import com.hedvig.rapio.util.IdNumberValidator
@@ -9,6 +10,7 @@ import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.ok
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import java.util.*
 import javax.validation.Valid
@@ -27,20 +29,28 @@ class QuotesController @Autowired constructor(
     @PostMapping()
     fun createQuote(@Valid @RequestBody request: QuoteRequestDTO): ResponseEntity<out Any> {
 
-        return logRequestId(request.requestId) {
+        val authentication = SecurityContextHolder.getContext().authentication
 
+        val currentUserName = authentication.name
+
+        if(!Partners.values().map { it.name }.contains(currentUserName)) {
+            logger.error("Could not find any partner named $currentUserName")
+        }
+
+        val partner = Partners.valueOf(currentUserName)
+
+        return logRequestId(request.requestId) {
             val validIdNumber = when (val idnumber = IdNumberValidator.validate(request.quoteData.personalNumber)) {
                 is None -> Left(badRequest("PersonalNumber is invalid"))
                 is Some -> Right(QuoteRequestDTO.quoteData.personalNumber.set(request, idnumber.t.idno))
             }
 
             return@logRequestId validIdNumber.flatMap { requestWithValidatedPnr ->
-                quoteService.createQuote(requestWithValidatedPnr).bimap(
+                quoteService.createQuote(requestWithValidatedPnr, partner).bimap(
                         { left -> notAccepted(left) },
                         { right -> ok(right) }
                 )
             }.getOrHandle { it }
-
             /*
         return validatePersonalNumber(request).toEither { badRequest("PersonalNumber is invalid") }.flatMap {
             requestWithValidatedPnr  ->
@@ -61,6 +71,7 @@ class QuotesController @Autowired constructor(
             )
             maybeQuote
         }.getOrHandle { it } */
+
         }
     }
 

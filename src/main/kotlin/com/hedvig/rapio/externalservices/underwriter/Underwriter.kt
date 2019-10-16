@@ -1,6 +1,7 @@
 package com.hedvig.rapio.externalservices.underwriter
 
 import arrow.core.Either
+import com.hedvig.rapio.apikeys.Partners
 import com.hedvig.rapio.externalservices.underwriter.transport.ErrorResponse
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
 import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
@@ -18,6 +19,7 @@ interface Underwriter {
             lineOfBusiness: LineOfBusiness,
             quoteData: IncompleteHomeQuoteDataDto,
             sourceId: UUID,
+            source: Partners,
             ssn:String): IncompleteQuoteReference
     fun updateQuote(quoteId:String, quoteData: IncompleteQuoteDto): IncompleteQuoteDto
     fun completeQuote(quoteId: String): Either<ErrorResponse, CompleteQuoteReference>
