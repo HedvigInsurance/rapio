@@ -36,7 +36,7 @@ class FakeUnderwriter : Underwriter {
             )
     }
 
-    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, sourceId: UUID, source: Partners, ssn:String): IncompleteQuoteReference {
+    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, source: Partners, ssn:String): IncompleteQuoteReference {
         return IncompleteQuoteReference("someId")
     }
 }
