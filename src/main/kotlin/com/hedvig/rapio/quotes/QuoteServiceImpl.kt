@@ -1,12 +1,9 @@
 package com.hedvig.rapio.quotes
 
 import arrow.core.Either
-import com.hedvig.rapio.apikeys.Partners
+import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.externalservices.underwriter.Underwriter
-import com.hedvig.rapio.externalservices.underwriter.transport.ErrorCodes
-import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHomeQuoteDataDto
-import com.hedvig.rapio.externalservices.underwriter.transport.LineOfBusiness
-import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
+import com.hedvig.rapio.externalservices.underwriter.transport.*
 import com.hedvig.rapio.quotes.web.dto.*
 import org.springframework.stereotype.Service
 import java.util.*
@@ -17,27 +14,31 @@ class QuoteServiceImpl(
         val underwriter: Underwriter
 ) : QuoteService {
 
-    override fun createQuote(requestDTO: QuoteRequestDTO, partner: Partners): Either<String, QuoteResponseDTO> {
+    override fun createQuote(requestDTO: QuoteRequestDTO, partner: Partner): Either<String, QuoteResponseDTO> {
 
-        val productType = ProductType.valueOf(requestDTO.productType.name)
+        val lineOfBusiness = if (requestDTO.quoteData.productSubType == ProductSubType.RENT) ApartmentProductSubType.RENT else ApartmentProductSubType.BRF
 
-        val lineOfBusiness = if (requestDTO.quoteData.productSubType == ProductSubType.RENT) LineOfBusiness.RENT else LineOfBusiness.BRF
 
-        val quoteData = IncompleteHomeQuoteDataDto(
+        val quoteData = IncompleteApartmentQuoteDataDto(
                 street = requestDTO.quoteData.street,
                 zipCode = requestDTO.quoteData.zipCode,
                 city = requestDTO.quoteData.city,
                 livingSpace = requestDTO.quoteData.livingSpace,
                 householdSize = requestDTO.quoteData.householdSize,
-                isStudent = false
+                floor = 0,
+                subType = lineOfBusiness
         )
+        val request = IncompleteQuoteDTO(
+                incompleteApartmentQuoteData = quoteData,
+                firstName = null,
+                lastName = null,
+                quotingPartner = partner.name,
+                birthDate = null,
+                ssn = requestDTO.quoteData.personalNumber,
+                currentInsurer = null
+                )
 
-        val quote = underwriter.createQuote(
-                productType = productType,
-                lineOfBusiness = lineOfBusiness,
-                quoteData = quoteData,
-                source = partner,
-                ssn = requestDTO.quoteData.personalNumber)
+        val quote = underwriter.createQuote(request)
 
         val completeQuote = underwriter.completeQuote(quoteId = quote.id)
 

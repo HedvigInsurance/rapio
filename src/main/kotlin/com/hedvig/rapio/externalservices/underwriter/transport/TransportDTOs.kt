@@ -1,19 +1,17 @@
 package com.hedvig.rapio.externalservices.underwriter.transport
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.hedvig.rapio.externalservices.underwriter.IncompleteHouseQuoteDataDto
-import com.hedvig.rapio.externalservices.underwriter.QuoteInitiatedFrom
 import java.math.BigDecimal
 import java.time.Instant
+import java.time.LocalDate
 
 enum class ProductType {
-    HOME,
+    APARTMENT,
     HOUSE,
     OBJECT,
     UNKNOWN
 }
-enum class LineOfBusiness {
+
+enum class ApartmentProductSubType {
     BRF,
     RENT,
     RENT_BRF,
@@ -26,39 +24,52 @@ enum class LineOfBusiness {
 }
 
 
-data class PostIncompleteQuoteRequest (
-        val productType: ProductType,
-        val lineOfBusiness: LineOfBusiness?,
+data class IncompleteQuoteDTO(
+        val firstName: String? = null,
+        val lastName: String? = null,
+        val currentInsurer: String? = null,
+        val birthDate: LocalDate?,
         val ssn: String?,
-        val incompleteQuoteDataDto: QuoteData?,
-        val quoteInitiatedFrom: QuoteInitiatedFrom = QuoteInitiatedFrom.PARTNER
+        val quotingPartner: String?,
+        val incompleteHouseQuoteData: IncompleteHouseQuoteDataDto? = null,
+        val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?
 )
 
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes(JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name =  "house"),
-JsonSubTypes.Type(value = IncompleteHomeQuoteDataDto::class, name =  "home"))
-sealed class QuoteData
 
 data class IncompleteHouseQuoteDataDto(
         val street: String?,
         val zipCode: String?,
         val city: String?,
         val livingSpace: Int?,
-        val householdSize: Int?,
-        val isStudent: Boolean?
-) : QuoteData()
-data class IncompleteHomeQuoteDataDto(
-        val street: String?,
-        val city: String?,
-        val zipCode: String?,
-        val isStudent: Boolean?,
-        val livingSpace: Int?,
+        val personalNumber: String?,
         val householdSize: Int?
-) : QuoteData()
+)
 
-data class CompleteQuoteResponse (
+data class IncompleteApartmentQuoteDataDto(
+        val street: String?,
+        val zipCode: String?,
+        val city: String?,
+        val livingSpace: Int?,
+        val householdSize: Int?,
+        val floor: Int?,
+        val subType: ApartmentProductSubType?
+)
+
+data class CompleteQuoteResponse(
         val id: String,
         val price: BigDecimal,
         val validTo: Instant?
 )
+data class PostIncompleteQuoteResult (
+        val id: String,
+        val productType: ProductType,
+        val quoteInitiatedFrom: QuoteInitiatedFrom?
+)
+
+
+enum class QuoteInitiatedFrom {
+    RAPIO,
+    WEBONBOARDING,
+    APP
+}
+

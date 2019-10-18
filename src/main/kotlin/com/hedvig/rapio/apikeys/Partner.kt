@@ -1,6 +1,6 @@
 package com.hedvig.rapio.apikeys
 
-enum class Partners {
+enum class Partner {
     INSPLANET,
     COMPRICER,
     HEDVIG

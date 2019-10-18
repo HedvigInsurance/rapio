@@ -3,7 +3,6 @@ package com.hedvig.rapio.externalservices.underwriter
 import arrow.core.Either
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.hedvig.rapio.apikeys.Partners
 import com.hedvig.rapio.externalservices.underwriter.transport.ErrorResponse
 import com.hedvig.rapio.externalservices.underwriter.transport.*
 import feign.FeignException
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.*
 
 data class IncompleteQuoteReference(
         val id: String
@@ -26,17 +24,13 @@ private val logger = KotlinLogging.logger{}
 @Component
 class ConcreteUnderwriter(private val client:UnderwriterClient,
                           private val objectMapper:ObjectMapper) :Underwriter {
-    override fun createQuote(productType: ProductType, lineOfBusiness: LineOfBusiness, quoteData: IncompleteHomeQuoteDataDto, source: Partners, ssn:String): IncompleteQuoteReference {
+    override fun createQuote(data: IncompleteQuoteDTO): IncompleteQuoteReference {
 
-        val result = client.postIncompleteQuote(PostIncompleteQuoteRequest(productType, lineOfBusiness, ssn = ssn, incompleteQuoteDataDto = quoteData))
+        val result = client.createQuote(data)
         val body = result.body!!
 
         return IncompleteQuoteReference(
                 id = body.id)
-    }
-
-    override fun updateQuote(quoteId: String, quoteData: IncompleteQuoteDto): IncompleteQuoteDto {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun completeQuote(quoteId: String): Either<ErrorResponse, CompleteQuoteReference> {
@@ -46,7 +40,7 @@ class ConcreteUnderwriter(private val client:UnderwriterClient,
                 return Either.Right(CompleteQuoteReference(
                         id = response.body!!.id,
                         price = Money.of(response.body!!.price, "SEK"),
-                        validTo = response.body!!.validTo ?: Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
+                        validTo = Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
                 ))
             }
 
@@ -62,9 +56,9 @@ class ConcreteUnderwriter(private val client:UnderwriterClient,
         throw RuntimeException("Could not complete incomplete quote with id $quoteId")
     }
 
-    override fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String): Either<ErrorResponse, SignedQuoteResponseDto> {
+    override fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String): Either<ErrorResponse, SignedQuoteResponseDto> {
         try {
-            val response = this.client.signQuote(id, SignQuoteRequest(Name(firstName, lastName), null, email))
+            val response = this.client.signQuote(id, SignQuoteRequest(Name(firstName, lastName), startsAt, email))
                 return Either.right(response.body!!)
         } catch (ex: FeignException) {
             if (ex.status() == 422) {

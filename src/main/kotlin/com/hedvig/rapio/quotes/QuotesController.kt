@@ -1,7 +1,7 @@
 package com.hedvig.rapio.quotes
 
 import arrow.core.*
-import com.hedvig.rapio.apikeys.Partners
+import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.comparison.web.dto.ExternalErrorResponseDTO
 import com.hedvig.rapio.quotes.web.dto.*
 import com.hedvig.rapio.util.IdNumberValidator
@@ -33,11 +33,11 @@ class QuotesController @Autowired constructor(
 
         val currentUserName = authentication.name
 
-        if(!Partners.values().map { it.name }.contains(currentUserName)) {
+        if(!Partner.values().map { it.name }.contains(currentUserName)) {
             logger.error("Could not find any partner named $currentUserName")
         }
 
-        val partner = Partners.valueOf(currentUserName)
+        val partner = Partner.valueOf(currentUserName)
 
         return logRequestId(request.requestId) {
             val validIdNumber = when (val idnumber = IdNumberValidator.validate(request.quoteData.personalNumber)) {
