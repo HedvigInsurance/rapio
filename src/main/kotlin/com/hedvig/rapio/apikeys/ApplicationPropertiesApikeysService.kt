@@ -22,7 +22,7 @@ class ApplicationPropertiesApikeysService(val config: Keys) : UserDetailsService
 
         val apiUserName = config.apikeys?.get(username)
 
-        if(!Partners.values().map { it.name }.contains(apiUserName)) {
+        if(!Partner.values().map { it.name }.contains(apiUserName)) {
             logger.error("Could not find any partner named $apiUserName")
             throw UsernameNotFoundException("Could not find any partner named $apiUserName")
         }

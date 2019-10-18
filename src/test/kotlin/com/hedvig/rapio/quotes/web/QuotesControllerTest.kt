@@ -1,7 +1,6 @@
 package com.hedvig.rapio.quotes.web
 
 import arrow.core.Right
-import com.hedvig.rapio.apikeys.Partners
 import com.hedvig.rapio.quotes.QuotesController
 import com.hedvig.rapio.quotes.QuoteService
 import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
