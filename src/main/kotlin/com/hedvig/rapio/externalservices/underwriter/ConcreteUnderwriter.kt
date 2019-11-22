@@ -15,57 +15,54 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 data class IncompleteQuoteReference(
-        val id: String
+    val id: String
 )
 
-private val logger = KotlinLogging.logger{}
+private val logger = KotlinLogging.logger {}
 
 @Profile("!fakes")
 @Component
-class ConcreteUnderwriter(private val client:UnderwriterClient,
-                          private val objectMapper:ObjectMapper) :Underwriter {
+class ConcreteUnderwriter(private val client: UnderwriterClient,
+                          private val objectMapper: ObjectMapper) : Underwriter {
     override fun createQuote(data: IncompleteQuoteDTO): IncompleteQuoteReference {
 
         val result = client.createQuote(data)
         val body = result.body!!
 
         return IncompleteQuoteReference(
-                id = body.id)
+            id = body.id)
     }
 
     override fun completeQuote(quoteId: String): Either<ErrorResponse, CompleteQuoteReference> {
         try {
             val response = this.client.createCompleteQuote(quoteId)
-            if (response.statusCode.is2xxSuccessful) {
-                return Either.Right(CompleteQuoteReference(
-                        id = response.body!!.id,
-                        price = Money.of(response.body!!.price, "SEK"),
-                        validTo = Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
-                ))
-            }
-
-        }catch (ex:FeignException) {
+            return Either.Right(CompleteQuoteReference(
+                id = response.body!!.id,
+                price = Money.of(response.body!!.price, "SEK"),
+                validTo = Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
+            ))
+        } catch (ex: FeignException) {
             logger.error("Got error calling underwriter: ", ex)
 
-            if(ex.status() == 422) {
+            if (ex.status() == 422) {
                 val error = objectMapper.readValue<ErrorResponse>(ex.contentUTF8())
                 return Either.Left(error)
             }
-
+            throw RuntimeException("Unhandled FeignException when completing", ex)
         }
-        throw RuntimeException("Could not complete incomplete quote with id $quoteId")
     }
 
     override fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String): Either<ErrorResponse, SignedQuoteResponseDto> {
         try {
             val response = this.client.signQuote(id, SignQuoteRequest(Name(firstName, lastName), startsAt, email))
-                return Either.right(response.body!!)
+            return Either.right(response.body!!)
         } catch (ex: FeignException) {
             if (ex.status() == 422) {
                 val error = objectMapper.readValue<ErrorResponse>(ex.contentUTF8())
                 return Either.left(error)
             }
+
+            throw RuntimeException("Unhandled FeignException when signing", ex)
         }
-        throw RuntimeException("Couldn't sign member")
     }
 }
