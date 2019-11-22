@@ -51,9 +51,8 @@ class ConcreteUnderwriter(private val client:UnderwriterClient,
                 val error = objectMapper.readValue<ErrorResponse>(ex.contentUTF8())
                 return Either.Left(error)
             }
-
+            throw RuntimeException("Unhandled FeignException when completing", ex)
         }
-        throw RuntimeException("Could not complete incomplete quote with id $quoteId")
     }
 
     override fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String): Either<ErrorResponse, SignedQuoteResponseDto> {
@@ -65,7 +64,8 @@ class ConcreteUnderwriter(private val client:UnderwriterClient,
                 val error = objectMapper.readValue<ErrorResponse>(ex.contentUTF8())
                 return Either.left(error)
             }
+
+            throw RuntimeException("Unhandled FeignException when signing", ex)
         }
-        throw RuntimeException("Couldn't sign member")
     }
 }
