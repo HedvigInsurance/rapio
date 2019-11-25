@@ -45,6 +45,7 @@ dependencies {
 
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     implementation("org.springframework.cloud:spring-cloud-openfeign-core")
+    implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
 
     implementation("org.liquibase:liquibase-core:3.6.3")
     implementation("com.vladmihalcea:hibernate-types-52:2.6.1")

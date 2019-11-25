@@ -42,8 +42,6 @@ class ConcreteUnderwriter(private val client: UnderwriterClient,
                 validTo = Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
             ))
         } catch (ex: FeignException) {
-            logger.error("Got error calling underwriter: ", ex)
-
             if (ex.status() == 422) {
                 val error = objectMapper.readValue<ErrorResponse>(ex.contentUTF8())
                 return Either.Left(error)
