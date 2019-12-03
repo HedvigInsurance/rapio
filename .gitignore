@@ -1,6 +1,9 @@
 # Compiled class file
 *.class
 
+# Application development file
+/src/main/resources/application-development.yml
+
 # Log file
 *.log
 

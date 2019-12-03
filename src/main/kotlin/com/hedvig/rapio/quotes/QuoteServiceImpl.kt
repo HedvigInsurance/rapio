@@ -5,9 +5,9 @@ import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.externalservices.underwriter.Underwriter
 import com.hedvig.rapio.externalservices.underwriter.transport.*
 import com.hedvig.rapio.quotes.web.dto.*
+import com.hedvig.rapio.quotes.web.dto.ProductType
 import org.springframework.stereotype.Service
 import java.util.*
-
 
 @Service
 class QuoteServiceImpl(
@@ -15,53 +15,80 @@ class QuoteServiceImpl(
 ) : QuoteService {
 
     override fun createQuote(requestDTO: QuoteRequestDTO, partner: Partner): Either<String, QuoteResponseDTO> {
+        val quoteData = requestDTO.quoteData
 
-        val lineOfBusiness = if (requestDTO.quoteData.productSubType == ProductSubType.RENT) ApartmentProductSubType.RENT else ApartmentProductSubType.BRF
-
-
-        val quoteData = IncompleteApartmentQuoteDataDto(
-                street = requestDTO.quoteData.street,
-                zipCode = requestDTO.quoteData.zipCode,
-                city = requestDTO.quoteData.city,
-                livingSpace = requestDTO.quoteData.livingSpace,
-                householdSize = requestDTO.quoteData.householdSize,
-                floor = 0,
-                subType = lineOfBusiness
-        )
-        val request = IncompleteQuoteDTO(
-                incompleteApartmentQuoteData = quoteData,
-                firstName = null,
-                lastName = null,
-                quotingPartner = partner.name,
-                birthDate = null,
-                ssn = requestDTO.quoteData.personalNumber,
-                currentInsurer = null
+        val requestQuoteData = when(quoteData) {
+            is ApartmentQuoteRequestData -> {
+                IncompleteApartmentQuoteDataDto(
+                    street = quoteData.street,
+                    zipCode = quoteData.zipCode,
+                    city = quoteData.city,
+                    livingSpace = quoteData.livingSpace,
+                    householdSize = quoteData.householdSize,
+                    floor = 0,
+                    subType = if (quoteData.productSubType == ProductSubType.RENT) ApartmentProductSubType.RENT else ApartmentProductSubType.BRF
                 )
+            }
+            is HouseQuoteRequestData -> {
+                IncompleteHouseQuoteDataDto(
+                    street = quoteData.street,
+                    zipCode = quoteData.zipCode,
+                    city = quoteData.city,
+                    livingSpace = quoteData.livingSpace,
+                    householdSize = quoteData.householdSize,
+                    ancillaryArea = quoteData.ancillaryArea,
+                    yearOfConstruction = quoteData.yearOfConstruction,
+                    numberOfBathrooms = quoteData.numberOfBathrooms,
+                    extraBuildings = quoteData.extraBuildings,
+                    isSubleted = quoteData.isSubleted,
+                    floor = quoteData.floor
+                )
+            }
+        }
+
+        val request = IncompleteQuoteDTO(
+            incompleteQuoteData = requestQuoteData,
+            firstName = null,
+            lastName = null,
+            quotingPartner = partner.name,
+            birthDate = null,
+            ssn = when(quoteData) {
+             is ApartmentQuoteRequestData -> quoteData.personalNumber
+             is HouseQuoteRequestData -> quoteData.personalNumber
+             else -> null
+            },
+            productType = when(quoteData) {
+                is ApartmentQuoteRequestData -> ProductType.APARTMENT
+                is HouseQuoteRequestData -> ProductType.HOUSE
+                else -> null
+            },
+            currentInsurer = null
+        )
 
         val quote = underwriter.createQuote(request)
 
         val completeQuote = underwriter.completeQuote(quoteId = quote.id)
 
         return completeQuote.bimap(
-                { it.errorMessage },
-                {
-                    QuoteResponseDTO(
-                            requestDTO.requestId,
-                            it.id,
-                            it.validTo.epochSecond,
-                            it.price)
-                })
+        { it.errorMessage },
+            {
+                QuoteResponseDTO(
+                        requestDTO.requestId,
+                        it.id,
+                        it.validTo.epochSecond,
+                        it.price
+                )
+            }
+        )
     }
 
     override fun signQuote(quoteId: UUID, request: SignRequestDTO): Either<String, SignResponseDTO> {
-
-
         val response = this.underwriter.signQuote(
-                quoteId.toString(),
-                request.email,
-                request.startsAt.date,
-                request.firstName,
-                request.lastName
+            quoteId.toString(),
+            request.email,
+            request.startsAt.date,
+            request.firstName,
+            request.lastName
         )
 
         return when (response) {
