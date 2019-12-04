@@ -55,8 +55,7 @@ data class IncompleteHouseQuoteDataDto(
     val yearOfConstruction: Int?,
     val numberOfBathrooms: Int?,
     val extraBuildings: List<ExtraBuildingRequestDto>?,
-    val isSubleted: Boolean?,
-    val floor: Int = 0
+    val isSubleted: Boolean?
 ): IncompleteQuoteRequestData()
 
 data class IncompleteApartmentQuoteDataDto(

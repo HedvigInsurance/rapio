@@ -40,8 +40,7 @@ class QuoteServiceImpl(
                     yearOfConstruction = quoteData.yearOfConstruction,
                     numberOfBathrooms = quoteData.numberOfBathrooms,
                     extraBuildings = quoteData.extraBuildings,
-                    isSubleted = quoteData.isSubleted,
-                    floor = quoteData.floor
+                    isSubleted = quoteData.isSubleted
                 )
             }
         }
