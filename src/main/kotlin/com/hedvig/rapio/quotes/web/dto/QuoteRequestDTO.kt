@@ -75,7 +75,9 @@ data class HouseQuoteRequestData(
     @get:NotBlank val isSubleted: Boolean,
 
     @get:NotBlank val floor: Int
-): QuoteRequestData()
+): QuoteRequestData() {
+    companion object
+}
 
 enum class ProductSubType {
     BRF,
