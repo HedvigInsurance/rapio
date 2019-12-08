@@ -1,8 +1,8 @@
 package com.hedvig.rapio.quotes.web
 
 import arrow.core.Right
-import com.hedvig.rapio.quotes.QuotesController
 import com.hedvig.rapio.quotes.QuoteService
+import com.hedvig.rapio.quotes.QuotesController
 import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
 import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
 import com.ninjasquad.springmockk.MockkBean
@@ -29,11 +29,11 @@ internal class QuotesControllerTest {
     lateinit var mockMvc: MockMvc
 
     @MockkBean
-    lateinit var quoteService:QuoteService
+    lateinit var quoteService: QuoteService
 
     val createRequestJson = """
         {"requestId":"adads",
-         "productType": "HOME",
+         "productType": "APARTMENT",
          "quoteData": { 
             "personalNumber": "191212121212",
             "street": "testgatan",

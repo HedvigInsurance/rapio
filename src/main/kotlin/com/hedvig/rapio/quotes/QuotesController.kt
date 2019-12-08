@@ -41,8 +41,8 @@ class QuotesController @Autowired constructor(
         val partner = Partner.valueOf(currentUserName)
 
         val personnummer = when (request.quoteData) {
-            is ApartmentQuoteRequestData -> request.quoteData.personalNumber
-            is HouseQuoteRequestData -> request.quoteData.personalNumber
+            is ApartmentQuoteRequestData -> (request.quoteData as ApartmentQuoteRequestData).personalNumber
+            is HouseQuoteRequestData -> (request.quoteData as HouseQuoteRequestData).personalNumber
         }
 
         return logRequestId(request.requestId) {
@@ -50,8 +50,8 @@ class QuotesController @Autowired constructor(
                 is None -> Left(badRequest("PersonalNumber is invalid"))
                 is Some ->
                     when (request.quoteData) {
-                        is ApartmentQuoteRequestData -> Right(request.copy(quoteData = request.quoteData.copy(personalNumber = idNumber.t.idno)))
-                        is HouseQuoteRequestData -> Right(request.copy(quoteData = request.quoteData.copy(personalNumber = idNumber.t.idno)))
+                        is ApartmentQuoteRequestData -> Right(request.copy(quoteData = (request.quoteData as ApartmentQuoteRequestData).copy(personalNumber = idNumber.t.idno)))
+                        is HouseQuoteRequestData -> Right(request.copy(quoteData = (request.quoteData as HouseQuoteRequestData).copy(personalNumber = idNumber.t.idno)))
                     }
             }
 
@@ -61,15 +61,6 @@ class QuotesController @Autowired constructor(
                         { right -> ok(right) }
                 )
             }.getOrHandle { it }
-        }
-    }
-
-    private fun validatePersonalNumber(request: QuoteRequestDTO): Option<QuoteRequestDTO> {
-        return when (request.quoteData) {
-            is ApartmentQuoteRequestData -> IdNumberValidator.validate(request.quoteData.personalNumber)
-                    .map { request.copy(quoteData = request.quoteData.copy(personalNumber = it.idno)) }
-            is HouseQuoteRequestData -> IdNumberValidator.validate(request.quoteData.personalNumber)
-                    .map { request.copy(quoteData = request.quoteData.copy(personalNumber = it.idno)) }
         }
     }
 

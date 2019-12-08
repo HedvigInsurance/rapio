@@ -11,16 +11,14 @@ import javax.validation.constraints.*
 data class QuoteRequestDTO(
     val requestId :String,
     @get: Valid val productType: ProductType,
-    val quoteData: QuoteRequestData
+    @set:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "productType")
+    @JsonSubTypes(
+            JsonSubTypes.Type(value = com.hedvig.rapio.quotes.web.dto.ApartmentQuoteRequestData::class, name = "APARTMENT"),
+            JsonSubTypes.Type(value = com.hedvig.rapio.quotes.web.dto.HouseQuoteRequestData::class, name = "HOUSE")
+    ) var quoteData: QuoteRequestData
 ) {
     companion object
 }
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "productType")
-@JsonSubTypes(
-    JsonSubTypes.Type(value = com.hedvig.rapio.quotes.web.dto.ApartmentQuoteRequestData::class, name = "apartment"),
-    JsonSubTypes.Type(value = com.hedvig.rapio.quotes.web.dto.HouseQuoteRequestData::class, name = "house")
-)
 
 sealed class QuoteRequestData {
 }
@@ -64,17 +62,14 @@ data class HouseQuoteRequestData(
     @get:Min(1) @Max(100)
     val householdSize: Int,
 
-    @get:NotBlank val ancillaryArea: Int,
-
-    @get:NotBlank val yearOfConstruction: Int,
+    val ancillaryArea: Int,
+    val yearOfConstruction: Int,
 
     @get:Min(0) @Max(20) val numberOfBathrooms: Int,
 
     val extraBuildings: List<ExtraBuildingRequestDto>?,
-
-    @get:NotBlank val isSubleted: Boolean,
-
-    @get:NotBlank val floor: Int
+    val isSubleted: Boolean,
+    val floor: Int
 ): QuoteRequestData() {
     companion object
 }

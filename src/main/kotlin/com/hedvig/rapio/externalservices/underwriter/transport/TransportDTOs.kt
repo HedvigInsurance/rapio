@@ -32,15 +32,15 @@ data class IncompleteQuoteDTO(
         val currentInsurer: String? = null,
         val birthDate: LocalDate?,
         val ssn: String?,
-        @get: Valid val quotingPartner: String?,
+        val quotingPartner: String?,
         val productType: com.hedvig.rapio.quotes.web.dto.ProductType?,
         val incompleteQuoteData: IncompleteQuoteRequestData
 )
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "productType")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
-        JsonSubTypes.Type(value = IncompleteApartmentQuoteDataDto::class, name = "APARTMENT"),
-        JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "HOUSE")
+        JsonSubTypes.Type(value = IncompleteApartmentQuoteDataDto::class, name = "apartment"),
+        JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house")
 )
 sealed class IncompleteQuoteRequestData {
 }
@@ -55,7 +55,8 @@ data class IncompleteHouseQuoteDataDto(
     val yearOfConstruction: Int?,
     val numberOfBathrooms: Int?,
     val extraBuildings: List<ExtraBuildingRequestDto>?,
-    val isSubleted: Boolean?
+    val isSubleted: Boolean?,
+    val floor: Int?
 ): IncompleteQuoteRequestData()
 
 data class IncompleteApartmentQuoteDataDto(
