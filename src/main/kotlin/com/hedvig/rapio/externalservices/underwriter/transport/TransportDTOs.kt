@@ -7,13 +7,6 @@ import java.time.Instant
 import java.time.LocalDate
 import javax.validation.Valid
 
-enum class ProductType {
-    APARTMENT,
-    HOUSE,
-    OBJECT,
-    UNKNOWN
-}
-
 enum class ApartmentProductSubType {
     BRF,
     RENT,
@@ -33,7 +26,7 @@ data class IncompleteQuoteDTO(
         val birthDate: LocalDate?,
         val ssn: String?,
         val quotingPartner: String?,
-        val productType: com.hedvig.rapio.quotes.web.dto.ProductType?,
+        val productType: ProductType,
         val incompleteQuoteData: IncompleteQuoteRequestData
 )
 

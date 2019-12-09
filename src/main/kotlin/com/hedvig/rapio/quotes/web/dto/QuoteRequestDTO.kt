@@ -13,7 +13,7 @@ data class QuoteRequestDTO(
     @get: Valid val productType: ProductType,
     @set:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "productType")
     @JsonSubTypes(
-            JsonSubTypes.Type(value = com.hedvig.rapio.quotes.web.dto.ApartmentQuoteRequestData::class, name = "APARTMENT"),
+            JsonSubTypes.Type(value = com.hedvig.rapio.quotes.web.dto.ApartmentQuoteRequestData::class, name = "HOME"),
             JsonSubTypes.Type(value = com.hedvig.rapio.quotes.web.dto.HouseQuoteRequestData::class, name = "HOUSE")
     ) var quoteData: QuoteRequestData
 ) {
@@ -80,6 +80,6 @@ enum class ProductSubType {
 }
 
 enum class ProductType {
-    APARTMENT,
+    HOME,
     HOUSE
 }

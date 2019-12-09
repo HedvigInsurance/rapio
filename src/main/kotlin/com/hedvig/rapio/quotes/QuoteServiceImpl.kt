@@ -4,8 +4,8 @@ import arrow.core.Either
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.externalservices.underwriter.Underwriter
 import com.hedvig.rapio.externalservices.underwriter.transport.*
+import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
 import com.hedvig.rapio.quotes.web.dto.*
-import com.hedvig.rapio.quotes.web.dto.ProductType
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -55,12 +55,10 @@ class QuoteServiceImpl(
             ssn = when(quoteData) {
              is ApartmentQuoteRequestData -> quoteData.personalNumber
              is HouseQuoteRequestData -> quoteData.personalNumber
-             else -> null
             },
             productType = when(quoteData) {
                 is ApartmentQuoteRequestData -> ProductType.APARTMENT
                 is HouseQuoteRequestData -> ProductType.HOUSE
-                else -> null
             },
             currentInsurer = null
         )
