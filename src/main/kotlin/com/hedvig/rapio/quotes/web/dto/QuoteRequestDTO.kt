@@ -55,17 +55,17 @@ data class HouseQuoteRequestData(
 
     @get:NotBlank val city: String,
 
-    @get:Min(1) @Max(1000) val livingSpace: Int,
+    @get:Min(1) @get:Max(1000) val livingSpace: Int,
 
     @get:Size(min=12, max=12) val personalNumber: String,
 
-    @get:Min(1) @Max(100)
+    @get:Min(1) @get:Max(100)
     val householdSize: Int,
 
     val ancillaryArea: Int,
     val yearOfConstruction: Int,
 
-    @get:Min(0) @Max(20) val numberOfBathrooms: Int,
+    @get:Min(0) @get:Max(20) val numberOfBathrooms: Int,
 
     val extraBuildings: List<ExtraBuildingRequestDto>?,
     val isSubleted: Boolean,
