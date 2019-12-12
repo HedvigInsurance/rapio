@@ -4,10 +4,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 
-
 class IdNumberValidator {
-
-
     companion object {
         fun validate(idNumber: String): Option<ValidIdNumber> {
             var value = idNumber
@@ -74,4 +71,11 @@ class IdNumberValidator {
     }
 }
 
-data class ValidIdNumber (val idno:String, val valid:Boolean, val ssn: Boolean, val coOrdinationNumber:Boolean, val male:Boolean, val company: Boolean)
+data class ValidIdNumber(
+    val idno: String,
+    val valid: Boolean,
+    val ssn: Boolean,
+    val coOrdinationNumber: Boolean,
+    val male: Boolean,
+    val company: Boolean
+)

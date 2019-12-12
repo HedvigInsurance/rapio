@@ -1,8 +1,8 @@
 package com.hedvig.rapio.quotes.web
 
 import arrow.core.Right
-import com.hedvig.rapio.quotes.QuotesController
 import com.hedvig.rapio.quotes.QuoteService
+import com.hedvig.rapio.quotes.QuotesController
 import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
 import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
 import com.ninjasquad.springmockk.MockkBean
@@ -29,9 +29,9 @@ internal class QuotesControllerTest {
     lateinit var mockMvc: MockMvc
 
     @MockkBean
-    lateinit var quoteService:QuoteService
+    lateinit var quoteService: QuoteService
 
-    val createRequestJson = """
+    val createApartmentRequestJson = """
         {"requestId":"adads",
          "productType": "HOME",
          "quoteData": { 
@@ -46,9 +46,31 @@ internal class QuotesControllerTest {
         }
     """.trimIndent()
 
+    val createHouseRequestJson = """
+        {
+            "requestId": "1231a",
+            "productType": "HOUSE",
+            "quoteData": {
+                "street": "harry",
+                "zipCode": "11216",
+                "city": "stockholm",
+                "livingSpace": "240",
+                "personalNumber": "191212121212",
+                "householdSize": "4",
+                "ancilliaryArea": "123",
+                "yearOfConstruction": "1976",
+                "numberOfBathrooms": "2",
+                "extraBuildings": [
+                ],
+                "isSubleted": "false",
+                "floor": "2"
+            }
+        }
+    """.trimIndent()
+
     @Test
     @WithMockUser("COMPRICER")
-    fun create_quote(){
+    fun create_apartment_quote(){
 
         val response = QuoteResponseDTO(
                 requestId = "adads",
@@ -60,7 +82,7 @@ internal class QuotesControllerTest {
 
         val request = post("/v1/quotes")
                 .with(user("compricer"))
-                .content(createRequestJson)
+                .content(createApartmentRequestJson)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
 
@@ -69,7 +91,31 @@ internal class QuotesControllerTest {
         result
                 .andExpect(status().is2xxSuccessful)
                 .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
+    }
 
+    @Test
+    @WithMockUser("COMPRICER")
+    fun create_house_quote(){
+
+        val response = QuoteResponseDTO(
+                requestId = "1231a",
+                monthlyPremium = Money.of(123,"SEK"),
+                quoteId = UUID.randomUUID().toString(),
+                validUntil = Instant.now().epochSecond
+        )
+        every { quoteService.createQuote(any(), any()) } returns(Right(response))
+
+        val request = post("/v1/quotes")
+                .with(user("compricer"))
+                .content(createHouseRequestJson)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+
+        val result = mockMvc.perform(request)
+
+        result
+                .andExpect(status().is2xxSuccessful)
+                .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
     }
 
     val signRequestJson = """
@@ -102,7 +148,5 @@ internal class QuotesControllerTest {
         result
                 .andExpect(status().is2xxSuccessful)
                 .andExpect(jsonPath("$.quoteId", Matchers.equalTo(id.toString())))
-
     }
-
 }
