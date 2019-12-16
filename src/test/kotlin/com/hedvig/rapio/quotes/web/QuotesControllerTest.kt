@@ -135,7 +135,7 @@ internal class QuotesControllerTest {
     fun sign_quote(){
 
         val id = UUID.randomUUID()
-        every { quoteService.signQuote(id, any()) } returns Right(SignResponseDTO("jl", id.toString(), Instant.now().epochSecond))
+        every { quoteService.signQuote(id, any()) } returns Right(SignResponseDTO("jl", id.toString(), id.toString(), Instant.now().epochSecond))
 
         val request = post("/v1/quotes/$id/sign")
                 .with(user("compricer"))
