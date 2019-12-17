@@ -93,7 +93,7 @@ class QuoteServiceImpl(
             is Either.Right -> {
 
                 Either.Right(SignResponseDTO(requestId = request.requestId,
-                        quoteId = response.b.id, signedAt = response.b.signedAt.epochSecond))
+                        quoteId = response.b.id, productId = response.b.id, signedAt = response.b.signedAt.epochSecond))
             }
             is Either.Left -> {
                 return when (response.a.errorCode) {
