@@ -14,34 +14,23 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
-data class IncompleteQuoteReference(
-    val id: String
-)
-
 private val logger = KotlinLogging.logger {}
 
 @Profile("!fakes")
 @Component
 class ConcreteUnderwriter(private val client: UnderwriterClient,
                           private val objectMapper: ObjectMapper) : Underwriter {
-    override fun createQuote(data: IncompleteQuoteDTO): IncompleteQuoteReference {
-
-        val result = client.createQuote(data)
-        val body = result.body!!
-
-        return IncompleteQuoteReference(
-            id = body.id)
-    }
-
-    override fun completeQuote(quoteId: String): Either<ErrorResponse, CompleteQuoteReference> {
+    override fun createQuote(data: IncompleteQuoteDTO): Either<ErrorResponse, CompleteQuoteReference> {
         try {
-            val response = this.client.createCompleteQuote(quoteId)
+            val result = client.createQuote(data)
+            val body = result.body!!
+
             return Either.Right(CompleteQuoteReference(
-                id = response.body!!.id,
-                price = Money.of(response.body!!.price, "SEK"),
+                id = body.id,
+                price = Money.of(body.price, "SEK"),
                 validTo = Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
             ))
-        } catch (ex: FeignException) {
+        }catch (ex: FeignException) {
             if (ex.status() == 422) {
                 val error = objectMapper.readValue<ErrorResponse>(ex.contentUTF8())
                 return Either.Left(error)

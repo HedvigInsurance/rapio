@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
-import javax.validation.Valid
 
 enum class ApartmentProductSubType {
     BRF,
@@ -20,20 +19,22 @@ enum class ApartmentProductSubType {
 }
 
 data class IncompleteQuoteDTO(
-        val firstName: String? = null,
-        val lastName: String? = null,
-        val currentInsurer: String? = null,
-        val birthDate: LocalDate?,
-        val ssn: String?,
-        val quotingPartner: String?,
-        val productType: ProductType,
-        val incompleteQuoteData: IncompleteQuoteRequestData
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val currentInsurer: String? = null,
+    val birthDate: LocalDate?,
+    val ssn: String?,
+    val quotingPartner: String?,
+    val productType: ProductType,
+    val incompleteQuoteData: IncompleteQuoteRequestData,
+    val complete: Boolean,
+    val underwritingGuidelinesBypassedBy: String?
 )
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
-        JsonSubTypes.Type(value = IncompleteApartmentQuoteDataDto::class, name = "apartment"),
-        JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house")
+    JsonSubTypes.Type(value = IncompleteApartmentQuoteDataDto::class, name = "apartment"),
+    JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house")
 )
 sealed class IncompleteQuoteRequestData {
 }
@@ -50,7 +51,7 @@ data class IncompleteHouseQuoteDataDto(
     val extraBuildings: List<ExtraBuildingRequestDto>?,
     val isSubleted: Boolean?,
     val floor: Int?
-): IncompleteQuoteRequestData()
+) : IncompleteQuoteRequestData()
 
 data class IncompleteApartmentQuoteDataDto(
     val street: String?,
@@ -60,17 +61,16 @@ data class IncompleteApartmentQuoteDataDto(
     val householdSize: Int?,
     val floor: Int?,
     val subType: ApartmentProductSubType?
-): IncompleteQuoteRequestData()
+) : IncompleteQuoteRequestData()
 
 data class CompleteQuoteResponse(
     val id: String,
     val price: BigDecimal,
     val validTo: Instant?
 )
-data class PostIncompleteQuoteResult (
-    val id: String,
-    val productType: ProductType,
-    val quoteInitiatedFrom: QuoteInitiatedFrom?
+
+data class PostIncompleteQuoteResult(
+    val id: String
 )
 
 enum class QuoteInitiatedFrom {
