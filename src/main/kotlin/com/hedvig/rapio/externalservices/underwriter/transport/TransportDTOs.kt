@@ -27,7 +27,7 @@ data class IncompleteQuoteDTO(
     val quotingPartner: String?,
     val productType: ProductType,
     val incompleteQuoteData: IncompleteQuoteRequestData,
-    val complete: Boolean,
+    val shouldComplete: Boolean,
     val underwritingGuidelinesBypassedBy: String?
 )
 

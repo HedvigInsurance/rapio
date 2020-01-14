@@ -61,7 +61,7 @@ class QuoteServiceImpl(
                 is HouseQuoteRequestData -> ProductType.HOUSE
             },
             currentInsurer = null,
-            complete = true,
+            shouldComplete = true,
             underwritingGuidelinesBypassedBy = null
         )
 
