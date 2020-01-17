@@ -10,12 +10,9 @@ import org.springframework.web.bind.annotation.RequestMethod
 @FeignClient(name = "underwriterclient", url = "\${hedvig.underwriter.url:underwriter}")
 interface UnderwriterClient {
 
-    @RequestMapping(value = ["/_/v1/quote"], method = [RequestMethod.POST])
-    fun createQuote(@RequestBody body: IncompleteQuoteDTO): ResponseEntity<PostIncompleteQuoteResult>
-    
-    @RequestMapping(value = ["/_/v1/quote/{quoteId}/completeQuote"], method = [RequestMethod.POST])
-    fun createCompleteQuote(@PathVariable("quoteId") quoteId: String) : ResponseEntity<CompleteQuoteResponse>
+    @RequestMapping(value = ["/_/v1/quotes"], method = [RequestMethod.POST])
+    fun createQuote(@RequestBody body: IncompleteQuoteDTO): ResponseEntity<CompleteQuoteResponse>
 
-    @RequestMapping(value = ["/_/v1/quote/{quoteId}/sign"], method = [RequestMethod.POST])
+    @RequestMapping(value = ["/_/v1/quotes/{quoteId}/sign"], method = [RequestMethod.POST])
     fun signQuote(@PathVariable("quoteId") quoteId: String, @RequestBody body:SignQuoteRequest) : ResponseEntity<SignedQuoteResponseDto>
 }

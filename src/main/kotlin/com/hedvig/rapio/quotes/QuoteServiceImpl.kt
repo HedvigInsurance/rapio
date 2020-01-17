@@ -60,12 +60,12 @@ class QuoteServiceImpl(
                 is ApartmentQuoteRequestData -> ProductType.APARTMENT
                 is HouseQuoteRequestData -> ProductType.HOUSE
             },
-            currentInsurer = null
+            currentInsurer = null,
+            shouldComplete = true,
+            underwritingGuidelinesBypassedBy = null
         )
 
-        val quote = underwriter.createQuote(request)
-
-        val completeQuote = underwriter.completeQuote(quoteId = quote.id)
+        val completeQuote = underwriter.createQuote(request)
 
         return completeQuote.bimap(
         { it.errorMessage },

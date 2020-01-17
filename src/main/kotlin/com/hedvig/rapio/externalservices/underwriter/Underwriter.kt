@@ -7,9 +7,8 @@ import java.time.LocalDate
 import javax.money.MonetaryAmount
 
 interface Underwriter {
-    fun completeQuote(quoteId: String): Either<ErrorResponse, CompleteQuoteReference>
     fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String) : Either<ErrorResponse, SignedQuoteResponseDto>
-    fun createQuote(data: IncompleteQuoteDTO): IncompleteQuoteReference
+    fun createQuote(data: IncompleteQuoteDTO): Either<ErrorResponse, CompleteQuoteReference>
 }
 
 data class CompleteQuoteReference(

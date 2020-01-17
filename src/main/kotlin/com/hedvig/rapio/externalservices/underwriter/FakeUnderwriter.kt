@@ -8,6 +8,7 @@ import com.hedvig.rapio.externalservices.underwriter.transport.SignedQuoteRespon
 import org.javamoney.moneta.Money
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
+import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -20,16 +21,7 @@ class FakeUnderwriter : Underwriter {
         return Right(SignedQuoteResponseDto(id, Instant.now()))
     }
 
-
-    override fun completeQuote(quoteId: String): Either<ErrorResponse, CompleteQuoteReference> {
-        return Either.Right(CompleteQuoteReference(
-                "",
-                Money.of(123, "SEK"),
-                Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant())
-        )
-    }
-
-    override fun createQuote(data: IncompleteQuoteDTO): IncompleteQuoteReference {
-        return IncompleteQuoteReference("someId")
+    override fun createQuote(data: IncompleteQuoteDTO): Either<ErrorResponse, CompleteQuoteReference> {
+        return Right(CompleteQuoteReference("someId", Money.of(10, "SEK"), Instant.now()))
     }
 }
