@@ -49,7 +49,7 @@ class ConcreteUnderwriter(private val client: UnderwriterClient,
                 return Either.left(error)
             }
 
-            throw RuntimeException("Unhandled FeignException when signing", ex)
+            throw ex
         }
     }
 }
