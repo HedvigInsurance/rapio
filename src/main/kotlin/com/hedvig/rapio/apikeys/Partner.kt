@@ -4,5 +4,5 @@ enum class Partner {
     INSPLANET,
     COMPRICER,
     HEDVIG,
-    INSURLEY
+    INSURELY
 }
