@@ -6,5 +6,5 @@ data class SignResponseDTO(
   val quoteId: String,
   val productId: String,
   val signedAt: Long,
-  val paymentRedirection: String
+  val completionUrl: String
 )

@@ -141,7 +141,7 @@ internal class QuotesControllerTest {
         quoteId = id.toString(),
         productId = id.toString(),
         signedAt = Instant.now().epochSecond,
-        paymentRedirection = "PAYMENT_REDIRECTION"
+        completionUrl = "PAYMENT_REDIRECTION"
       )
     )
 

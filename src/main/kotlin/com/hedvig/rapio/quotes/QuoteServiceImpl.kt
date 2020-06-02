@@ -108,7 +108,7 @@ class QuoteServiceImpl(
             quoteId = response.b.id,
             productId = response.b.id,
             signedAt = response.b.signedAt.epochSecond,
-            paymentRedirection = "PAYMENT_REDIRECTION_HERE"
+            completionUrl = "PAYMENT_REDIRECTION_HERE"
           )
         )
       }
