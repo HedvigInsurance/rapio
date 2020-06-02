@@ -76,6 +76,7 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:6.2")
     implementation("ch.qos.logback:logback-access")
 
+
     api("io.arrow-kt:arrow-core:${property("arrowVerions")}")
     api("io.arrow-kt:arrow-syntax:${property("arrowVerions")}")
     api("io.arrow-kt:arrow-optics:${property("arrowVerions")}")
@@ -89,6 +90,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.2.0")
     testImplementation("com.ninja-squad:springmockk:1.1.2")
     testImplementation("io.mockk:mockk:1.9.1")
+    testImplementation("com.h2database:h2:1.4.200")
 
 
     liquibaseRuntime("org.liquibase:liquibase-core:3.6.1")

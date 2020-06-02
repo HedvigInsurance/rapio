@@ -2,9 +2,6 @@ language: java
 jdk: openjdk11
 sudo: required
 
-before_script:
-  - psql -c 'create database rapio;' -U postgres
-
 script:
   - ./gradlew build
 
