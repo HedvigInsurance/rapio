@@ -17,7 +17,7 @@ class ApiGateway(
       val response = apiGatewayClient.setupPaymentLink(token, CreateSetupPaymentLinkRequestDto(memberId))
       response.body!!.url
     } catch (e: Exception) {
-      logger.error("Something went wrong with setting up a payment link for member $memberId [ Error: $e ]")
+      logger.error("Something went wrong with setting up a payment link for member $memberId", e)
       null
     }
   }
