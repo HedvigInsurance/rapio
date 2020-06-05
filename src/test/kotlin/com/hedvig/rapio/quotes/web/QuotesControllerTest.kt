@@ -1,6 +1,7 @@
 package com.hedvig.rapio.quotes.web
 
 import arrow.core.Right
+import com.hedvig.rapio.externalservices.apigateway.ApiGateway
 import com.hedvig.rapio.quotes.QuoteService
 import com.hedvig.rapio.quotes.QuotesController
 import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
@@ -20,18 +21,18 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 @WebMvcTest(controllers = [QuotesController::class], secure = false)
 internal class QuotesControllerTest {
 
-    @Autowired
-    lateinit var mockMvc: MockMvc
+  @Autowired
+  lateinit var mockMvc: MockMvc
 
-    @MockkBean
-    lateinit var quoteService: QuoteService
+  @MockkBean
+  lateinit var quoteService: QuoteService
 
-    val createApartmentRequestJson = """
+  val createApartmentRequestJson = """
         {"requestId":"adads",
          "productType": "HOME",
          "quoteData": { 
@@ -46,7 +47,7 @@ internal class QuotesControllerTest {
         }
     """.trimIndent()
 
-    val createHouseRequestJson = """
+  val createHouseRequestJson = """
         {
             "requestId": "1231a",
             "productType": "HOUSE",
@@ -68,57 +69,57 @@ internal class QuotesControllerTest {
         }
     """.trimIndent()
 
-    @Test
-    @WithMockUser("COMPRICER")
-    fun create_apartment_quote(){
+  @Test
+  @WithMockUser("COMPRICER")
+  fun create_apartment_quote() {
 
-        val response = QuoteResponseDTO(
-                requestId = "adads",
-                monthlyPremium = Money.of(123,"SEK"),
-                quoteId = UUID.randomUUID().toString(),
-                validUntil = Instant.now().epochSecond
-                )
-        every { quoteService.createQuote(any(), any()) } returns(Right(response))
+    val response = QuoteResponseDTO(
+      requestId = "adads",
+      monthlyPremium = Money.of(123, "SEK"),
+      quoteId = UUID.randomUUID().toString(),
+      validUntil = Instant.now().epochSecond
+    )
+    every { quoteService.createQuote(any(), any()) } returns (Right(response))
 
-        val request = post("/v1/quotes")
-                .with(user("compricer"))
-                .content(createApartmentRequestJson)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
+    val request = post("/v1/quotes")
+      .with(user("compricer"))
+      .content(createApartmentRequestJson)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
 
-        val result = mockMvc.perform(request)
+    val result = mockMvc.perform(request)
 
-        result
-                .andExpect(status().is2xxSuccessful)
-                .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
-    }
+    result
+      .andExpect(status().is2xxSuccessful)
+      .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
+  }
 
-    @Test
-    @WithMockUser("COMPRICER")
-    fun create_house_quote(){
+  @Test
+  @WithMockUser("COMPRICER")
+  fun create_house_quote() {
 
-        val response = QuoteResponseDTO(
-                requestId = "1231a",
-                monthlyPremium = Money.of(123,"SEK"),
-                quoteId = UUID.randomUUID().toString(),
-                validUntil = Instant.now().epochSecond
-        )
-        every { quoteService.createQuote(any(), any()) } returns(Right(response))
+    val response = QuoteResponseDTO(
+      requestId = "1231a",
+      monthlyPremium = Money.of(123, "SEK"),
+      quoteId = UUID.randomUUID().toString(),
+      validUntil = Instant.now().epochSecond
+    )
+    every { quoteService.createQuote(any(), any()) } returns (Right(response))
 
-        val request = post("/v1/quotes")
-                .with(user("compricer"))
-                .content(createHouseRequestJson)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
+    val request = post("/v1/quotes")
+      .with(user("compricer"))
+      .content(createHouseRequestJson)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
 
-        val result = mockMvc.perform(request)
+    val result = mockMvc.perform(request)
 
-        result
-                .andExpect(status().is2xxSuccessful)
-                .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
-    }
+    result
+      .andExpect(status().is2xxSuccessful)
+      .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
+  }
 
-    val signRequestJson = """
+  val signRequestJson = """
         {
             "requestId": "jl",
             "startsAt": {
@@ -131,22 +132,30 @@ internal class QuotesControllerTest {
         }
     """.trimIndent()
 
-    @Test
-    fun sign_quote(){
+  @Test
+  fun sign_quote() {
 
-        val id = UUID.randomUUID()
-        every { quoteService.signQuote(id, any()) } returns Right(SignResponseDTO("jl", id.toString(), id.toString(), Instant.now().epochSecond))
+    val id = UUID.randomUUID()
+    every { quoteService.signQuote(id, any()) } returns Right(
+      SignResponseDTO(
+        requestId = "jl",
+        quoteId = id.toString(),
+        productId = id.toString(),
+        signedAt = Instant.now().epochSecond,
+        completionUrl = "PAYMENT_REDIRECTION"
+      )
+    )
 
-        val request = post("/v1/quotes/$id/sign")
-                .with(user("compricer"))
-                .content(signRequestJson)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
+    val request = post("/v1/quotes/$id/sign")
+      .with(user("compricer"))
+      .content(signRequestJson)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
 
-        val result = mockMvc.perform(request)
+    val result = mockMvc.perform(request)
 
-        result
-                .andExpect(status().is2xxSuccessful)
-                .andExpect(jsonPath("$.quoteId", Matchers.equalTo(id.toString())))
-    }
+    result
+      .andExpect(status().is2xxSuccessful)
+      .andExpect(jsonPath("$.quoteId", Matchers.equalTo(id.toString())))
+  }
 }
