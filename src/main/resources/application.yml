@@ -27,4 +27,7 @@ server:
       timeout: 0
 
 
-
+hedvig:
+  api-gateway:
+    url: api-gateway
+    token: test
