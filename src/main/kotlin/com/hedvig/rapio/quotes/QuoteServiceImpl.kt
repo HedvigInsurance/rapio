@@ -2,6 +2,7 @@ package com.hedvig.rapio.quotes
 
 import arrow.core.Either
 import com.hedvig.rapio.apikeys.Partner
+import com.hedvig.rapio.externalservices.apigateway.ApiGateway
 import com.hedvig.rapio.externalservices.underwriter.Underwriter
 import com.hedvig.rapio.externalservices.underwriter.transport.ApartmentProductSubType
 import com.hedvig.rapio.externalservices.underwriter.transport.ErrorCodes
@@ -21,7 +22,8 @@ import java.util.UUID
 
 @Service
 class QuoteServiceImpl(
-  val underwriter: Underwriter
+  val underwriter: Underwriter,
+  val apiGateway: ApiGateway
 ) : QuoteService {
 
   override fun createQuote(requestDTO: QuoteRequestDTO, partner: Partner): Either<String, QuoteResponseDTO> {
@@ -101,6 +103,7 @@ class QuoteServiceImpl(
 
     return when (response) {
       is Either.Right -> {
+        val completionUrlMaybe: String? = apiGateway.setupPaymentLink(response.b.memberId)
 
         Either.Right(
           SignResponseDTO(
@@ -108,7 +111,7 @@ class QuoteServiceImpl(
             quoteId = response.b.id,
             productId = response.b.id,
             signedAt = response.b.signedAt.epochSecond,
-            completionUrl = "PAYMENT_REDIRECTION_HERE"
+            completionUrl = completionUrlMaybe
           )
         )
       }
