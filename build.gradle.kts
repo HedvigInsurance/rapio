@@ -76,6 +76,7 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:6.2")
     implementation("ch.qos.logback:logback-access")
 
+    implementation("com.neovisionaries:nv-i18n:1.27")
 
     api("io.arrow-kt:arrow-core:${property("arrowVerions")}")
     api("io.arrow-kt:arrow-syntax:${property("arrowVerions")}")
