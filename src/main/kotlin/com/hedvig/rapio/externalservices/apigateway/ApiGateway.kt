@@ -13,7 +13,7 @@ class ApiGateway(
   @Value("\${hedvig.api-gateway.token}") private val token: String
 ) {
 
-  fun setupPaymentLink(memberId: String, countyCode: CountryCode): String? {
+  fun setupPaymentLink(memberId: String): String? {
     return try {
       val response = apiGatewayClient.setupPaymentLink(
         token,
