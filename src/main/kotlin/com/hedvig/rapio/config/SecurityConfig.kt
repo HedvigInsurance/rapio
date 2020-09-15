@@ -27,6 +27,5 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .antMatchers("/actuator/health/**").permitAll()
                 .antMatchers("/**").authenticated()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
     }
 }
