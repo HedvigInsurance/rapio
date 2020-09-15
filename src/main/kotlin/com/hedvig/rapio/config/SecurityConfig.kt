@@ -2,6 +2,7 @@ package com.hedvig.rapio.config
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
@@ -10,6 +11,10 @@ import org.springframework.security.config.http.SessionCreationPolicy
 @Profile("auth")
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(
+    prePostEnabled = true,
+    securedEnabled = true,
+    jsr250Enabled = true)
 class SecurityConfig : WebSecurityConfigurerAdapter() {
 
 
@@ -21,13 +26,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .authorizeRequests()
                 .antMatchers("/actuator/health/**").permitAll()
                 .antMatchers("/**").authenticated()
-
-
-
-                //.and()
-
-                //.realmName("hedvig")
-                    .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
     }
 }

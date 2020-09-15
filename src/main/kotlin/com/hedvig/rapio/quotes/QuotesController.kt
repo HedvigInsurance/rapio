@@ -20,6 +20,7 @@ import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.ok
+import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -35,15 +36,10 @@ class QuotesController @Autowired constructor(
   val quoteService: QuoteService
 ) {
   @PostMapping()
+  @Secured("ROLE_COMPARISON")
   fun createQuote(@Valid @RequestBody request: QuoteRequestDTO): ResponseEntity<*> {
 
-    val authentication = SecurityContextHolder.getContext().authentication
-
-    val currentUserName = authentication.name
-
-    if (!Partner.values().map { it.name }.contains(currentUserName)) {
-      logger.error("Could not find any partner named $currentUserName")
-    }
+    val currentUserName = SecurityContextHolder.getContext().authentication.name
 
     val partner = Partner.valueOf(currentUserName)
 
@@ -84,6 +80,7 @@ class QuotesController @Autowired constructor(
   }
 
   @PostMapping("{quoteId}/sign")
+  @Secured("ROLE_COMPARISON")
   fun signQuote(
     @Valid @PathVariable quoteId: UUID,
     @Valid @RequestBody request: SignRequestDTO

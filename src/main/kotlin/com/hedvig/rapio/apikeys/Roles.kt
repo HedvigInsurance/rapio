@@ -1,5 +1,6 @@
 package com.hedvig.rapio.apikeys
 
 enum class Roles {
-    COMPARISON
+    COMPARISON,
+    INSURANCE_INFO
 }

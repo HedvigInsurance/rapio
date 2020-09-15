@@ -4,7 +4,6 @@ import com.hedvig.rapio.externalservices.apigateway.ApiGateway
 import com.hedvig.rapio.externalservices.underwriter.transport.UnderwriterClient
 import com.hedvig.rapio.quotes.QuoteService
 import com.ninjasquad.springmockk.MockkBean
-import org.junit.Ignore
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -38,7 +37,6 @@ class ApiKeysTest {
   @MockkBean
   lateinit var apiGateway: ApiGateway
 
-  @Ignore
   @Test
   fun apikey_with_basic_auth() {
     mvc
@@ -46,7 +44,6 @@ class ApiKeysTest {
       .andExpect(status().isNotFound)
   }
 
-  @Ignore
   @Test
   fun apikey_not_found() {
     mvc
