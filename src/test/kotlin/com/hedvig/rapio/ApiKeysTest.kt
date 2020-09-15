@@ -4,8 +4,10 @@ import arrow.core.Right
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
 import com.hedvig.rapio.externalservices.underwriter.transport.UnderwriterClient
 import com.hedvig.rapio.quotes.QuoteService
-import com.hedvig.rapio.quotes.util.QuoteData
+import com.hedvig.rapio.quotes.util.QuoteData.createApartmentRequestJson
+import com.hedvig.rapio.quotes.util.QuoteData.makeSignResponse
 import com.hedvig.rapio.quotes.util.QuoteData.quoteResponse
+import com.hedvig.rapio.quotes.util.QuoteData.signRequestJson
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.junit.jupiter.api.Test
@@ -65,9 +67,46 @@ class ApiKeysTest {
 
     mvc
       .perform(post("/v1/quotes").with(httpBasic("mrAvyUser", ""))
-        .content(QuoteData.createApartmentRequestJson)
+        .content(createApartmentRequestJson)
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON))
       .andExpect(status().isForbidden)
+  }
+
+  @Test
+  fun `succeed to access v1 quotes if the role is ROLE_COMPARISON` () {
+
+    every { quoteService.createQuote(any(), any()) } returns Right(quoteResponse)
+
+    mvc
+      .perform(post("/v1/quotes").with(httpBasic("mrInsplanetUser", ""))
+        .content(createApartmentRequestJson)
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON))
+      .andExpect(status().is2xxSuccessful)
+  }
+
+  @Test
+  fun `fail to access signing quotes if the role is not ROLE_COMPARISON` () {
+    every { quoteService.signQuote(any(), any()) } returns Right(makeSignResponse())
+
+    mvc
+      .perform(post("/v1/quotes/BA483B2A-2549-4C88-9311-F7394BB34D16/sign").with(httpBasic("mrAvyUser", ""))
+        .content(signRequestJson)
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON))
+      .andExpect(status().isForbidden)
+  }
+
+  @Test
+  fun `succeed to access signing quotes if the role is not ROLE_COMPARISON` () {
+    every { quoteService.signQuote(any(), any()) } returns Right(makeSignResponse())
+
+    mvc
+      .perform(post("/v1/quotes/BA483B2A-2549-4C88-9311-F7394BB34D16/sign").with(httpBasic("mrInsplanetUser", ""))
+        .content(signRequestJson)
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON))
+      .andExpect(status().is2xxSuccessful)
   }
 }

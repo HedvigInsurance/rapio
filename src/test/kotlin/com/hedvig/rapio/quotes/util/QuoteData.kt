@@ -1,6 +1,7 @@
 package com.hedvig.rapio.quotes.util
 
 import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
+import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
 import org.javamoney.moneta.Money
 import java.time.Instant
 import java.util.UUID
@@ -44,9 +45,30 @@ object QuoteData {
     """.trimIndent()
 
     val quoteResponse = QuoteResponseDTO(
-    requestId = "adads",
-    monthlyPremium = Money.of(123, "SEK"),
-    quoteId = UUID.randomUUID().toString(),
-    validUntil = Instant.now().epochSecond
+        requestId = "adads",
+        monthlyPremium = Money.of(123, "SEK"),
+        quoteId = UUID.randomUUID().toString(),
+        validUntil = Instant.now().epochSecond
+    )
+
+    val signRequestJson = """
+        {
+            "requestId": "jl",
+            "startsAt": {
+                "date": "2019-11-01",
+                "timezone": "Europe/Stockholm"
+            },
+            "email": "some@test.com",
+            "firstName": "test",
+            "lastName": "Tolvansson"
+        }
+    """.trimIndent()
+
+    fun makeSignResponse(id: UUID = UUID.randomUUID()) = SignResponseDTO(
+        requestId = "jl",
+        quoteId = id.toString(),
+        productId = id.toString(),
+        signedAt = Instant.now().epochSecond,
+        completionUrl = "PAYMENT_REDIRECTION"
     )
 }
