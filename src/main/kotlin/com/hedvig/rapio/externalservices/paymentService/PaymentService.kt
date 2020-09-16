@@ -1,5 +1,6 @@
 package com.hedvig.rapio.externalservices.paymentService
 
+import com.hedvig.rapio.externalservices.paymentService.transport.PaymentServiceClient
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
