@@ -17,8 +17,9 @@ class InsuranceInfoController(
     fun getInsuranceInfo(
         @Valid @RequestParam memberId: String
     ): ResponseEntity<InsuranceInfo> {
-        val insuranceInfo = insuranceInfoService.getInsuranceInfo(memberId)
-
-        return ResponseEntity.ok(insuranceInfo)
+        return when (val insuranceInfo = insuranceInfoService.getInsuranceInfo(memberId)) {
+            null -> ResponseEntity.notFound().build()
+            else -> ResponseEntity.ok(insuranceInfo)
+        }
     }
 }

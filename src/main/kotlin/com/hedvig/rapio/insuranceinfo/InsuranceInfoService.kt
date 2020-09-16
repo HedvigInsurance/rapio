@@ -1,12 +1,14 @@
 package com.hedvig.rapio.insuranceinfo
 
+import com.hedvig.rapio.externalservices.paymentService.PaymentService
 import com.hedvig.rapio.externalservices.productPricing.ProductPricingService
 import com.hedvig.rapio.externalservices.productPricing.transport.Contract
 import org.springframework.stereotype.Service
 
 @Service
 class InsuranceInfoService(
-    val productPricingService: ProductPricingService
+    val productPricingService: ProductPricingService,
+    val paymentService: PaymentService
 ) {
 
     fun getInsuranceInfo(memberId: String): InsuranceInfo? {
@@ -16,6 +18,8 @@ class InsuranceInfoService(
             throw IllegalStateException("Should have only one contract")
         }
 
+        val isDirectDebitConnected = paymentService.isDirectDebitConnected(memberId)
+
         val contract = contracts[0]
 
         return InsuranceInfo(
@@ -23,7 +27,7 @@ class InsuranceInfoService(
             contract.status,
             contract.agreements.find { x -> x.id == contract.currentAgreementId }!!.basePremium,
             contract.masterInception,
-            null
+            isDirectDebitConnected
         )
     }
 

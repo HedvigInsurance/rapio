@@ -2,6 +2,8 @@ package com.hedvig.rapio
 
 import arrow.core.Right
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
+import com.hedvig.rapio.externalservices.paymentService.transport.PaymentServiceClient
+import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
 import com.hedvig.rapio.externalservices.underwriter.transport.UnderwriterClient
 import com.hedvig.rapio.quotes.QuoteService
 import com.hedvig.rapio.quotes.util.QuoteData.createApartmentRequestJson
@@ -45,6 +47,12 @@ class ApiKeysTest {
 
   @MockkBean
   lateinit var apiGateway: ApiGateway
+
+  @MockkBean
+  lateinit var paymentServiceClient: PaymentServiceClient
+
+  @MockkBean
+  lateinit var productPricingClient: ProductPricingClient
 
   @Test
   fun apikey_with_basic_auth() {
