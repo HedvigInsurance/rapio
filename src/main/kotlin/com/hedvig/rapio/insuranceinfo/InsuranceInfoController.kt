@@ -1,9 +1,10 @@
 package com.hedvig.rapio.insuranceinfo
 
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
@@ -14,8 +15,9 @@ class InsuranceInfoController(
 ) {
 
     @GetMapping("/{memberId}")
+    @Secured("ROLE_INSURANCE_INFO")
     fun getInsuranceInfo(
-        @Valid @RequestParam memberId: String
+        @Valid @PathVariable memberId: String
     ): ResponseEntity<InsuranceInfo> {
         return when (val insuranceInfo = insuranceInfoService.getInsuranceInfo(memberId)) {
             null -> ResponseEntity.notFound().build()
