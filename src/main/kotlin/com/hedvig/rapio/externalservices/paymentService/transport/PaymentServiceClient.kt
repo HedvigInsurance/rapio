@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 
 @FeignClient(
     name = "payment-service",
-    url = "\${hedvig.paymentService.url:payment-service}"
+    url = "\${hedvig.payment-service.url:payment-service}"
 )
 interface PaymentServiceClient {
     @GetMapping("/directDebit/status")
