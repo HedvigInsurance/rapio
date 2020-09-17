@@ -1,15 +1,16 @@
 package com.hedvig.rapio.quotes.web
 
 import arrow.core.Right
-import com.hedvig.rapio.externalservices.apigateway.ApiGateway
 import com.hedvig.rapio.quotes.QuoteService
 import com.hedvig.rapio.quotes.QuotesController
-import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
-import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
+import com.hedvig.rapio.quotes.util.QuoteData
+import com.hedvig.rapio.quotes.util.QuoteData.createApartmentRequestJson
+import com.hedvig.rapio.quotes.util.QuoteData.createHouseRequestJson
+import com.hedvig.rapio.quotes.util.QuoteData.quoteResponse
+import com.hedvig.rapio.quotes.util.QuoteData.signRequestJson
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.hamcrest.Matchers
-import org.javamoney.moneta.Money
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -20,8 +21,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 @WebMvcTest(controllers = [QuotesController::class], secure = false)
 internal class QuotesControllerTest {
@@ -32,54 +32,11 @@ internal class QuotesControllerTest {
   @MockkBean
   lateinit var quoteService: QuoteService
 
-  val createApartmentRequestJson = """
-        {"requestId":"adads",
-         "productType": "HOME",
-         "quoteData": { 
-            "personalNumber": "191212121212",
-            "street": "testgatan",
-            "zipCode": "12345",
-            "city": "Stockholm",
-            "livingSpace": 42,
-            "householdSize": 2,
-            "productSubType": "RENT"
-         }
-        }
-    """.trimIndent()
-
-  val createHouseRequestJson = """
-        {
-            "requestId": "1231a",
-            "productType": "HOUSE",
-            "quoteData": {
-                "street": "harry",
-                "zipCode": "11216",
-                "city": "stockholm",
-                "livingSpace": "240",
-                "personalNumber": "191212121212",
-                "householdSize": "4",
-                "ancilliaryArea": "123",
-                "yearOfConstruction": "1976",
-                "numberOfBathrooms": "2",
-                "extraBuildings": [
-                ],
-                "isSubleted": "false",
-                "floor": "2"
-            }
-        }
-    """.trimIndent()
-
   @Test
   @WithMockUser("COMPRICER")
   fun create_apartment_quote() {
 
-    val response = QuoteResponseDTO(
-      requestId = "adads",
-      monthlyPremium = Money.of(123, "SEK"),
-      quoteId = UUID.randomUUID().toString(),
-      validUntil = Instant.now().epochSecond
-    )
-    every { quoteService.createQuote(any(), any()) } returns (Right(response))
+    every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
 
     val request = post("/v1/quotes")
       .with(user("compricer"))
@@ -98,13 +55,7 @@ internal class QuotesControllerTest {
   @WithMockUser("COMPRICER")
   fun create_house_quote() {
 
-    val response = QuoteResponseDTO(
-      requestId = "1231a",
-      monthlyPremium = Money.of(123, "SEK"),
-      quoteId = UUID.randomUUID().toString(),
-      validUntil = Instant.now().epochSecond
-    )
-    every { quoteService.createQuote(any(), any()) } returns (Right(response))
+    every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
 
     val request = post("/v1/quotes")
       .with(user("compricer"))
@@ -119,32 +70,11 @@ internal class QuotesControllerTest {
       .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
   }
 
-  val signRequestJson = """
-        {
-            "requestId": "jl",
-            "startsAt": {
-                "date": "2019-11-01",
-                "timezone": "Europe/Stockholm"
-            },
-            "email": "some@test.com",
-            "firstName": "test",
-            "lastName": "Tolvansson"
-        }
-    """.trimIndent()
-
   @Test
   fun sign_quote() {
 
     val id = UUID.randomUUID()
-    every { quoteService.signQuote(id, any()) } returns Right(
-      SignResponseDTO(
-        requestId = "jl",
-        quoteId = id.toString(),
-        productId = id.toString(),
-        signedAt = Instant.now().epochSecond,
-        completionUrl = "PAYMENT_REDIRECTION"
-      )
-    )
+    every { quoteService.signQuote(id, any()) } returns Right( QuoteData.makeSignResponse(id) )
 
     val request = post("/v1/quotes/$id/sign")
       .with(user("compricer"))
