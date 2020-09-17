@@ -14,13 +14,9 @@ class InsuranceInfoService(
     fun getInsuranceInfo(memberId: String): InsuranceInfo? {
         val contracts: List<Contract> = productPricingService.getContractsByMemberId(memberId)
 
-        if (contracts.size != 1) {
-            throw IllegalStateException("Should have only one contract")
-        }
-
         val isDirectDebitConnected = paymentService.isDirectDebitConnected(memberId)
 
-        val contract = contracts[0]
+        val contract = contracts.maxBy { contract -> contract.createdAt }!!
 
         return InsuranceInfo(
             memberId,
