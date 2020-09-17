@@ -12,7 +12,7 @@ class InsuranceInfoService(
 ) {
 
     fun getInsuranceInfo(memberId: String): InsuranceInfo? {
-        val contracts: List<Contract> = productPricingService.getContractsByMemberId(memberId) ?: return null
+        val contracts: List<Contract> = productPricingService.getContractsByMemberId(memberId)
 
         if (contracts.size != 1) {
             throw IllegalStateException("Should have only one contract")
