@@ -25,7 +25,7 @@ class InsuranceInfoService(
         return InsuranceInfo(
             memberId,
             contract.status,
-            contract.agreements.find { x -> x.id == contract.currentAgreementId }!!.basePremium,
+            contract.agreements.find { agreement -> agreement.id == contract.currentAgreementId }!!.basePremium,
             contract.masterInception,
             isDirectDebitConnected
         )
