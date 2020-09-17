@@ -5,7 +5,10 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 
-@FeignClient(name = "productPricingClient", url = "\${hedvig.productPricing.url:product-pricing}")
+@FeignClient(
+    name = "productPricingClient",
+    url = "\${hedvig.productPricing.url:product-pricing}"
+)
 interface ProductPricingClient {
 
     @GetMapping(value = ["/_/contracts/members/{memberId}"])
