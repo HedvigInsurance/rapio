@@ -22,14 +22,17 @@ class ApplicationPropertiesApikeysService(val config: Keys) : UserDetailsService
 
         val apiUserName = config.apikeys?.get(username)
 
-        if (!Partner.values().map { it.name }.contains(apiUserName)) {
+        val partner: Partner
+        try {
+            partner = Partner.valueOf(apiUserName!!)
+        } catch (ex: Exception) {
             logger.error("Could not find any partner named $apiUserName")
             throw UsernameNotFoundException("Could not find any partner named $apiUserName")
         }
 
         val user = User.withDefaultPasswordEncoder().username(apiUserName)
             .password("")
-            .roles(Partner.valueOf(apiUserName!!).role.name).build()
+            .roles(partner.role.name).build()
 
         sentry.user = SentryUser(null, apiUserName, null, null)
         return user
