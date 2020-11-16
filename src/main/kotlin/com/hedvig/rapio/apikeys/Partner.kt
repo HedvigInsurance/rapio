@@ -5,5 +5,6 @@ enum class Partner(val role: Roles) {
     COMPRICER(role = Roles.COMPARISON),
     HEDVIG(role = Roles.COMPARISON),
     INSURLEY(role = Roles.COMPARISON),
+    KEYSOLUTIONS(role = Roles.COMPARISON),
     AVY(role = Roles.INSURANCE_INFO)
 }
