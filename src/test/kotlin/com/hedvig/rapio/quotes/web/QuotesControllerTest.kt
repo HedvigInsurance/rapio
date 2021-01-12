@@ -5,6 +5,8 @@ import com.hedvig.rapio.quotes.QuoteService
 import com.hedvig.rapio.quotes.QuotesController
 import com.hedvig.rapio.quotes.util.QuoteData
 import com.hedvig.rapio.quotes.util.QuoteData.createApartmentRequestJson
+import com.hedvig.rapio.quotes.util.QuoteData.createStudentRentApartmentRequestJson
+import com.hedvig.rapio.quotes.util.QuoteData.createStudentBrfApartmentRequestJson
 import com.hedvig.rapio.quotes.util.QuoteData.createHouseRequestJson
 import com.hedvig.rapio.quotes.util.QuoteData.quoteResponse
 import com.hedvig.rapio.quotes.util.QuoteData.signRequestJson
@@ -41,6 +43,44 @@ internal class QuotesControllerTest {
     val request = post("/v1/quotes")
       .with(user("compricer"))
       .content(createApartmentRequestJson)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+
+    val result = mockMvc.perform(request)
+
+    result
+      .andExpect(status().is2xxSuccessful)
+      .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
+  }
+
+  @Test
+  @WithMockUser("COMPRICER")
+  fun create_student_rent_apartment_quote() {
+
+    every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+
+    val request = post("/v1/quotes")
+      .with(user("compricer"))
+      .content(createStudentRentApartmentRequestJson)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+
+    val result = mockMvc.perform(request)
+
+    result
+      .andExpect(status().is2xxSuccessful)
+      .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
+  }
+
+  @Test
+  @WithMockUser("COMPRICER")
+  fun create_student_brf_apartment_quote() {
+
+    every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+
+    val request = post("/v1/quotes")
+      .with(user("compricer"))
+      .content(createStudentBrfApartmentRequestJson)
       .contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
 

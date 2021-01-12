@@ -22,6 +22,36 @@ object QuoteData {
         }
     """.trimIndent()
 
+    val createStudentRentApartmentRequestJson = """
+        {"requestId":"adads",
+         "productType": "HOME",
+         "quoteData": { 
+            "personalNumber": "191212121212",
+            "street": "testgatan",
+            "zipCode": "12345",
+            "city": "Stockholm",
+            "livingSpace": 42,
+            "householdSize": 2,
+            "productSubType": "STUDENT_RENT"
+         }
+        }
+    """.trimIndent()
+
+    val createStudentBrfApartmentRequestJson = """
+        {"requestId":"adads",
+         "productType": "HOME",
+         "quoteData": { 
+            "personalNumber": "191212121212",
+            "street": "testgatan",
+            "zipCode": "12345",
+            "city": "Stockholm",
+            "livingSpace": 42,
+            "householdSize": 2,
+            "productSubType": "STUDENT_BRF"
+         }
+        }
+    """.trimIndent()
+
     val createHouseRequestJson = """
         {
             "requestId": "1231a",

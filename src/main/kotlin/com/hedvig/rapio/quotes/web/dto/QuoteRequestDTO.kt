@@ -76,7 +76,9 @@ data class HouseQuoteRequestData(
 
 enum class ProductSubType {
     BRF,
-    RENT
+    RENT,
+    STUDENT_RENT,
+    STUDENT_BRF
 }
 
 enum class ProductType {
