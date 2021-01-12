@@ -38,7 +38,12 @@ class QuoteServiceImpl(
           livingSpace = quoteData.livingSpace,
           householdSize = quoteData.householdSize,
           floor = 0,
-          subType = if (quoteData.productSubType == ProductSubType.RENT) ApartmentProductSubType.RENT else ApartmentProductSubType.BRF
+          subType = when (quoteData.productSubType) {
+            ProductSubType.RENT -> ApartmentProductSubType.RENT
+            ProductSubType.BRF -> ApartmentProductSubType.BRF
+            ProductSubType.STUDENT_RENT -> ApartmentProductSubType.STUDENT_RENT
+            ProductSubType.STUDENT_BRF -> ApartmentProductSubType.STUDENT_BRF
+          }
         )
       }
       is HouseQuoteRequestData -> {
