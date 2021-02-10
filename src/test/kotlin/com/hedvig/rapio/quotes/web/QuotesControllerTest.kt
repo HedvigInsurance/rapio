@@ -5,6 +5,8 @@ import com.hedvig.rapio.quotes.QuoteService
 import com.hedvig.rapio.quotes.QuotesController
 import com.hedvig.rapio.quotes.util.QuoteData
 import com.hedvig.rapio.quotes.util.QuoteData.createApartmentRequestJson
+import com.hedvig.rapio.quotes.util.QuoteData.createDeprecatedApartmentRequestJson
+import com.hedvig.rapio.quotes.util.QuoteData.createDeprecatedHouseRequestJson
 import com.hedvig.rapio.quotes.util.QuoteData.createStudentRentApartmentRequestJson
 import com.hedvig.rapio.quotes.util.QuoteData.createStudentBrfApartmentRequestJson
 import com.hedvig.rapio.quotes.util.QuoteData.createHouseRequestJson
@@ -43,6 +45,25 @@ internal class QuotesControllerTest {
     val request = post("/v1/quotes")
       .with(user("compricer"))
       .content(createApartmentRequestJson)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+
+    val result = mockMvc.perform(request)
+
+    result
+      .andExpect(status().is2xxSuccessful)
+      .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
+  }
+
+  @Test
+  @WithMockUser("COMPRICER")
+  fun create_deprecated_apartment_quote() {
+
+    every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+
+    val request = post("/v1/quotes")
+      .with(user("compricer"))
+      .content(createDeprecatedApartmentRequestJson)
       .contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
 
@@ -100,6 +121,25 @@ internal class QuotesControllerTest {
     val request = post("/v1/quotes")
       .with(user("compricer"))
       .content(createHouseRequestJson)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+
+    val result = mockMvc.perform(request)
+
+    result
+      .andExpect(status().is2xxSuccessful)
+      .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
+  }
+
+  @Test
+  @WithMockUser("COMPRICER")
+  fun create_deprecated_house_quote() {
+
+    every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+
+    val request = post("/v1/quotes")
+      .with(user("compricer"))
+      .content(createDeprecatedHouseRequestJson)
       .contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
 
