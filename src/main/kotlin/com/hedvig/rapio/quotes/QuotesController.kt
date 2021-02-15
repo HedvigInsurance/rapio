@@ -1,19 +1,10 @@
 package com.hedvig.rapio.quotes
 
-import arrow.core.Left
-import arrow.core.None
-import arrow.core.Right
-import arrow.core.Some
-import arrow.core.flatMap
 import arrow.core.getOrHandle
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.comparison.web.dto.ExternalErrorResponseDTO
-import com.hedvig.rapio.quotes.web.dto.ApartmentQuoteRequestData
-import com.hedvig.rapio.quotes.web.dto.HouseQuoteRequestData
-import com.hedvig.rapio.quotes.web.dto.QuoteRequestDTO
-import com.hedvig.rapio.quotes.web.dto.SignRequestDTO
-import com.hedvig.rapio.util.IdNumberValidator
-import com.hedvig.rapio.util.badRequest
+import com.hedvig.rapio.quotes.web.dto.*
+import com.hedvig.rapio.util.SwedishPersonalNumberValidator
 import com.hedvig.rapio.util.notAccepted
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
@@ -35,48 +26,38 @@ import javax.validation.Valid
 class QuotesController @Autowired constructor(
   val quoteService: QuoteService
 ) {
+
   @PostMapping()
   @Secured("ROLE_COMPARISON")
-  fun createQuote(@Valid @RequestBody request: QuoteRequestDTO): ResponseEntity<*> {
+  fun createQuote(@Valid @RequestBody request: QuoteRequestDTO): ResponseEntity<*> = logRequestId(request.requestId) {
 
     val currentUserName = SecurityContextHolder.getContext().authentication.name
-
     val partner = Partner.valueOf(currentUserName)
 
-    val personnummer = when (request.quoteData) {
-      is ApartmentQuoteRequestData -> (request.quoteData as ApartmentQuoteRequestData).personalNumber
-      is HouseQuoteRequestData -> (request.quoteData as HouseQuoteRequestData).personalNumber
-    }
+    val requestData = when (val data = request.quoteData) {
 
-    return logRequestId(request.requestId) {
-      val validIdNumber = when (val idNumber = IdNumberValidator.validate(personnummer)) {
-        is None -> Left(badRequest("PersonalNumber is invalid"))
-        is Some ->
-          when (request.quoteData) {
-            is ApartmentQuoteRequestData -> Right(
-              request.copy(
-                quoteData = (request.quoteData as ApartmentQuoteRequestData).copy(
-                  personalNumber = idNumber.t.idno
-                )
-              )
-            )
-            is HouseQuoteRequestData -> Right(
-              request.copy(
-                quoteData = (request.quoteData as HouseQuoteRequestData).copy(
-                  personalNumber = idNumber.t.idno
-                )
-              )
-            )
-          }
+      is ApartmentQuoteRequestData -> {
+        request.copy(quoteData = data.copy(
+            personalNumber = SwedishPersonalNumberValidator.validate(data.personalNumber).idno
+          )
+        )
       }
 
-      return@logRequestId validIdNumber.flatMap { requestWithValidatedPnr ->
-        quoteService.createQuote(requestWithValidatedPnr, partner).bimap(
-          { left -> notAccepted(left) },
-          { right -> ok(right) }
+      is HouseQuoteRequestData -> {
+        request.copy(
+          quoteData = data.copy(
+            personalNumber = SwedishPersonalNumberValidator.validate(data.personalNumber).idno
+          )
         )
-      }.getOrHandle { it }
+      }
+
+      is NorwegianTravelQuoteRequestData -> request
     }
+
+    return@logRequestId quoteService.createQuote(requestData, partner).bimap(
+      { left -> notAccepted(left) },
+      { right -> ok(right) }
+    ).getOrHandle { it }
   }
 
   @PostMapping("{quoteId}/sign")

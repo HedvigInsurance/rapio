@@ -5,6 +5,7 @@ import java.time.ZoneId
 
 data class SignQuoteRequest (
         val name: Name?,
+        val ssn: String?,
         val startDate: LocalDate,
         val email: String
 )

@@ -17,7 +17,7 @@ import java.time.ZoneId
 @Component
 class FakeUnderwriter : Underwriter {
 
-    override fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String): Either<ErrorResponse, SignedQuoteResponseDto> {
+    override fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String, ssn: String?): Either<ErrorResponse, SignedQuoteResponseDto> {
         return Right(SignedQuoteResponseDto(id, "1234", Instant.now()))
     }
 

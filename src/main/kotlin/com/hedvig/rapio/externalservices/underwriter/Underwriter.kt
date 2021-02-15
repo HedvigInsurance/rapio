@@ -7,7 +7,7 @@ import java.time.LocalDate
 import javax.money.MonetaryAmount
 
 interface Underwriter {
-    fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String) : Either<ErrorResponse, SignedQuoteResponseDto>
+    fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String, ssn: String?) : Either<ErrorResponse, SignedQuoteResponseDto>
     fun createQuote(data: IncompleteQuoteDTO): Either<ErrorResponse, CompleteQuoteReference>
 }
 

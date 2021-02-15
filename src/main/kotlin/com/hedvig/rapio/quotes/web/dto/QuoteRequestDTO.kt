@@ -9,15 +9,18 @@ import javax.validation.constraints.*
 
 @optics
 data class QuoteRequestDTO(
-    val requestId :String,
-    @get: Valid val productType: ProductType,
+    @get:NotBlank val requestId: String,
+    @get:Valid val productType: ProductType,
+    @get:Valid
     @set:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "productType")
     @JsonSubTypes(
-            JsonSubTypes.Type(value = ApartmentQuoteRequestData::class, name = "SWEDISH_APARTMENT"),
-            JsonSubTypes.Type(value = HouseQuoteRequestData::class, name = "SWEDISH_HOUSE"),
-            JsonSubTypes.Type(value = ApartmentQuoteRequestData::class, name = "HOME"), // Deprecated use SWEDISH_APARTMENT
-            JsonSubTypes.Type(value = HouseQuoteRequestData::class, name = "HOUSE")  // Deprecated use SWEDISH_HOUSE
-    ) var quoteData: QuoteRequestData
+        JsonSubTypes.Type(value = ApartmentQuoteRequestData::class, name = "HOME"), // Deprecated use SWEDISH_APARTMENT
+        JsonSubTypes.Type(value = HouseQuoteRequestData::class, name = "HOUSE"),  // Deprecated use SWEDISH_HOUSE
+        JsonSubTypes.Type(value = ApartmentQuoteRequestData::class, name = "SWEDISH_APARTMENT"),
+        JsonSubTypes.Type(value = HouseQuoteRequestData::class, name = "SWEDISH_HOUSE"),
+        JsonSubTypes.Type(value = NorwegianTravelQuoteRequestData::class, name = "NORWEGIAN_TRAVEL")
+    )
+    var quoteData: QuoteRequestData
 ) {
     companion object
 }
@@ -29,17 +32,15 @@ sealed class QuoteRequestData {
 data class ApartmentQuoteRequestData(
     @get:NotBlank val street: String,
 
-    @get:Digits(integer = 5, fraction = 0)
-    @get:Size(min=5, max=5)
     @get:NotBlank val zipCode: String,
 
     @get:NotBlank val city: String,
 
-    @get:Min(1) @Max(1000) val livingSpace: Int,
+    @get:Min(1) @get:Max(1000) val livingSpace: Int,
 
-    @get:Size(min=12, max=12) val personalNumber: String,
+    @get:NotBlank val personalNumber: String,
 
-    @get:Min(1) @Max(100)
+    @get:Min(1) @get:Max(100)
     val householdSize: Int,
 
     val productSubType: ProductSubType
@@ -51,15 +52,13 @@ data class ApartmentQuoteRequestData(
 data class HouseQuoteRequestData(
     @get:NotBlank val street: String,
 
-    @get:Digits(integer = 5, fraction = 0)
-    @get:Size(min=5, max=5)
     @get:NotBlank val zipCode: String,
 
     @get:NotBlank val city: String,
 
     @get:Min(1) @get:Max(1000) val livingSpace: Int,
 
-    @get:Size(min=12, max=12) val personalNumber: String,
+    @get:NotBlank val personalNumber: String,
 
     @get:Min(1) @get:Max(100)
     val householdSize: Int,
@@ -76,6 +75,18 @@ data class HouseQuoteRequestData(
     companion object
 }
 
+@optics
+data class NorwegianTravelQuoteRequestData(
+    @get:NotBlank @get:Pattern(regexp = """\d{4}-\d{2}-\d{2}""")
+    val birthDate: String,
+    @get:Min(0) @get:Max(5)
+    val coInsured: Int,
+    val youth: Boolean
+
+): QuoteRequestData() {
+    companion object
+}
+
 enum class ProductSubType {
     BRF,
     RENT,
@@ -84,8 +95,9 @@ enum class ProductSubType {
 }
 
 enum class ProductType {
+    HOME, // Deprecated use SWEDISH_APARTMENT
+    HOUSE, // Deprecated use SWEDISH_HOUSE
     SWEDISH_APARTMENT,
     SWEDISH_HOUSE,
-    HOME, // Deprecated use SWEDISH_APARTMENT
-    HOUSE // Deprecated use SWEDISH_HOUSE
+    NORWEGIAN_TRAVEL
 }

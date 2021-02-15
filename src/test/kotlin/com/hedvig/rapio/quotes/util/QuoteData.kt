@@ -22,6 +22,21 @@ object QuoteData {
         }
     """.trimIndent()
 
+    val createApartmentRequestJsonWithInvalidPnr = """
+        {"requestId":"adads",
+         "productType": "SWEDISH_APARTMENT",
+         "quoteData": { 
+            "personalNumber": "xxx",
+            "street": "testgatan",
+            "zipCode": "12345",
+            "city": "Stockholm",
+            "livingSpace": 42,
+            "householdSize": 2,
+            "productSubType": "RENT"
+         }
+        }
+    """.trimIndent()
+
     val createDeprecatedApartmentRequestJson = """
         {"requestId":"adads",
          "productType": "HOME",
@@ -107,6 +122,18 @@ object QuoteData {
                 ],
                 "isSubleted": "false",
                 "floor": "2"
+            }
+        }
+    """.trimIndent()
+
+    val createNorwegianTravelRequestJson = """
+        {
+            "requestId": "1231a",
+            "productType": "NORWEGIAN_TRAVEL",
+            "quoteData": {
+                "birthDate": "1999-01-01",
+                "coInsured": 2,
+                "youth": false
             }
         }
     """.trimIndent()

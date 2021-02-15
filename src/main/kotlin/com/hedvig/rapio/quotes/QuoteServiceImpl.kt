@@ -4,20 +4,11 @@ import arrow.core.Either
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
 import com.hedvig.rapio.externalservices.underwriter.Underwriter
-import com.hedvig.rapio.externalservices.underwriter.transport.ApartmentProductSubType
-import com.hedvig.rapio.externalservices.underwriter.transport.ErrorCodes
-import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteApartmentQuoteDataDto
-import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHouseQuoteDataDto
-import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteQuoteDTO
+import com.hedvig.rapio.externalservices.underwriter.transport.*
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
-import com.hedvig.rapio.quotes.web.dto.ApartmentQuoteRequestData
-import com.hedvig.rapio.quotes.web.dto.HouseQuoteRequestData
-import com.hedvig.rapio.quotes.web.dto.ProductSubType
-import com.hedvig.rapio.quotes.web.dto.QuoteRequestDTO
-import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
-import com.hedvig.rapio.quotes.web.dto.SignRequestDTO
-import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
+import com.hedvig.rapio.quotes.web.dto.*
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.util.UUID
 
 @Service
@@ -61,6 +52,11 @@ class QuoteServiceImpl(
           floor = quoteData.floor
         )
       }
+      is NorwegianTravelQuoteRequestData ->
+        IncompleteNorwegianTravelQuoteDataDto(
+          coInsured = quoteData.coInsured,
+          youth = quoteData.youth
+        )
     }
 
     val request = IncompleteQuoteDTO(
@@ -68,14 +64,20 @@ class QuoteServiceImpl(
       firstName = null,
       lastName = null,
       quotingPartner = partner.name,
-      birthDate = null,
+      birthDate = when (quoteData) {
+        is ApartmentQuoteRequestData -> null
+        is HouseQuoteRequestData -> null
+        is NorwegianTravelQuoteRequestData -> LocalDate.parse(quoteData.birthDate)
+      },
       ssn = when (quoteData) {
         is ApartmentQuoteRequestData -> quoteData.personalNumber
         is HouseQuoteRequestData -> quoteData.personalNumber
+        is NorwegianTravelQuoteRequestData -> null
       },
       productType = when (quoteData) {
         is ApartmentQuoteRequestData -> ProductType.APARTMENT
         is HouseQuoteRequestData -> ProductType.HOUSE
+        is NorwegianTravelQuoteRequestData -> ProductType.TRAVEL
       },
       currentInsurer = null,
       shouldComplete = true,
@@ -103,7 +105,8 @@ class QuoteServiceImpl(
       request.email,
       request.startsAt.date,
       request.firstName,
-      request.lastName
+      request.lastName,
+      request.personalNumber
     )
 
     return when (response) {

@@ -14,7 +14,9 @@ data class SignRequestDTO(
         @get:Email val email:String,
 
         @get:NotBlank val firstName: String,
-        @get:NotBlank val lastName: String
+        @get:NotBlank val lastName: String,
+
+        val personalNumber: String?
         )
 
 data class Date(
