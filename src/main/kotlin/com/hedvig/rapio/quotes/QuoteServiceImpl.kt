@@ -57,6 +57,16 @@ class QuoteServiceImpl(
           coInsured = quoteData.coInsured,
           youth = quoteData.youth
         )
+      is NorwegianHomeContentQuoteRequestData ->
+        IncompleteNorwegianHomeContentQuoteDataDto(
+          street = quoteData.street,
+          zipCode = quoteData.zipCode,
+          city = quoteData.city,
+          livingSpace = quoteData.livingSpace,
+          coInsured = quoteData.coInsured,
+          youth = quoteData.youth,
+          subType = quoteData.productSubType
+        )
     }
 
     val request = IncompleteQuoteDTO(
@@ -68,16 +78,19 @@ class QuoteServiceImpl(
         is ApartmentQuoteRequestData -> null
         is HouseQuoteRequestData -> null
         is NorwegianTravelQuoteRequestData -> LocalDate.parse(quoteData.birthDate)
+        is NorwegianHomeContentQuoteRequestData -> LocalDate.parse(quoteData.birthDate)
       },
       ssn = when (quoteData) {
         is ApartmentQuoteRequestData -> quoteData.personalNumber
         is HouseQuoteRequestData -> quoteData.personalNumber
         is NorwegianTravelQuoteRequestData -> null
+        is NorwegianHomeContentQuoteRequestData -> null
       },
       productType = when (quoteData) {
         is ApartmentQuoteRequestData -> ProductType.APARTMENT
         is HouseQuoteRequestData -> ProductType.HOUSE
         is NorwegianTravelQuoteRequestData -> ProductType.TRAVEL
+        is NorwegianHomeContentQuoteRequestData -> ProductType.HOME_CONTENT
       },
       currentInsurer = null,
       shouldComplete = true,

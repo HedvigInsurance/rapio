@@ -18,7 +18,8 @@ data class QuoteRequestDTO(
         JsonSubTypes.Type(value = HouseQuoteRequestData::class, name = "HOUSE"),  // Deprecated use SWEDISH_HOUSE
         JsonSubTypes.Type(value = ApartmentQuoteRequestData::class, name = "SWEDISH_APARTMENT"),
         JsonSubTypes.Type(value = HouseQuoteRequestData::class, name = "SWEDISH_HOUSE"),
-        JsonSubTypes.Type(value = NorwegianTravelQuoteRequestData::class, name = "NORWEGIAN_TRAVEL")
+        JsonSubTypes.Type(value = NorwegianTravelQuoteRequestData::class, name = "NORWEGIAN_TRAVEL"),
+        JsonSubTypes.Type(value = NorwegianHomeContentQuoteRequestData::class, name = "NORWEGIAN_HOME_CONTENT")
     )
     var quoteData: QuoteRequestData
 ) {
@@ -87,6 +88,21 @@ data class NorwegianTravelQuoteRequestData(
     companion object
 }
 
+@optics
+data class NorwegianHomeContentQuoteRequestData(
+    @get:NotBlank val street: String,
+    @get:NotBlank @get:Pattern(regexp = """\d{4}""") val zipCode: String,
+    @get:NotBlank val city: String,
+    @get:Min(1) @get:Max(1000) val livingSpace: Int,
+    @get:NotBlank @get:Pattern(regexp = """\d{4}-\d{2}-\d{2}""") val birthDate: String,
+    @get:Min(0) @get:Max(5) val coInsured: Int,
+    val youth: Boolean,
+    @get:NotBlank @get:Pattern(regexp = """(OWN|RENT)""") val productSubType: String
+
+): QuoteRequestData() {
+    companion object
+}
+
 enum class ProductSubType {
     BRF,
     RENT,
@@ -99,5 +115,6 @@ enum class ProductType {
     HOUSE, // Deprecated use SWEDISH_HOUSE
     SWEDISH_APARTMENT,
     SWEDISH_HOUSE,
-    NORWEGIAN_TRAVEL
+    NORWEGIAN_TRAVEL,
+    NORWEGIAN_HOME_CONTENT
 }

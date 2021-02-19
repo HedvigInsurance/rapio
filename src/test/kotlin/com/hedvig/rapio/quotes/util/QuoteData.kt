@@ -138,6 +138,22 @@ object QuoteData {
         }
     """.trimIndent()
 
+    val createNorwegianHomeContentRequestJson = """
+        {
+            "requestId": "1231a",
+            "productType": "NORWEGIAN_TRAVEL",
+            "quoteData": {
+                "street": "harry",
+                "zipCode": "11216",
+                "city": "stockholm",
+                "livingSpace": "240",
+                "birthDate": "1999-01-01",
+                "coInsured": 1,
+                "youth": false
+            }
+        }
+    """.trimIndent()
+
     val quoteResponse = QuoteResponseDTO(
         requestId = "adads",
         monthlyPremium = Money.of(123, "SEK"),
