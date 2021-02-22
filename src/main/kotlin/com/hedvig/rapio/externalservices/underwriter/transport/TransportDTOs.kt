@@ -23,8 +23,7 @@ data class IncompleteQuoteDTO(
     val quotingPartner: String?,
     val productType: ProductType,
     val incompleteQuoteData: IncompleteQuoteRequestData,
-    val shouldComplete: Boolean,
-    val underwritingGuidelinesBypassedBy: String?
+    val shouldComplete: Boolean
 )
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")

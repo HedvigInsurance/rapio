@@ -80,7 +80,7 @@ data class HouseQuoteRequestData(
 data class NorwegianTravelQuoteRequestData(
     @get:NotBlank @get:Pattern(regexp = """\d{4}-\d{2}-\d{2}""")
     val birthDate: String,
-    @get:Min(0) @get:Max(5)
+    @get:Min(0) @get:Max(100)
     val coInsured: Int,
     val youth: Boolean
 
@@ -95,7 +95,7 @@ data class NorwegianHomeContentQuoteRequestData(
     @get:NotBlank val city: String,
     @get:Min(1) @get:Max(1000) val livingSpace: Int,
     @get:NotBlank @get:Pattern(regexp = """\d{4}-\d{2}-\d{2}""") val birthDate: String,
-    @get:Min(0) @get:Max(5) val coInsured: Int,
+    @get:Min(0) @get:Max(100) val coInsured: Int,
     val youth: Boolean,
     @get:NotBlank @get:Pattern(regexp = """(OWN|RENT)""") val productSubType: String
 

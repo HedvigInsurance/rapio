@@ -93,8 +93,7 @@ class QuoteServiceImpl(
         is NorwegianHomeContentQuoteRequestData -> ProductType.HOME_CONTENT
       },
       currentInsurer = null,
-      shouldComplete = true,
-      underwritingGuidelinesBypassedBy = null
+      shouldComplete = true
     )
 
     val completeQuote = underwriter.createQuote(request)
