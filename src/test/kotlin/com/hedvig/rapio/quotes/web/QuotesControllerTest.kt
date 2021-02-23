@@ -1,15 +1,19 @@
 package com.hedvig.rapio.quotes.web
 
+import arrow.core.Left
 import arrow.core.Right
 import com.hedvig.rapio.quotes.QuoteService
 import com.hedvig.rapio.quotes.QuotesController
 import com.hedvig.rapio.quotes.util.QuoteData
 import com.hedvig.rapio.quotes.util.QuoteData.createApartmentRequestJson
+import com.hedvig.rapio.quotes.util.QuoteData.createApartmentRequestJsonWithInvalidPnr
 import com.hedvig.rapio.quotes.util.QuoteData.createDeprecatedApartmentRequestJson
 import com.hedvig.rapio.quotes.util.QuoteData.createDeprecatedHouseRequestJson
 import com.hedvig.rapio.quotes.util.QuoteData.createStudentRentApartmentRequestJson
 import com.hedvig.rapio.quotes.util.QuoteData.createStudentBrfApartmentRequestJson
 import com.hedvig.rapio.quotes.util.QuoteData.createHouseRequestJson
+import com.hedvig.rapio.quotes.util.QuoteData.createNorwegianHomeContentRequestJson
+import com.hedvig.rapio.quotes.util.QuoteData.createNorwegianTravelRequestJson
 import com.hedvig.rapio.quotes.util.QuoteData.quoteResponse
 import com.hedvig.rapio.quotes.util.QuoteData.signRequestJson
 import com.ninjasquad.springmockk.MockkBean
@@ -72,6 +76,44 @@ internal class QuotesControllerTest {
     result
       .andExpect(status().is2xxSuccessful)
       .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
+  }
+
+  @Test
+  @WithMockUser("COMPRICER")
+  @Throws
+  fun create_apartment_quote_with_invalid_pnr() {
+
+    val request = post("/v1/quotes")
+      .with(user("compricer"))
+      .content(createApartmentRequestJsonWithInvalidPnr)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+
+    val result = mockMvc.perform(request)
+
+      result
+        .andExpect(status().isBadRequest)
+        .andExpect(jsonPath("$.errorMessage", Matchers.equalTo("Personal number number is required")))
+  }
+
+  @Test
+  @WithMockUser("COMPRICER")
+  @Throws
+  fun create_breaching_uw_apartment_quote() {
+
+    every { quoteService.createQuote(any(), any()) } returns (Left("Testing"))
+
+    val request = post("/v1/quotes")
+      .with(user("compricer"))
+      .content(createApartmentRequestJson)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+
+    val result = mockMvc.perform(request)
+
+      result
+        .andExpect(status().isUnprocessableEntity)
+        .andExpect(jsonPath("$.errorMessage", Matchers.equalTo("Testing")))
   }
 
   @Test
@@ -140,6 +182,44 @@ internal class QuotesControllerTest {
     val request = post("/v1/quotes")
       .with(user("compricer"))
       .content(createDeprecatedHouseRequestJson)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+
+    val result = mockMvc.perform(request)
+
+    result
+      .andExpect(status().is2xxSuccessful)
+      .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
+  }
+
+  @Test
+  @WithMockUser("COMPRICER")
+  fun create_norwegian_travel_quote() {
+
+    every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+
+    val request = post("/v1/quotes")
+      .with(user("compricer"))
+      .content(createNorwegianTravelRequestJson)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+
+    val result = mockMvc.perform(request)
+
+    result
+      .andExpect(status().is2xxSuccessful)
+      .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
+  }
+
+  @Test
+  @WithMockUser("COMPRICER")
+  fun create_norwegian_home_content_quote() {
+
+    every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+
+    val request = post("/v1/quotes")
+      .with(user("compricer"))
+      .content(createNorwegianHomeContentRequestJson)
       .contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
 

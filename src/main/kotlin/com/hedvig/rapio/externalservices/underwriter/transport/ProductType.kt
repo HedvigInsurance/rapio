@@ -4,5 +4,7 @@ enum class ProductType {
     APARTMENT,
     HOUSE,
     OBJECT,
+    TRAVEL,
+    HOME_CONTENT,
     UNKNOWN
 }

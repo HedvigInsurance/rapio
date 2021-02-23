@@ -39,9 +39,9 @@ class ConcreteUnderwriter(private val client: UnderwriterClient,
         }
     }
 
-    override fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String): Either<ErrorResponse, SignedQuoteResponseDto> {
+    override fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String, ssn: String?): Either<ErrorResponse, SignedQuoteResponseDto> {
         try {
-            val response = this.client.signQuote(id, SignQuoteRequest(Name(firstName, lastName), startsAt, email))
+            val response = this.client.signQuote(id, SignQuoteRequest(Name(firstName, lastName), ssn, startsAt, email))
             return Either.right(response.body!!)
         } catch (ex: FeignException) {
             if (ex.status() == 422) {

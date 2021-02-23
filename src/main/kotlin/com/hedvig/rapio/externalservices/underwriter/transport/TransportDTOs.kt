@@ -23,14 +23,15 @@ data class IncompleteQuoteDTO(
     val quotingPartner: String?,
     val productType: ProductType,
     val incompleteQuoteData: IncompleteQuoteRequestData,
-    val shouldComplete: Boolean,
-    val underwritingGuidelinesBypassedBy: String?
+    val shouldComplete: Boolean
 )
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
     JsonSubTypes.Type(value = IncompleteApartmentQuoteDataDto::class, name = "apartment"),
-    JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house")
+    JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house"),
+    JsonSubTypes.Type(value = IncompleteNorwegianTravelQuoteDataDto::class, name = "norwegianTravel"),
+    JsonSubTypes.Type(value = IncompleteNorwegianHomeContentQuoteDataDto::class, name = "norwegianHomeContents")
 )
 sealed class IncompleteQuoteRequestData {
 }
@@ -57,6 +58,21 @@ data class IncompleteApartmentQuoteDataDto(
     val householdSize: Int?,
     val floor: Int?,
     val subType: ApartmentProductSubType?
+) : IncompleteQuoteRequestData()
+
+data class IncompleteNorwegianTravelQuoteDataDto(
+    val coInsured: Int?,
+    val youth: Boolean?
+) : IncompleteQuoteRequestData()
+
+data class IncompleteNorwegianHomeContentQuoteDataDto(
+    val street: String?,
+    val zipCode: String?,
+    val city: String?,
+    val livingSpace: Int?,
+    val coInsured: Int?,
+    val youth: Boolean?,
+    val subType: String
 ) : IncompleteQuoteRequestData()
 
 data class CompleteQuoteResponse(
