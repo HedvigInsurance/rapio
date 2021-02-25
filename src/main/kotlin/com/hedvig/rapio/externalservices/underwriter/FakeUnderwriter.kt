@@ -18,7 +18,7 @@ import java.time.ZoneId
 class FakeUnderwriter : Underwriter {
 
     override fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String, ssn: String?): Either<ErrorResponse, SignedQuoteResponseDto> {
-        return Right(SignedQuoteResponseDto(id, "1234", Instant.now()))
+        return Right(SignedQuoteResponseDto(id, "1234", Instant.now(), "SEK"))
     }
 
     override fun createQuote(data: IncompleteQuoteDTO): Either<ErrorResponse, CompleteQuoteReference> {
