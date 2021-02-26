@@ -197,9 +197,12 @@ class NorwayIntegrationTest {
             SignedQuoteResponseDto(
                 id = uwProductId,
                 memberId = "12345",
-                signedAt = uwSignedAt
+                signedAt = uwSignedAt,
+                market = "NORWAY"
             )
         )
+        val agSetupPaymentLinkRequest1 = slot<String>()
+        val agSetupPaymentLinkRequest2 = slot<String>()
 
         every { concreteUnderwriter.signQuote(
             capture(uwSignRequestId),
@@ -209,6 +212,11 @@ class NorwayIntegrationTest {
             capture(uwSignRequestLastName),
             capture(uwSignRequestSsn)
         ) } returns uwSignResponse
+
+        every { apiGateway.setupPaymentLink(
+            capture(agSetupPaymentLinkRequest1),
+            capture(agSetupPaymentLinkRequest2)
+        ) } returns "payment-link"
 
         val requestData = """
             {
@@ -237,7 +245,7 @@ class NorwayIntegrationTest {
             .andExpect(jsonPath("$.quoteId", equalTo(uwProductId)))
             .andExpect(jsonPath("$.productId", equalTo(uwProductId)))
             .andExpect(jsonPath("$.signedAt", equalTo(uwSignedAt.epochSecond.toInt())))
-            .andExpect(jsonPath("$.completionUrl", equalTo("")))
+            .andExpect(jsonPath("$.completionUrl", equalTo("payment-link")))
 
         assertThat(uwSignRequestId.captured).isEqualTo(uwQuoteId)
         assertThat(uwSignRequestFirstName.captured).isEqualTo("Apan")
@@ -245,6 +253,8 @@ class NorwayIntegrationTest {
         assertThat(uwSignRequestEmail.captured).isEqualTo("apan@apansson.se")
         assertThat(uwSignRequestSsn.captured).isEqualTo("121212012345")
         assertThat(uwSignRequestStartsAt.captured).isEqualTo("${LocalDate.now()}")
-    }
 
+        assertThat(agSetupPaymentLinkRequest1.captured).isEqualTo("12345")
+        assertThat(agSetupPaymentLinkRequest2.captured).isEqualTo("NORWAY")
+    }
 }

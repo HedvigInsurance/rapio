@@ -13,11 +13,19 @@ class ApiGateway(
   @Value("\${hedvig.api-gateway.token}") private val token: String
 ) {
 
-  fun setupPaymentLink(memberId: String): String? {
+  fun setupPaymentLink(memberId: String, market: String): String? {
     return try {
+      val countryCode = when (market) {
+        "SWEDEN" -> CountryCode.SE
+        "NORWAY" -> CountryCode.NO
+        "DENMARK" -> CountryCode.DK
+        else ->
+          throw RuntimeException("Unknown market: $market")
+      }
+
       val response = apiGatewayClient.setupPaymentLink(
         token,
-        CreateSetupPaymentLinkRequestDto(memberId = memberId, countryCode = CountryCode.SE)
+        CreateSetupPaymentLinkRequestDto(memberId, countryCode)
       )
       response.body!!.url
     } catch (e: Exception) {

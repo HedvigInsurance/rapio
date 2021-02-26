@@ -123,7 +123,7 @@ class QuoteServiceImpl(
 
     return when (response) {
       is Either.Right -> {
-        val completionUrlMaybe: String? = apiGateway.setupPaymentLink(response.b.memberId)
+        val completionUrlMaybe: String? = apiGateway.setupPaymentLink(response.b.memberId, response.b.market)
 
         Either.Right(
           SignResponseDTO(
