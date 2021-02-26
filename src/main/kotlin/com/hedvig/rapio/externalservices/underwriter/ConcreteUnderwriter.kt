@@ -27,7 +27,7 @@ class ConcreteUnderwriter(private val client: UnderwriterClient,
 
             return Either.Right(CompleteQuoteReference(
                 id = body.id,
-                price = Money.of(body.price, "SEK"),
+                price = Money.of(body.price, body.currency),
                 validTo = Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
             ))
         }catch (ex: FeignException) {
