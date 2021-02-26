@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
+import java.util.UUID
 
 enum class ApartmentProductSubType {
     BRF,
@@ -78,6 +79,7 @@ data class IncompleteNorwegianHomeContentQuoteDataDto(
 data class CompleteQuoteResponse(
     val id: String,
     val price: BigDecimal,
+    val currency: String,
     val validTo: Instant?
 )
 
