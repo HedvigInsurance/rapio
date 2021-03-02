@@ -9,7 +9,7 @@ import javax.validation.constraints.*
 
 @optics
 data class QuoteRequestDTO(
-    @get:NotBlank val requestId: String,
+    val requestId: String,
     @get:Valid val productType: ProductType,
     @get:Valid
     @set:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "productType")
