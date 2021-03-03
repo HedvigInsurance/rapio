@@ -175,6 +175,27 @@ internal class QuotesControllerTest {
 
   @Test
   @WithMockUser("COMPRICER")
+  fun validateBlankRequestIdWorks() {
+
+    every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+
+    val requestJson = createHouseRequestJson.replace("1231a", "")
+
+    val request = post("/v1/quotes")
+      .with(user("compricer"))
+      .content(requestJson)
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+
+    val result = mockMvc.perform(request)
+
+    result
+      .andExpect(status().is2xxSuccessful)
+      .andExpect(jsonPath("$.quoteId", Matchers.any(String::class.java)))
+  }
+
+  @Test
+  @WithMockUser("COMPRICER")
   fun create_deprecated_house_quote() {
 
     every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
