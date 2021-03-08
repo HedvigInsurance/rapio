@@ -10,8 +10,9 @@ RUN ./gradlew --version
 FROM gradle_setup AS dependencies
 COPY build.gradle.kts .
 COPY settings.gradle .
-# running 'classes' without source files will only download dependencies
-RUN ./gradlew clean classes --no-daemon
+# running 'build' with only a gradle-file will only fetch dependencies
+# we explicitly omit bootJar, since it requires a main class file, which we don't have at this stage
+RUN ./gradlew clean build -x bootJar --no-daemon
 
 
 ##### Build stage #####
