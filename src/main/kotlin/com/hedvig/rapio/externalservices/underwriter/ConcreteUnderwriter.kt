@@ -52,4 +52,14 @@ class ConcreteUnderwriter(private val client: UnderwriterClient,
             throw ex
         }
     }
+
+    override fun quoteBundle(request: QuoteBundleRequestDto): Either<ErrorResponse, QuoteBundleResponseDto> {
+        try {
+            val response = this.client.quoteBundle(request)
+            return Either.right(response.body!!)
+        } catch (e: Exception) {
+            logger.warn { "Failed to get quote bundle from Underwriter: $e" }
+            throw RuntimeException("Underwriter error")
+        }
+    }
 }

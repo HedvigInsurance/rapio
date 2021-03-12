@@ -145,4 +145,18 @@ class QuoteServiceImpl(
       }
     }
   }
+
+  override fun bundleQuotes(request: BundleQuotesRequestDTO): Either<String, BundleQuotesResponseDTO> {
+
+    return when (val response = underwriter.quoteBundle(QuoteBundleRequestDto(request.quoteIds))) {
+      is Either.Right -> {
+        with(response.b.bundleCost.monthlyNet) {
+          Either.right(BundleQuotesResponseDTO.from(request.requestId, amount, currency))
+        }
+      }
+      is Either.Left -> {
+        Either.Left(response.a.errorMessage)
+      }
+    }
+  }
 }

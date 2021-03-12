@@ -15,4 +15,7 @@ interface UnderwriterClient {
 
     @RequestMapping(value = ["/_/v1/quotes/{quoteId}/sign"], method = [RequestMethod.POST])
     fun signQuote(@PathVariable("quoteId") quoteId: String, @RequestBody body:SignQuoteRequest) : ResponseEntity<SignedQuoteResponseDto>
+
+    @RequestMapping(value = ["/_/v1/quotes/bundle"], method = [RequestMethod.POST])
+    fun quoteBundle(@RequestBody body: QuoteBundleRequestDto) : ResponseEntity<QuoteBundleResponseDto>
 }

@@ -9,6 +9,7 @@ import javax.money.MonetaryAmount
 interface Underwriter {
     fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String, ssn: String?) : Either<ErrorResponse, SignedQuoteResponseDto>
     fun createQuote(data: IncompleteQuoteDTO): Either<ErrorResponse, CompleteQuoteReference>
+    fun quoteBundle(request: QuoteBundleRequestDto) : Either<ErrorResponse, QuoteBundleResponseDto>
 }
 
 data class CompleteQuoteReference(

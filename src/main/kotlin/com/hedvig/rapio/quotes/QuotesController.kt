@@ -61,6 +61,23 @@ class QuotesController @Autowired constructor(
     ).getOrHandle { it }
   }
 
+  @PostMapping("bundle")
+  @Secured("ROLE_COMPARISON")
+  fun bundleQuotes(
+    @Valid @RequestBody request: BundleQuotesRequestDTO
+  ): ResponseEntity<out Any> {
+
+    return logRequestId(request.requestId) {
+
+      val response = quoteService.bundleQuotes(request)
+
+      return@logRequestId response.bimap(
+        { left -> ResponseEntity.status(500).body(ExternalErrorResponseDTO(left)) },
+        { right -> ok(right) }
+      ).getOrHandle { it }
+    }
+  }
+
   @PostMapping("{quoteId}/sign")
   @Secured("ROLE_COMPARISON")
   fun signQuote(
