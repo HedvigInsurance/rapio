@@ -106,7 +106,6 @@ class NorwayIntegrationTest {
         assertThat(uwQuoteRequest.captured.lastName).isNull()
         assertThat(uwQuoteRequest.captured.ssn).isNull()
         assertThat(uwQuoteRequest.captured.productType.name).isEqualTo("TRAVEL")
-        assertThat(uwQuoteRequest.captured.quotingPartner).isEqualTo("HEDVIG")
         assertThat(uwQuoteRequest.captured.shouldComplete).isTrue()
 
         val incompleteQuoteData = uwQuoteRequest.captured.incompleteQuoteData as IncompleteNorwegianTravelQuoteDataDto
@@ -167,7 +166,6 @@ class NorwayIntegrationTest {
         assertThat(uwQuoteRequest.captured.lastName).isNull()
         assertThat(uwQuoteRequest.captured.ssn).isNull()
         assertThat(uwQuoteRequest.captured.productType.name).isEqualTo("HOME_CONTENT")
-        assertThat(uwQuoteRequest.captured.quotingPartner).isEqualTo("HEDVIG")
         assertThat(uwQuoteRequest.captured.shouldComplete).isTrue()
 
         val incompleteQuoteData = uwQuoteRequest.captured.incompleteQuoteData as IncompleteNorwegianHomeContentQuoteDataDto

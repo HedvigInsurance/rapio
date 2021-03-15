@@ -7,6 +7,7 @@ import com.hedvig.rapio.externalservices.underwriter.Underwriter
 import com.hedvig.rapio.externalservices.underwriter.transport.*
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
 import com.hedvig.rapio.quotes.web.dto.*
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.UUID
@@ -111,6 +112,21 @@ class QuoteServiceImpl(
     )
   }
 
+  override fun bundleQuotes(request: BundleQuotesRequestDTO): Either<String, BundleQuotesResponseDTO> {
+
+    return when (val response = underwriter.quoteBundle(QuoteBundleRequestDto(request.quoteIds))) {
+      is Either.Right -> {
+        with(response.b.bundleCost.monthlyNet) {
+          Either.right(BundleQuotesResponseDTO.from(request.requestId, amount, currency))
+        }
+      }
+      is Either.Left -> {
+        logger.info("Failed to sign bundle: ${response.a.errorCode} - ${response.a.errorMessage}")
+        Either.Left(response.a.errorMessage)
+      }
+    }
+  }
+
   override fun signQuote(quoteId: UUID, request: SignRequestDTO): Either<String, SignResponseDTO> {
     val response = this.underwriter.signQuote(
       quoteId.toString(),
@@ -136,13 +152,57 @@ class QuoteServiceImpl(
         )
       }
       is Either.Left -> {
+        logger.info("Failed to sign bundle: ${response.a.errorCode} - ${response.a.errorMessage}")
         return when (response.a.errorCode) {
           ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> Either.Left("Cannot sign quote, breaches underwriting guidelines")
           ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED -> Either.Left("Cannot sign quote, quote has expired")
           ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> Either.Left("Cannot sign quote, already a Hedvig member")
+          ErrorCodes.NO_SUCH_QUOTE -> Either.Left("Quote not found..")
+          ErrorCodes.INVALID_BUNDLING -> Either.Left("Bundling not supported..")
           ErrorCodes.UNKNOWN_ERROR_CODE -> Either.Left("Something went wrong..")
         }
       }
     }
   }
+
+  override fun signBundle(request: SignBundleRequestDTO): Either<String, SignBundleResponseDTO> {
+    val response = underwriter.signBundle(
+      request.quoteIds,
+      request.email,
+      request.startsAt.date,
+      request.firstName,
+      request.lastName,
+      request.personalNumber,
+      request.monthlyPremium.amount,
+      request.monthlyPremium.currency)
+
+    return response.bimap(
+      {
+        logger.info("Failed to sign bundle: ${it.errorCode} - ${it.errorMessage}")
+        when (it.errorCode) {
+          ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> "Cannot sign quote, breaches underwriting guidelines"
+          ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED -> "Cannot sign quote, quote has expired"
+          ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> "Cannot sign quote, already a Hedvig member"
+          ErrorCodes.NO_SUCH_QUOTE -> "Quote not found.."
+          ErrorCodes.INVALID_BUNDLING -> "Bundling not supported.."
+          ErrorCodes.UNKNOWN_ERROR_CODE -> "Something went wrong.."
+        }
+      },
+      {
+        val completionUrlMaybe: String? = apiGateway.setupPaymentLink(it.memberId, it.market)
+
+        SignBundleResponseDTO(
+          requestId = request.requestId,
+          productIds = it.contracts.map { it.id.toString() }.toList(),
+          signedAt = it.contracts.first().signedAt.epochSecond,
+          completionUrl = completionUrlMaybe
+        )
+      }
+    )
+  }
+
+  companion object {
+    val logger = LoggerFactory.getLogger(this::class.java)!!
+  }
+
 }
