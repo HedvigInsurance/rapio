@@ -96,6 +96,23 @@ class QuotesController @Autowired constructor(
     }
   }
 
+  @PostMapping("bundle/sign")
+  @Secured("ROLE_COMPARISON")
+  fun signBundle(
+    @Valid @RequestBody request: SignBundleRequestDTO
+  ): ResponseEntity<out Any> {
+
+    return logRequestId(request.requestId) {
+
+      val response = quoteService.signBundle(request)
+
+      return@logRequestId response.bimap(
+        { left -> ResponseEntity.status(500).body(ExternalErrorResponseDTO(left)) },
+        { right -> ok(right) }
+      ).getOrHandle { it }
+    }
+  }
+
   private fun <T> logRequestId(requestId: String, fn: () -> T): T {
     try {
       MDC.put("requestId", requestId)
