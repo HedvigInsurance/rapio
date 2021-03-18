@@ -53,6 +53,9 @@ class QuotesController @Autowired constructor(
 
       is NorwegianTravelQuoteRequestData -> request
       is NorwegianHomeContentQuoteRequestData -> request
+      is DanishHomeContentQuoteRequestData -> request
+      is DanishTravelQuoteRequestData -> request
+      is DanishAccidentQuoteRequestData -> request
     }
 
     return@logRequestId quoteService.createQuote(requestData, partner).bimap(

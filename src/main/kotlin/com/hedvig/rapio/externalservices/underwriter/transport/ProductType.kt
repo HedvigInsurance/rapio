@@ -6,5 +6,6 @@ enum class ProductType {
     OBJECT,
     TRAVEL,
     HOME_CONTENT,
+    ACCIDENT,
     UNKNOWN
 }
