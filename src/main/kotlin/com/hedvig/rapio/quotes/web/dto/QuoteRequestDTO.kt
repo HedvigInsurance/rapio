@@ -109,12 +109,14 @@ data class NorwegianHomeContentQuoteRequestData(
 @optics
 data class DanishHomeContentQuoteRequestData(
     @get:NotBlank val street: String,
-    val apartmentNumber: String?,
-    val floor: String?,
+    val apartment: String?,
     @get:NotBlank @get:Pattern(regexp = """\d{3,4}""") val zipCode: String,
     val city: String?,
-    @get:Min(1) @get:Max(1000) val livingSpace: Int,
+    val bbrId: String?,
+    @get:Min(1) @get:Max(1000) val livingSpace: Int?,
     @get:Min(0) @get:Max(100) val coInsured: Int,
+    @get:NotBlank @get:Pattern(regexp = """\d{4}-\d{2}-\d{2}""")
+    val birthDate: String,
     val student: Boolean,
     @get:NotBlank @get:Pattern(regexp = """(OWN|RENT)""") val productSubType: String
 
@@ -125,12 +127,15 @@ data class DanishHomeContentQuoteRequestData(
 @optics
 data class DanishTravelQuoteRequestData(
     @get:NotBlank val street: String,
-    val apartmentNumber: String?,
-    val floor: String?,
+    val apartment: String?,
     @get:NotBlank @get:Pattern(regexp = """\d{3,4}""") val zipCode: String,
     val city: String?,
+    val bbrId: String?,
     @get:Min(0) @get:Max(100) val coInsured: Int,
-    val student: Boolean
+    @get:NotBlank @get:Pattern(regexp = """\d{4}-\d{2}-\d{2}""")
+    val birthDate: String,
+    val student: Boolean,
+    @get:NotBlank @get:Pattern(regexp = """(WHOLE_WORLD|NON_US_CANADA)""") val travelArea: String
 
 ): QuoteRequestData() {
     companion object
@@ -139,11 +144,13 @@ data class DanishTravelQuoteRequestData(
 @optics
 data class DanishAccidentQuoteRequestData(
     @get:NotBlank val street: String,
-    val apartmentNumber: String?,
-    val floor: String?,
+    val apartment: String?,
     @get:NotBlank @get:Pattern(regexp = """\d{3,4}""") val zipCode: String,
     val city: String?,
+    val bbrId: String?,
     @get:Min(0) @get:Max(100) val coInsured: Int,
+    @get:NotBlank @get:Pattern(regexp = """\d{4}-\d{2}-\d{2}""")
+    val birthDate: String,
     val student: Boolean
 
 ): QuoteRequestData() {

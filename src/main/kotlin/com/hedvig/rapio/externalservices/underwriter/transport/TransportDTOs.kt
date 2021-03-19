@@ -81,10 +81,10 @@ data class IncompleteNorwegianHomeContentQuoteDataDto(
 
 data class IncompleteDanishHomeContentQuoteDataDto(
     val street: String?,
-    val apartmentNumber: String?,
-    val floor: String?,
+    val apartment: String?,
     val zipCode: String?,
     val city: String?,
+    val bbrId: String?,
     val livingSpace: Int?,
     val coInsured: Int?,
     val student: Boolean?,
@@ -93,20 +93,21 @@ data class IncompleteDanishHomeContentQuoteDataDto(
 
 data class IncompleteDanishTravelQuoteDataDto(
     val street: String?,
-    val apartmentNumber: String?,
-    val floor: String?,
+    val apartment: String?,
     val zipCode: String?,
     val city: String?,
+    val bbrId: String?,
     val coInsured: Int?,
-    val student: Boolean?
+    val student: Boolean?,
+    val travelArea: String?
 ) : IncompleteQuoteRequestData()
 
 data class IncompleteDanishAccidentQuoteDataDto(
     val street: String?,
-    val apartmentNumber: String?,
-    val floor: String?,
+    val apartment: String?,
     val zipCode: String?,
     val city: String?,
+    val bbrId: String?,
     val coInsured: Int?,
     val student: Boolean?
 ) : IncompleteQuoteRequestData()

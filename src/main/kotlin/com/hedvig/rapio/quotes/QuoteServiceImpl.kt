@@ -71,10 +71,10 @@ class QuoteServiceImpl(
       is DanishHomeContentQuoteRequestData ->
         IncompleteDanishHomeContentQuoteDataDto(
           street = quoteData.street,
-          apartmentNumber = quoteData.apartmentNumber,
-          floor = quoteData.floor,
+          apartment = quoteData.apartment,
           zipCode = quoteData.zipCode,
           city = quoteData.city,
+          bbrId = quoteData.bbrId,
           livingSpace = quoteData.livingSpace,
           coInsured = quoteData.coInsured,
           student = quoteData.student,
@@ -83,20 +83,21 @@ class QuoteServiceImpl(
       is DanishTravelQuoteRequestData ->
         IncompleteDanishTravelQuoteDataDto(
           street = quoteData.street,
-          apartmentNumber = quoteData.apartmentNumber,
-          floor = quoteData.floor,
+          apartment = quoteData.apartment,
           zipCode = quoteData.zipCode,
           city = quoteData.city,
+          bbrId = quoteData.bbrId,
           coInsured = quoteData.coInsured,
-          student = quoteData.student
+          student = quoteData.student,
+          travelArea = quoteData.travelArea
         )
       is DanishAccidentQuoteRequestData ->
         IncompleteDanishAccidentQuoteDataDto(
           street = quoteData.street,
-          apartmentNumber = quoteData.apartmentNumber,
-          floor = quoteData.floor,
+          apartment = quoteData.apartment,
           zipCode = quoteData.zipCode,
           city = quoteData.city,
+          bbrId = quoteData.bbrId,
           coInsured = quoteData.coInsured,
           student = quoteData.student
         )
@@ -112,9 +113,9 @@ class QuoteServiceImpl(
         is HouseQuoteRequestData -> null
         is NorwegianTravelQuoteRequestData -> LocalDate.parse(quoteData.birthDate)
         is NorwegianHomeContentQuoteRequestData -> LocalDate.parse(quoteData.birthDate)
-        is DanishHomeContentQuoteRequestData -> null
-        is DanishTravelQuoteRequestData -> null
-        is DanishAccidentQuoteRequestData -> null
+        is DanishHomeContentQuoteRequestData -> LocalDate.parse(quoteData.birthDate)
+        is DanishTravelQuoteRequestData -> LocalDate.parse(quoteData.birthDate)
+        is DanishAccidentQuoteRequestData -> LocalDate.parse(quoteData.birthDate)
       },
       ssn = when (quoteData) {
         is ApartmentQuoteRequestData -> quoteData.personalNumber

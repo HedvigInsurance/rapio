@@ -95,12 +95,13 @@ class DanishIntegrationTest {
               "requestId": "apa",
               "quoteData": {
                 "street": "ApStreet 1234",
-                "apartmentNumber": "10A",
-                "floor": "1",
+                "apartment": "10.th",
                 "zipCode": "1234",
                 "city": "ApCity",
+                "bbrId": "12345",
                 "livingSpace": 60,
                 "coInsured": 0,
+                "birthDate": "1971-01-20",
                 "student": true,
                 "productSubType": "OWN"
               },
@@ -119,7 +120,7 @@ class DanishIntegrationTest {
             assertThat(monthlyPremium.toString()).isEqualTo("DKK 250")
         }
 
-        assertThat(uwQuoteRequest.captured.birthDate).isNull()
+        assertThat(uwQuoteRequest.captured.birthDate).isEqualTo("1971-01-20")
         assertThat(uwQuoteRequest.captured.currentInsurer).isNull()
         assertThat(uwQuoteRequest.captured.firstName).isNull()
         assertThat(uwQuoteRequest.captured.lastName).isNull()
@@ -130,10 +131,10 @@ class DanishIntegrationTest {
         val incompleteQuoteData = uwQuoteRequest.captured.incompleteQuoteData as IncompleteDanishHomeContentQuoteDataDto
 
         assertThat(incompleteQuoteData.street).isEqualTo("ApStreet 1234")
-        assertThat(incompleteQuoteData.apartmentNumber).isEqualTo("10A")
-        assertThat(incompleteQuoteData.floor).isEqualTo("1")
+        assertThat(incompleteQuoteData.apartment).isEqualTo("10.th")
         assertThat(incompleteQuoteData.zipCode).isEqualTo("1234")
         assertThat(incompleteQuoteData.city).isEqualTo("ApCity")
+        assertThat(incompleteQuoteData.bbrId).isEqualTo("12345")
         assertThat(incompleteQuoteData.livingSpace).isEqualTo(60)
         assertThat(incompleteQuoteData.coInsured).isEqualTo(0)
         assertThat(incompleteQuoteData.student).isTrue()
@@ -161,12 +162,14 @@ class DanishIntegrationTest {
               "requestId": "apa",
               "quoteData": {
                 "street": "ApStreet 1234",
-                "apartmentNumber": "10A",
-                "floor": "1",
+                "apartment": "10.th",
+                "bbrId": "12345",
                 "zipCode": "1234",
                 "city": "ApCity",
                 "coInsured": 0,
-                "student": true
+                "birthDate": "1970-01-20",
+                "student": true,
+                "travelArea": "WHOLE_WORLD"
               },
               "productType": "DANISH_TRAVEL"
             }
@@ -183,7 +186,7 @@ class DanishIntegrationTest {
             assertThat(monthlyPremium.toString()).isEqualTo("DKK 250")
         }
 
-        assertThat(uwQuoteRequest.captured.birthDate).isNull()
+        assertThat(uwQuoteRequest.captured.birthDate).isEqualTo("1970-01-20")
         assertThat(uwQuoteRequest.captured.currentInsurer).isNull()
         assertThat(uwQuoteRequest.captured.firstName).isNull()
         assertThat(uwQuoteRequest.captured.lastName).isNull()
@@ -194,12 +197,13 @@ class DanishIntegrationTest {
         val incompleteQuoteData = uwQuoteRequest.captured.incompleteQuoteData as IncompleteDanishTravelQuoteDataDto
 
         assertThat(incompleteQuoteData.street).isEqualTo("ApStreet 1234")
-        assertThat(incompleteQuoteData.apartmentNumber).isEqualTo("10A")
-        assertThat(incompleteQuoteData.floor).isEqualTo("1")
+        assertThat(incompleteQuoteData.apartment).isEqualTo("10.th")
         assertThat(incompleteQuoteData.zipCode).isEqualTo("1234")
         assertThat(incompleteQuoteData.city).isEqualTo("ApCity")
+        assertThat(incompleteQuoteData.bbrId).isEqualTo("12345")
         assertThat(incompleteQuoteData.coInsured).isEqualTo(0)
         assertThat(incompleteQuoteData.student).isTrue()
+        assertThat(incompleteQuoteData.travelArea).isEqualTo("WHOLE_WORLD")
     }
 
     @Test
@@ -223,11 +227,12 @@ class DanishIntegrationTest {
               "requestId": "apa",
               "quoteData": {
                 "street": "ApStreet 1234",
-                "apartmentNumber": "10A",
-                "floor": "1",
+                "apartment": "10A",
                 "zipCode": "1234",
                 "city": "ApCity",
+                "bbrId": "12345",
                 "coInsured": 0,
+                "birthDate": "1970-01-20",
                 "student": true
               },
               "productType": "DANISH_ACCIDENT"
@@ -245,7 +250,7 @@ class DanishIntegrationTest {
             assertThat(monthlyPremium.toString()).isEqualTo("DKK 250")
         }
 
-        assertThat(uwQuoteRequest.captured.birthDate).isNull()
+        assertThat(uwQuoteRequest.captured.birthDate).isEqualTo("1970-01-20")
         assertThat(uwQuoteRequest.captured.currentInsurer).isNull()
         assertThat(uwQuoteRequest.captured.firstName).isNull()
         assertThat(uwQuoteRequest.captured.lastName).isNull()
@@ -256,10 +261,10 @@ class DanishIntegrationTest {
         val incompleteQuoteData = uwQuoteRequest.captured.incompleteQuoteData as IncompleteDanishAccidentQuoteDataDto
 
         assertThat(incompleteQuoteData.street).isEqualTo("ApStreet 1234")
-        assertThat(incompleteQuoteData.apartmentNumber).isEqualTo("10A")
-        assertThat(incompleteQuoteData.floor).isEqualTo("1")
+        assertThat(incompleteQuoteData.apartment).isEqualTo("10A")
         assertThat(incompleteQuoteData.zipCode).isEqualTo("1234")
         assertThat(incompleteQuoteData.city).isEqualTo("ApCity")
+        assertThat(incompleteQuoteData.bbrId).isEqualTo("12345")
         assertThat(incompleteQuoteData.coInsured).isEqualTo(0)
         assertThat(incompleteQuoteData.student).isTrue()
     }
