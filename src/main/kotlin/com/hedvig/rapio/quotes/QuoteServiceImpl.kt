@@ -68,6 +68,39 @@ class QuoteServiceImpl(
           youth = quoteData.youth,
           subType = quoteData.productSubType
         )
+      is DanishHomeContentQuoteRequestData ->
+        IncompleteDanishHomeContentQuoteDataDto(
+          street = quoteData.street,
+          apartment = quoteData.apartment,
+          zipCode = quoteData.zipCode,
+          city = quoteData.city,
+          bbrId = quoteData.bbrId,
+          livingSpace = quoteData.livingSpace,
+          coInsured = quoteData.coInsured,
+          student = quoteData.student,
+          subType = quoteData.productSubType
+        )
+      is DanishTravelQuoteRequestData ->
+        IncompleteDanishTravelQuoteDataDto(
+          street = quoteData.street,
+          apartment = quoteData.apartment,
+          zipCode = quoteData.zipCode,
+          city = quoteData.city,
+          bbrId = quoteData.bbrId,
+          coInsured = quoteData.coInsured,
+          student = quoteData.student,
+          travelArea = quoteData.travelArea
+        )
+      is DanishAccidentQuoteRequestData ->
+        IncompleteDanishAccidentQuoteDataDto(
+          street = quoteData.street,
+          apartment = quoteData.apartment,
+          zipCode = quoteData.zipCode,
+          city = quoteData.city,
+          bbrId = quoteData.bbrId,
+          coInsured = quoteData.coInsured,
+          student = quoteData.student
+        )
     }
 
     val request = IncompleteQuoteDTO(
@@ -80,18 +113,27 @@ class QuoteServiceImpl(
         is HouseQuoteRequestData -> null
         is NorwegianTravelQuoteRequestData -> LocalDate.parse(quoteData.birthDate)
         is NorwegianHomeContentQuoteRequestData -> LocalDate.parse(quoteData.birthDate)
+        is DanishHomeContentQuoteRequestData -> LocalDate.parse(quoteData.birthDate)
+        is DanishTravelQuoteRequestData -> LocalDate.parse(quoteData.birthDate)
+        is DanishAccidentQuoteRequestData -> LocalDate.parse(quoteData.birthDate)
       },
       ssn = when (quoteData) {
         is ApartmentQuoteRequestData -> quoteData.personalNumber
         is HouseQuoteRequestData -> quoteData.personalNumber
         is NorwegianTravelQuoteRequestData -> null
         is NorwegianHomeContentQuoteRequestData -> null
+        is DanishHomeContentQuoteRequestData -> null
+        is DanishTravelQuoteRequestData -> null
+        is DanishAccidentQuoteRequestData -> null
       },
       productType = when (quoteData) {
         is ApartmentQuoteRequestData -> ProductType.APARTMENT
         is HouseQuoteRequestData -> ProductType.HOUSE
         is NorwegianTravelQuoteRequestData -> ProductType.TRAVEL
         is NorwegianHomeContentQuoteRequestData -> ProductType.HOME_CONTENT
+        is DanishHomeContentQuoteRequestData -> ProductType.HOME_CONTENT
+        is DanishTravelQuoteRequestData -> ProductType.TRAVEL
+        is DanishAccidentQuoteRequestData -> ProductType.ACCIDENT
       },
       currentInsurer = null,
       shouldComplete = true

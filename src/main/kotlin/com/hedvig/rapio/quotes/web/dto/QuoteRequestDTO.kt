@@ -19,7 +19,10 @@ data class QuoteRequestDTO(
         JsonSubTypes.Type(value = ApartmentQuoteRequestData::class, name = "SWEDISH_APARTMENT"),
         JsonSubTypes.Type(value = HouseQuoteRequestData::class, name = "SWEDISH_HOUSE"),
         JsonSubTypes.Type(value = NorwegianTravelQuoteRequestData::class, name = "NORWEGIAN_TRAVEL"),
-        JsonSubTypes.Type(value = NorwegianHomeContentQuoteRequestData::class, name = "NORWEGIAN_HOME_CONTENT")
+        JsonSubTypes.Type(value = NorwegianHomeContentQuoteRequestData::class, name = "NORWEGIAN_HOME_CONTENT"),
+        JsonSubTypes.Type(value = DanishHomeContentQuoteRequestData::class, name = "DANISH_HOME_CONTENT"),
+        JsonSubTypes.Type(value = DanishTravelQuoteRequestData::class, name = "DANISH_TRAVEL"),
+        JsonSubTypes.Type(value = DanishAccidentQuoteRequestData::class, name = "DANISH_ACCIDENT")
     )
     var quoteData: QuoteRequestData
 ) {
@@ -103,6 +106,57 @@ data class NorwegianHomeContentQuoteRequestData(
     companion object
 }
 
+@optics
+data class DanishHomeContentQuoteRequestData(
+    @get:NotBlank val street: String,
+    val apartment: String?,
+    @get:NotBlank @get:Pattern(regexp = """\d{3,4}""") val zipCode: String,
+    val city: String?,
+    val bbrId: String?,
+    @get:Min(1) @get:Max(1000) val livingSpace: Int?,
+    @get:Min(0) @get:Max(100) val coInsured: Int,
+    @get:NotBlank @get:Pattern(regexp = """\d{4}-\d{2}-\d{2}""")
+    val birthDate: String,
+    val student: Boolean,
+    @get:NotBlank @get:Pattern(regexp = """(OWN|RENT)""") val productSubType: String
+
+): QuoteRequestData() {
+    companion object
+}
+
+@optics
+data class DanishTravelQuoteRequestData(
+    @get:NotBlank val street: String,
+    val apartment: String?,
+    @get:NotBlank @get:Pattern(regexp = """\d{3,4}""") val zipCode: String,
+    val city: String?,
+    val bbrId: String?,
+    @get:Min(0) @get:Max(100) val coInsured: Int,
+    @get:NotBlank @get:Pattern(regexp = """\d{4}-\d{2}-\d{2}""")
+    val birthDate: String,
+    val student: Boolean,
+    @get:NotBlank @get:Pattern(regexp = """(WHOLE_WORLD|NON_US_CANADA)""") val travelArea: String
+
+): QuoteRequestData() {
+    companion object
+}
+
+@optics
+data class DanishAccidentQuoteRequestData(
+    @get:NotBlank val street: String,
+    val apartment: String?,
+    @get:NotBlank @get:Pattern(regexp = """\d{3,4}""") val zipCode: String,
+    val city: String?,
+    val bbrId: String?,
+    @get:Min(0) @get:Max(100) val coInsured: Int,
+    @get:NotBlank @get:Pattern(regexp = """\d{4}-\d{2}-\d{2}""")
+    val birthDate: String,
+    val student: Boolean
+
+): QuoteRequestData() {
+    companion object
+}
+
 enum class ProductSubType {
     BRF,
     RENT,
@@ -116,5 +170,8 @@ enum class ProductType {
     SWEDISH_APARTMENT,
     SWEDISH_HOUSE,
     NORWEGIAN_TRAVEL,
-    NORWEGIAN_HOME_CONTENT
+    NORWEGIAN_HOME_CONTENT,
+    DANISH_HOME_CONTENT,
+    DANISH_TRAVEL,
+    DANISH_ACCIDENT
 }
