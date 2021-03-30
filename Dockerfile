@@ -1,6 +1,13 @@
 ##### Dependencies stage #####
 FROM amazoncorretto:11 AS gradle_setup
 WORKDIR /usr/app
+
+ARG GITHUB_USER
+ARG GITHUB_TOKEN
+
+ENV GITHUB_USER=$GITHUB_USER
+ENV GITHUB_TOKEN=$GITHUB_TOKEN
+
 ENV GRADLE_USER_HOME=/usr/share/gradle/
 COPY gradlew .
 COPY gradle gradle

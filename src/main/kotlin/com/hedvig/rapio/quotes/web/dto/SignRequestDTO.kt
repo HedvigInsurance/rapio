@@ -1,5 +1,6 @@
 package com.hedvig.rapio.quotes.web.dto
 
+import com.hedvig.libs.logging.masking.Masked
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.validation.Valid
@@ -11,12 +12,12 @@ data class SignRequestDTO(
     val requestId: String,
     @get:Valid val startsAt: Date,
 
-    @get:Email val email: String,
+    @get:Email @Masked val email: String,
 
-    @get:NotBlank val firstName: String,
-    @get:NotBlank val lastName: String,
+    @get:NotBlank @Masked val firstName: String,
+    @get:NotBlank @Masked val lastName: String,
 
-    val personalNumber: String?
+    @Masked val personalNumber: String?
 ) {
     data class Date(
         @FutureOrPresent val date: LocalDate,

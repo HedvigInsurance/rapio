@@ -2,10 +2,10 @@ package com.hedvig.rapio.externalservices.underwriter.transport
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.hedvig.libs.logging.masking.Masked
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
-import java.util.UUID
 
 enum class ApartmentProductSubType {
     BRF,
@@ -16,11 +16,11 @@ enum class ApartmentProductSubType {
 }
 
 data class IncompleteQuoteDTO(
-    val firstName: String? = null,
-    val lastName: String? = null,
+    @Masked val firstName: String? = null,
+    @Masked val lastName: String? = null,
     val currentInsurer: String? = null,
     val birthDate: LocalDate?,
-    val ssn: String?,
+    @Masked val ssn: String?,
     val quotingPartner: String?,
     val productType: ProductType,
     val incompleteQuoteData: IncompleteQuoteRequestData,
@@ -41,7 +41,7 @@ sealed class IncompleteQuoteRequestData {
 }
 
 data class IncompleteHouseQuoteDataDto(
-    val street: String?,
+    @Masked val street: String?,
     val zipCode: String?,
     val city: String?,
     val livingSpace: Int?,
@@ -55,7 +55,7 @@ data class IncompleteHouseQuoteDataDto(
 ) : IncompleteQuoteRequestData()
 
 data class IncompleteApartmentQuoteDataDto(
-    val street: String?,
+    @Masked val street: String?,
     val zipCode: String?,
     val city: String?,
     val livingSpace: Int?,
@@ -70,7 +70,7 @@ data class IncompleteNorwegianTravelQuoteDataDto(
 ) : IncompleteQuoteRequestData()
 
 data class IncompleteNorwegianHomeContentQuoteDataDto(
-    val street: String?,
+    @Masked val street: String?,
     val zipCode: String?,
     val city: String?,
     val livingSpace: Int?,
@@ -80,11 +80,11 @@ data class IncompleteNorwegianHomeContentQuoteDataDto(
 ) : IncompleteQuoteRequestData()
 
 data class IncompleteDanishHomeContentQuoteDataDto(
-    val street: String?,
+    @Masked val street: String?,
     val apartment: String?,
     val zipCode: String?,
     val city: String?,
-    val bbrId: String?,
+    @Masked val bbrId: String?,
     val livingSpace: Int?,
     val coInsured: Int?,
     val student: Boolean?,
@@ -92,22 +92,22 @@ data class IncompleteDanishHomeContentQuoteDataDto(
 ) : IncompleteQuoteRequestData()
 
 data class IncompleteDanishTravelQuoteDataDto(
-    val street: String?,
+    @Masked val street: String?,
     val apartment: String?,
     val zipCode: String?,
     val city: String?,
-    val bbrId: String?,
+    @Masked val bbrId: String?,
     val coInsured: Int?,
     val student: Boolean?,
     val travelArea: String?
 ) : IncompleteQuoteRequestData()
 
 data class IncompleteDanishAccidentQuoteDataDto(
-    val street: String?,
+    @Masked val street: String?,
     val apartment: String?,
     val zipCode: String?,
     val city: String?,
-    val bbrId: String?,
+    @Masked val bbrId: String?,
     val coInsured: Int?,
     val student: Boolean?
 ) : IncompleteQuoteRequestData()

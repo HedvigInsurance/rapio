@@ -3,6 +3,7 @@ package com.hedvig.rapio.quotes.web.dto
 import arrow.optics.optics
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.hedvig.libs.logging.masking.Masked
 import com.hedvig.rapio.externalservices.underwriter.transport.ExtraBuildingRequestDto
 import javax.validation.Valid
 import javax.validation.constraints.*
@@ -34,7 +35,7 @@ sealed class QuoteRequestData {
 
 @optics
 data class ApartmentQuoteRequestData(
-    @get:NotBlank val street: String,
+    @get:NotBlank @Masked val street: String,
 
     @get:NotBlank val zipCode: String,
 
@@ -42,7 +43,7 @@ data class ApartmentQuoteRequestData(
 
     @get:Min(1) @get:Max(1000) val livingSpace: Int,
 
-    @get:NotBlank val personalNumber: String,
+    @get:NotBlank @Masked val personalNumber: String,
 
     @get:Min(1) @get:Max(100)
     val householdSize: Int,
@@ -54,7 +55,7 @@ data class ApartmentQuoteRequestData(
 
 @optics
 data class HouseQuoteRequestData(
-    @get:NotBlank val street: String,
+    @get:NotBlank @Masked val street: String,
 
     @get:NotBlank val zipCode: String,
 
@@ -62,7 +63,7 @@ data class HouseQuoteRequestData(
 
     @get:Min(1) @get:Max(1000) val livingSpace: Int,
 
-    @get:NotBlank val personalNumber: String,
+    @get:NotBlank @Masked val personalNumber: String,
 
     @get:Min(1) @get:Max(100)
     val householdSize: Int,
@@ -93,7 +94,7 @@ data class NorwegianTravelQuoteRequestData(
 
 @optics
 data class NorwegianHomeContentQuoteRequestData(
-    @get:NotBlank val street: String,
+    @get:NotBlank @Masked val street: String,
     @get:NotBlank @get:Pattern(regexp = """\d{4}""") val zipCode: String,
     @get:NotBlank val city: String,
     @get:Min(1) @get:Max(1000) val livingSpace: Int,
@@ -108,7 +109,7 @@ data class NorwegianHomeContentQuoteRequestData(
 
 @optics
 data class DanishHomeContentQuoteRequestData(
-    @get:NotBlank val street: String,
+    @get:NotBlank @Masked val street: String,
     val apartment: String?,
     @get:NotBlank @get:Pattern(regexp = """\d{3,4}""") val zipCode: String,
     val city: String?,
@@ -126,11 +127,11 @@ data class DanishHomeContentQuoteRequestData(
 
 @optics
 data class DanishTravelQuoteRequestData(
-    @get:NotBlank val street: String,
+    @get:NotBlank @Masked val street: String,
     val apartment: String?,
     @get:NotBlank @get:Pattern(regexp = """\d{3,4}""") val zipCode: String,
     val city: String?,
-    val bbrId: String?,
+    @Masked val bbrId: String?,
     @get:Min(0) @get:Max(100) val coInsured: Int,
     @get:NotBlank @get:Pattern(regexp = """\d{4}-\d{2}-\d{2}""")
     val birthDate: String,
@@ -143,11 +144,11 @@ data class DanishTravelQuoteRequestData(
 
 @optics
 data class DanishAccidentQuoteRequestData(
-    @get:NotBlank val street: String,
+    @get:NotBlank @Masked val street: String,
     val apartment: String?,
     @get:NotBlank @get:Pattern(regexp = """\d{3,4}""") val zipCode: String,
     val city: String?,
-    val bbrId: String?,
+    @Masked val bbrId: String?,
     @get:Min(0) @get:Max(100) val coInsured: Int,
     @get:NotBlank @get:Pattern(regexp = """\d{4}-\d{2}-\d{2}""")
     val birthDate: String,
