@@ -1,5 +1,6 @@
 package com.hedvig.rapio.quotes.web.dto
 
+import com.hedvig.libs.logging.masking.Masked
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
@@ -13,10 +14,10 @@ data class SignBundleRequestDTO(
     val requestId: String,
     @get:NotEmpty val quoteIds: List<UUID>,
     @get:Valid val startsAt: Date,
-    @get:Email val email: String,
-    @get:NotBlank val firstName: String,
-    @get:NotBlank val lastName: String,
-    val personalNumber: String?,
+    @get:Email @Masked val email: String,
+    @get:NotBlank @Masked val firstName: String,
+    @get:NotBlank @Masked val lastName: String,
+    @Masked val personalNumber: String?,
     val monthlyPremium: Amount
 ) {
     data class Date(

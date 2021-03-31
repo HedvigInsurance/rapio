@@ -3,6 +3,18 @@ Partner integration API to Hedvig for price comparison and siging offers.
 
 API specification is found [here](https://docs.google.com/document/d/1x5cetC_JhJWJH4_TdHCxK9FSVa4MiItUkucQL1Z2ZkQ/edit#)
 
+## GitHub Package credentials
+
+This project have dependencies on shared Hedvig libs in GitHub. To be able to build the project the credentials
+have to be in place. To achieve this in a local development environment:
+
+1. Create a personal GitHub development token with `read:packages` access.
+2. Create a new file `gradle.properties` in the project root (or globally in `~/.gradle` folder) and insert 
+   the token generated in step (1) like this:
+
+GITHUB_USER=<github user>
+GITHUB_TOKEN=<github token>
+
 ## Testing
 
 ### Local testing
@@ -119,10 +131,3 @@ To manually test rAPIo locally:
     }
   }
   EOF
-
-## Testing in Stage
-
-Add basic auth and change host in the curls above:
-
-- add `-u hedvigtest123:` to the curl
-- change host and port to `https://extapi.dev.hedvigit.com/v1/quotes` in the curls above

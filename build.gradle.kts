@@ -20,9 +20,17 @@ repositories {
     mavenCentral()
     maven("https://dl.bintray.com/arrow-kt/arrow-kt/")
     //maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' } // for SNAPSHOT builds
+    maven {
+        url = uri("https://maven.pkg.github.com/HedvigInsurance/libs")
+        credentials {
+            username = project.findProperty("GITHUB_USER") as? String ?: System.getenv("GITHUB_USER")
+            password = project.findProperty("GITHUB_TOKEN") as? String ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 dependencies {
+    implementation("com.hedvig.libs", "logging", "1.0.2")
 
     implementation(platform("org.jdbi:jdbi3-bom:${property("jdbiVersion")}"))
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}"))

@@ -1,6 +1,7 @@
 package com.hedvig.rapio.quotes
 
 import arrow.core.getOrHandle
+import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.comparison.web.dto.ExternalErrorResponseDTO
 import com.hedvig.rapio.quotes.web.dto.*
@@ -29,6 +30,7 @@ class QuotesController @Autowired constructor(
 
   @PostMapping()
   @Secured("ROLE_COMPARISON")
+  @LogCall
   fun createQuote(@Valid @RequestBody request: QuoteRequestDTO): ResponseEntity<*> = logRequestId(request.requestId) {
 
     val currentUserName = SecurityContextHolder.getContext().authentication.name
@@ -66,6 +68,7 @@ class QuotesController @Autowired constructor(
 
   @PostMapping("bundle")
   @Secured("ROLE_COMPARISON")
+  @LogCall
   fun bundleQuotes(
     @Valid @RequestBody request: BundleQuotesRequestDTO
   ): ResponseEntity<out Any> {
@@ -83,6 +86,7 @@ class QuotesController @Autowired constructor(
 
   @PostMapping("{quoteId}/sign")
   @Secured("ROLE_COMPARISON")
+  @LogCall
   fun signQuote(
     @Valid @PathVariable quoteId: UUID,
     @Valid @RequestBody request: SignRequestDTO
@@ -101,6 +105,7 @@ class QuotesController @Autowired constructor(
 
   @PostMapping("bundle/sign")
   @Secured("ROLE_COMPARISON")
+  @LogCall
   fun signBundle(
     @Valid @RequestBody request: SignBundleRequestDTO
   ): ResponseEntity<out Any> {

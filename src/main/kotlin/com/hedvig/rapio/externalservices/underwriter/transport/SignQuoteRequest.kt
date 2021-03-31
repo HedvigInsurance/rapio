@@ -1,13 +1,14 @@
 package com.hedvig.rapio.externalservices.underwriter.transport
 
+import com.hedvig.libs.logging.masking.Masked
 import java.time.LocalDate
 import java.time.ZoneId
 
 data class SignQuoteRequest (
         val name: Name?,
-        val ssn: String?,
+        @Masked val ssn: String?,
         val startDate: LocalDate,
-        val email: String
+        @Masked val email: String
 )
 
 data class DateWithZone (
@@ -16,6 +17,6 @@ data class DateWithZone (
 )
 
 data class Name (
-        val firstName: String,
-        val lastName: String
+        @Masked val firstName: String,
+        @Masked val lastName: String
 )

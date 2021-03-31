@@ -1,5 +1,6 @@
 package com.hedvig.rapio.insuranceinfo
 
+import com.hedvig.libs.logging.calls.LogCall
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,6 +17,7 @@ class InsuranceInfoController(
 
     @GetMapping("/{memberId}")
     @Secured("ROLE_INSURANCE_INFO")
+    @LogCall
     fun getInsuranceInfo(
         @Valid @PathVariable memberId: String
     ): ResponseEntity<InsuranceInfo> {
