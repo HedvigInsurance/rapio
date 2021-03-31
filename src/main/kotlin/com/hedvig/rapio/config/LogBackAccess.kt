@@ -8,14 +8,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import javax.servlet.Filter
 
-@Profile("runtime")
 @Configuration
 class LogBackAccess {
-
-    @Bean(name = ["TeeFilter"])
-    fun teeFilter(): Filter {
-        return ch.qos.logback.access.servlet.TeeFilter()
-    }
 
     @Bean
     fun servletContainer(): ServletWebServerFactory {
