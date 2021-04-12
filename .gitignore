@@ -3,6 +3,7 @@
 
 # Application development file
 /src/main/resources/application-development.yml
+gradle.properties
 
 # Log file
 *.log

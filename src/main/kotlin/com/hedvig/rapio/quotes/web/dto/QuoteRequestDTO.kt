@@ -111,6 +111,7 @@ data class NorwegianHomeContentQuoteRequestData(
 data class DanishHomeContentQuoteRequestData(
     @get:NotBlank @Masked val street: String,
     val apartment: String?,
+    val floor: String?,
     @get:NotBlank @get:Pattern(regexp = """\d{3,4}""") val zipCode: String,
     val city: String?,
     val bbrId: String?,
@@ -129,6 +130,7 @@ data class DanishHomeContentQuoteRequestData(
 data class DanishTravelQuoteRequestData(
     @get:NotBlank @Masked val street: String,
     val apartment: String?,
+    val floor: String?,
     @get:NotBlank @get:Pattern(regexp = """\d{3,4}""") val zipCode: String,
     val city: String?,
     @Masked val bbrId: String?,
@@ -146,6 +148,7 @@ data class DanishTravelQuoteRequestData(
 data class DanishAccidentQuoteRequestData(
     @get:NotBlank @Masked val street: String,
     val apartment: String?,
+    val floor: String?,
     @get:NotBlank @get:Pattern(regexp = """\d{3,4}""") val zipCode: String,
     val city: String?,
     @Masked val bbrId: String?,

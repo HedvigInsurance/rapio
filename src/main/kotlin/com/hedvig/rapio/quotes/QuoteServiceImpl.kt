@@ -72,6 +72,7 @@ class QuoteServiceImpl(
         IncompleteDanishHomeContentQuoteDataDto(
           street = quoteData.street,
           apartment = quoteData.apartment,
+          floor = quoteData.floor,
           zipCode = quoteData.zipCode,
           city = quoteData.city,
           bbrId = quoteData.bbrId,
@@ -84,6 +85,7 @@ class QuoteServiceImpl(
         IncompleteDanishTravelQuoteDataDto(
           street = quoteData.street,
           apartment = quoteData.apartment,
+          floor = quoteData.floor,
           zipCode = quoteData.zipCode,
           city = quoteData.city,
           bbrId = quoteData.bbrId,
@@ -95,6 +97,7 @@ class QuoteServiceImpl(
         IncompleteDanishAccidentQuoteDataDto(
           street = quoteData.street,
           apartment = quoteData.apartment,
+          floor = quoteData.floor,
           zipCode = quoteData.zipCode,
           city = quoteData.city,
           bbrId = quoteData.bbrId,
