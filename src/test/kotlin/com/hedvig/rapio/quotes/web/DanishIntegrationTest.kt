@@ -95,7 +95,8 @@ class DanishIntegrationTest {
               "requestId": "apa",
               "quoteData": {
                 "street": "ApStreet 1234",
-                "apartment": "10.th",
+                "apartment": "10",
+                "floor": "th",
                 "zipCode": "1234",
                 "city": "ApCity",
                 "bbrId": "12345",
@@ -131,7 +132,8 @@ class DanishIntegrationTest {
         val incompleteQuoteData = uwQuoteRequest.captured.incompleteQuoteData as IncompleteDanishHomeContentQuoteDataDto
 
         assertThat(incompleteQuoteData.street).isEqualTo("ApStreet 1234")
-        assertThat(incompleteQuoteData.apartment).isEqualTo("10.th")
+        assertThat(incompleteQuoteData.apartment).isEqualTo("10")
+        assertThat(incompleteQuoteData.floor).isEqualTo("th")
         assertThat(incompleteQuoteData.zipCode).isEqualTo("1234")
         assertThat(incompleteQuoteData.city).isEqualTo("ApCity")
         assertThat(incompleteQuoteData.bbrId).isEqualTo("12345")
@@ -162,7 +164,8 @@ class DanishIntegrationTest {
               "requestId": "apa",
               "quoteData": {
                 "street": "ApStreet 1234",
-                "apartment": "10.th",
+                "apartment": "10",
+                "floor": "th",
                 "bbrId": "12345",
                 "zipCode": "1234",
                 "city": "ApCity",
@@ -197,7 +200,8 @@ class DanishIntegrationTest {
         val incompleteQuoteData = uwQuoteRequest.captured.incompleteQuoteData as IncompleteDanishTravelQuoteDataDto
 
         assertThat(incompleteQuoteData.street).isEqualTo("ApStreet 1234")
-        assertThat(incompleteQuoteData.apartment).isEqualTo("10.th")
+        assertThat(incompleteQuoteData.apartment).isEqualTo("10")
+        assertThat(incompleteQuoteData.floor).isEqualTo("th")
         assertThat(incompleteQuoteData.zipCode).isEqualTo("1234")
         assertThat(incompleteQuoteData.city).isEqualTo("ApCity")
         assertThat(incompleteQuoteData.bbrId).isEqualTo("12345")
@@ -228,6 +232,7 @@ class DanishIntegrationTest {
               "quoteData": {
                 "street": "ApStreet 1234",
                 "apartment": "10A",
+                "floor": "1",
                 "zipCode": "1234",
                 "city": "ApCity",
                 "bbrId": "12345",
@@ -262,6 +267,7 @@ class DanishIntegrationTest {
 
         assertThat(incompleteQuoteData.street).isEqualTo("ApStreet 1234")
         assertThat(incompleteQuoteData.apartment).isEqualTo("10A")
+        assertThat(incompleteQuoteData.floor).isEqualTo("1")
         assertThat(incompleteQuoteData.zipCode).isEqualTo("1234")
         assertThat(incompleteQuoteData.city).isEqualTo("ApCity")
         assertThat(incompleteQuoteData.bbrId).isEqualTo("12345")

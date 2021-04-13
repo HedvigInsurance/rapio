@@ -82,6 +82,7 @@ data class IncompleteNorwegianHomeContentQuoteDataDto(
 data class IncompleteDanishHomeContentQuoteDataDto(
     @Masked val street: String?,
     val apartment: String?,
+    val floor: String?,
     val zipCode: String?,
     val city: String?,
     @Masked val bbrId: String?,
@@ -94,6 +95,7 @@ data class IncompleteDanishHomeContentQuoteDataDto(
 data class IncompleteDanishTravelQuoteDataDto(
     @Masked val street: String?,
     val apartment: String?,
+    val floor: String?,
     val zipCode: String?,
     val city: String?,
     @Masked val bbrId: String?,
@@ -105,6 +107,7 @@ data class IncompleteDanishTravelQuoteDataDto(
 data class IncompleteDanishAccidentQuoteDataDto(
     @Masked val street: String?,
     val apartment: String?,
+    val floor: String?,
     val zipCode: String?,
     val city: String?,
     @Masked val bbrId: String?,
