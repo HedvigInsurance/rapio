@@ -18,8 +18,6 @@ extra["arrowVerions"] = "0.10.0"
 repositories {
     jcenter()
     mavenCentral()
-    maven("https://dl.bintray.com/arrow-kt/arrow-kt/")
-    //maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' } // for SNAPSHOT builds
     maven {
         url = uri("https://maven.pkg.github.com/HedvigInsurance/libs")
         credentials {
