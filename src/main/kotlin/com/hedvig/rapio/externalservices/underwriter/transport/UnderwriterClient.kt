@@ -14,11 +14,11 @@ interface UnderwriterClient {
     fun createQuote(@RequestBody body: IncompleteQuoteDTO): ResponseEntity<CompleteQuoteResponse>
 
     @RequestMapping(value = ["/_/v1/quotes/bundle"], method = [RequestMethod.POST])
-    fun quoteBundle(@RequestBody body: QuoteBundleRequestDto) : ResponseEntity<QuoteBundleResponseDto>
+    fun quoteBundle(@RequestBody body: QuoteBundleRequestDto): ResponseEntity<QuoteBundleResponseDto>
 
     @RequestMapping(value = ["/_/v1/quotes/{quoteId}/signFromRapio"], method = [RequestMethod.POST])
-    fun signQuote(@PathVariable("quoteId") quoteId: String, @RequestBody body:SignQuoteRequest) : ResponseEntity<SignedQuoteResponseDto>
+    fun signQuote(@PathVariable("quoteId") quoteId: String, @RequestBody body: SignQuoteRequest): ResponseEntity<SignedQuoteResponseDto>
 
     @RequestMapping(value = ["/_/v1/quotes/bundle/sign"], method = [RequestMethod.POST])
-    fun signQuoteBundle(@RequestBody body:SignQuoteBundleRequest) : ResponseEntity<SignedQuoteBundleResponseDto>
+    fun signQuoteBundle(@RequestBody body: SignQuoteBundleRequest): ResponseEntity<SignedQuoteBundleResponseDto>
 }

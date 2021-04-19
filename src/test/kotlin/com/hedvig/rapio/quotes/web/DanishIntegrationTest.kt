@@ -17,28 +17,27 @@ import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
 import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import io.mockk.slot
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.MediaType
-import org.springframework.security.test.context.support.WithMockUser
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
-import io.mockk.slot
-import org.assertj.core.api.Assertions.assertThat
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.test.context.support.WithMockUser
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.junit4.SpringRunner
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
-
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -285,7 +284,7 @@ class DanishIntegrationTest {
         val uwSignQuoteRequest1 = slot<String>()
         val uwSignQuoteRequest2 = slot<SignQuoteRequest>()
         val uwSignQuoteResponse =
-                SignedQuoteResponseDto(
+            SignedQuoteResponseDto(
                 id = uwProductId,
                 memberId = "12345",
                 signedAt = now,
@@ -295,15 +294,19 @@ class DanishIntegrationTest {
         val agSetupPaymentLinkRequest1 = slot<String>()
         val agSetupPaymentLinkRequest2 = slot<CreateSetupPaymentLinkRequestDto>()
 
-        every { underwriterClient.signQuote(
-            capture(uwSignQuoteRequest1),
-            capture(uwSignQuoteRequest2)
-        ) } returns ResponseEntity.ok(uwSignQuoteResponse)
+        every {
+            underwriterClient.signQuote(
+                capture(uwSignQuoteRequest1),
+                capture(uwSignQuoteRequest2)
+            )
+        } returns ResponseEntity.ok(uwSignQuoteResponse)
 
-        every { apiGatewayClient.setupPaymentLink(
-            capture(agSetupPaymentLinkRequest1),
-            capture(agSetupPaymentLinkRequest2)
-        ) } returns ResponseEntity.ok(CreateSetupPaymentLinkResponseDto("payment-link"))
+        every {
+            apiGatewayClient.setupPaymentLink(
+                capture(agSetupPaymentLinkRequest1),
+                capture(agSetupPaymentLinkRequest2)
+            )
+        } returns ResponseEntity.ok(CreateSetupPaymentLinkResponseDto("payment-link"))
 
         val requestData = """
             {
@@ -350,5 +353,4 @@ class DanishIntegrationTest {
 
         return restTemplate.exchange(url, HttpMethod.POST, HttpEntity(data, headers), T::class.java)
     }
-
 }

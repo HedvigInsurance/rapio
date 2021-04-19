@@ -1,5 +1,5 @@
 package com.hedvig.rapio.comparison.web.dto
 
-data class ExternalErrorResponseDTO (
-        val errorMessage: String
+data class ExternalErrorResponseDTO(
+    val errorMessage: String
 )

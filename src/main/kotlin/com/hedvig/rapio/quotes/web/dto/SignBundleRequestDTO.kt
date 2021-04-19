@@ -30,4 +30,3 @@ data class SignBundleRequestDTO(
         val currency: String
     )
 }
-

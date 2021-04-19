@@ -9,32 +9,32 @@ import org.springframework.stereotype.Service
 
 @Service
 class ApiGateway(
-  private val apiGatewayClient: ApiGatewayClient,
-  @Value("\${hedvig.api-gateway.token}") private val token: String
+    private val apiGatewayClient: ApiGatewayClient,
+    @Value("\${hedvig.api-gateway.token}") private val token: String
 ) {
 
-  fun setupPaymentLink(memberId: String, market: String): String? {
-    return try {
-      val countryCode = when (market) {
-        "SWEDEN" -> CountryCode.SE
-        "NORWAY" -> CountryCode.NO
-        "DENMARK" -> CountryCode.DK
-        else ->
-          throw RuntimeException("Unknown market: $market")
-      }
+    fun setupPaymentLink(memberId: String, market: String): String? {
+        return try {
+            val countryCode = when (market) {
+                "SWEDEN" -> CountryCode.SE
+                "NORWAY" -> CountryCode.NO
+                "DENMARK" -> CountryCode.DK
+                else ->
+                    throw RuntimeException("Unknown market: $market")
+            }
 
-      val response = apiGatewayClient.setupPaymentLink(
-        token,
-        CreateSetupPaymentLinkRequestDto(memberId, countryCode)
-      )
-      response.body!!.url
-    } catch (e: Exception) {
-      logger.error("Something went wrong with setting up a payment link for member $memberId", e)
-      null
+            val response = apiGatewayClient.setupPaymentLink(
+                token,
+                CreateSetupPaymentLinkRequestDto(memberId, countryCode)
+            )
+            response.body!!.url
+        } catch (e: Exception) {
+            logger.error("Something went wrong with setting up a payment link for member $memberId", e)
+            null
+        }
     }
-  }
 
-  companion object {
-    val logger = LoggerFactory.getLogger(this::class.java)!!
-  }
+    companion object {
+        val logger = LoggerFactory.getLogger(this::class.java)!!
+    }
 }

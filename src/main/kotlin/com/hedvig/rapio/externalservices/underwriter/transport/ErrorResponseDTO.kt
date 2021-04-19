@@ -3,8 +3,8 @@ package com.hedvig.rapio.externalservices.underwriter.transport
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue
 
 data class ErrorResponse(
-        val errorCode: ErrorCodes = ErrorCodes.UNKNOWN_ERROR_CODE,
-        val errorMessage: String
+    val errorCode: ErrorCodes = ErrorCodes.UNKNOWN_ERROR_CODE,
+    val errorMessage: String
 )
 
 enum class ErrorCodes {

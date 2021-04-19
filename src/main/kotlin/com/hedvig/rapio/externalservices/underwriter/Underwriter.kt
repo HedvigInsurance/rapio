@@ -9,9 +9,9 @@ import javax.money.MonetaryAmount
 
 interface Underwriter {
     fun createQuote(data: IncompleteQuoteDTO): Either<ErrorResponse, CompleteQuoteReference>
-    fun quoteBundle(request: QuoteBundleRequestDto) : Either<ErrorResponse, QuoteBundleResponseDto>
-    fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String, ssn: String?) : Either<ErrorResponse, SignedQuoteResponseDto>
-    fun signBundle(ids: List<UUID>, email: String, startsAt: LocalDate, firstName: String, lastName: String, ssn: String?, price: String?, currency: String?) : Either<ErrorResponse, SignedQuoteBundleResponseDto>
+    fun quoteBundle(request: QuoteBundleRequestDto): Either<ErrorResponse, QuoteBundleResponseDto>
+    fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String, ssn: String?): Either<ErrorResponse, SignedQuoteResponseDto>
+    fun signBundle(ids: List<UUID>, email: String, startsAt: LocalDate, firstName: String, lastName: String, ssn: String?, price: String?, currency: String?): Either<ErrorResponse, SignedQuoteBundleResponseDto>
 }
 
 data class CompleteQuoteReference(
@@ -19,4 +19,3 @@ data class CompleteQuoteReference(
     val price: MonetaryAmount,
     val validTo: Instant
 )
-

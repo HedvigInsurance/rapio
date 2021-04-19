@@ -16,7 +16,7 @@ data class QuoteRequestDTO(
     @set:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "productType")
     @JsonSubTypes(
         JsonSubTypes.Type(value = ApartmentQuoteRequestData::class, name = "HOME"), // Deprecated use SWEDISH_APARTMENT
-        JsonSubTypes.Type(value = HouseQuoteRequestData::class, name = "HOUSE"),  // Deprecated use SWEDISH_HOUSE
+        JsonSubTypes.Type(value = HouseQuoteRequestData::class, name = "HOUSE"), // Deprecated use SWEDISH_HOUSE
         JsonSubTypes.Type(value = ApartmentQuoteRequestData::class, name = "SWEDISH_APARTMENT"),
         JsonSubTypes.Type(value = HouseQuoteRequestData::class, name = "SWEDISH_HOUSE"),
         JsonSubTypes.Type(value = NorwegianTravelQuoteRequestData::class, name = "NORWEGIAN_TRAVEL"),
@@ -30,8 +30,7 @@ data class QuoteRequestDTO(
     companion object
 }
 
-sealed class QuoteRequestData {
-}
+sealed class QuoteRequestData
 
 @optics
 data class ApartmentQuoteRequestData(
@@ -49,7 +48,7 @@ data class ApartmentQuoteRequestData(
     val householdSize: Int,
 
     val productSubType: ProductSubType
-): QuoteRequestData() {
+) : QuoteRequestData() {
     companion object
 }
 
@@ -76,7 +75,7 @@ data class HouseQuoteRequestData(
     val extraBuildings: List<ExtraBuildingRequestDto>?,
     val isSubleted: Boolean,
     val floor: Int
-): QuoteRequestData() {
+) : QuoteRequestData() {
     companion object
 }
 
@@ -88,7 +87,7 @@ data class NorwegianTravelQuoteRequestData(
     val coInsured: Int,
     val youth: Boolean
 
-): QuoteRequestData() {
+) : QuoteRequestData() {
     companion object
 }
 
@@ -103,7 +102,7 @@ data class NorwegianHomeContentQuoteRequestData(
     val youth: Boolean,
     @get:NotBlank @get:Pattern(regexp = """(OWN|RENT)""") val productSubType: String
 
-): QuoteRequestData() {
+) : QuoteRequestData() {
     companion object
 }
 
@@ -122,7 +121,7 @@ data class DanishHomeContentQuoteRequestData(
     val student: Boolean,
     @get:NotBlank @get:Pattern(regexp = """(OWN|RENT)""") val productSubType: String
 
-): QuoteRequestData() {
+) : QuoteRequestData() {
     companion object
 }
 
@@ -140,7 +139,7 @@ data class DanishTravelQuoteRequestData(
     val student: Boolean,
     @get:NotBlank @get:Pattern(regexp = """(WHOLE_WORLD|NON_US_CANADA)""") val travelArea: String
 
-): QuoteRequestData() {
+) : QuoteRequestData() {
     companion object
 }
 
@@ -157,7 +156,7 @@ data class DanishAccidentQuoteRequestData(
     val birthDate: String,
     val student: Boolean
 
-): QuoteRequestData() {
+) : QuoteRequestData() {
     companion object
 }
 

@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.web.filter.CommonsRequestLoggingFilter
 
-
 @Profile("staging")
 @Configuration
 class RequestLoggingFilterConfig {

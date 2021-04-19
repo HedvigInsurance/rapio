@@ -24,11 +24,15 @@ class FakeUnderwriter : Underwriter {
     }
 
     override fun quoteBundle(request: QuoteBundleRequestDto): Either<ErrorResponse, QuoteBundleResponseDto> {
-        return Right(QuoteBundleResponseDto(QuoteBundleResponseDto.BundleCost(
-            monthlyGross = QuoteBundleResponseDto.Amount("30.00", "SEK"),
-            monthlyDiscount = QuoteBundleResponseDto.Amount("5.00", "SEK"),
-            monthlyNet = QuoteBundleResponseDto.Amount("25.00", "SEK")
-        )))
+        return Right(
+            QuoteBundleResponseDto(
+                QuoteBundleResponseDto.BundleCost(
+                    monthlyGross = QuoteBundleResponseDto.Amount("30.00", "SEK"),
+                    monthlyDiscount = QuoteBundleResponseDto.Amount("5.00", "SEK"),
+                    monthlyNet = QuoteBundleResponseDto.Amount("25.00", "SEK")
+                )
+            )
+        )
     }
 
     override fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String, ssn: String?): Either<ErrorResponse, SignedQuoteResponseDto> {
@@ -45,10 +49,12 @@ class FakeUnderwriter : Underwriter {
         price: String?,
         currency: String?
     ): Either<ErrorResponse, SignedQuoteBundleResponseDto> {
-        return Right(SignedQuoteBundleResponseDto(
-            "1234",
-            "SWEDEN",
-            listOf(SignedQuoteBundleResponseDto.Contract(UUID.randomUUID(), Instant.now()))
-        ))
+        return Right(
+            SignedQuoteBundleResponseDto(
+                "1234",
+                "SWEDEN",
+                listOf(SignedQuoteBundleResponseDto.Contract(UUID.randomUUID(), Instant.now()))
+            )
+        )
     }
 }

@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestMethod
 
 @FeignClient(name = "api-gateway", url = "\${hedvig.api-gateway.url:api-gateway}")
 interface ApiGatewayClient {
-  @RequestMapping(value = ["/_/setupPaymentLink/create"], method = [RequestMethod.POST])
-  fun setupPaymentLink(
-    @RequestHeader token: String,
-    @RequestBody dto: CreateSetupPaymentLinkRequestDto
-  ): ResponseEntity<CreateSetupPaymentLinkResponseDto>
+    @RequestMapping(value = ["/_/setupPaymentLink/create"], method = [RequestMethod.POST])
+    fun setupPaymentLink(
+        @RequestHeader token: String,
+        @RequestBody dto: CreateSetupPaymentLinkRequestDto
+    ): ResponseEntity<CreateSetupPaymentLinkResponseDto>
 }

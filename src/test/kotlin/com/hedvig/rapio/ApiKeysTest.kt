@@ -30,123 +30,139 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @ActiveProfiles("auth", "testing")
 @TestPropertySource(
-  properties = [
-    "hedvig.rapio.apikeys.mrInsplanetUser=INSPLANET",
-    "hedvig.rapio.apikeys.mrInsplanetUser2=INSPLANET",
-    "hedvig.rapio.apikeys.mrAvyUser=AVY"
-  ]
+    properties = [
+        "hedvig.rapio.apikeys.mrInsplanetUser=INSPLANET",
+        "hedvig.rapio.apikeys.mrInsplanetUser2=INSPLANET",
+        "hedvig.rapio.apikeys.mrAvyUser=AVY"
+    ]
 )
 class ApiKeysTest {
-  @Autowired
-  lateinit var mvc: MockMvc
+    @Autowired
+    lateinit var mvc: MockMvc
 
-  @MockkBean
-  lateinit var quoteService: QuoteService
+    @MockkBean
+    lateinit var quoteService: QuoteService
 
-  @MockkBean
-  lateinit var underwriterClient: UnderwriterClient
+    @MockkBean
+    lateinit var underwriterClient: UnderwriterClient
 
-  @MockkBean
-  lateinit var apiGateway: ApiGateway
+    @MockkBean
+    lateinit var apiGateway: ApiGateway
 
-  @MockkBean
-  lateinit var paymentServiceClient: PaymentServiceClient
+    @MockkBean
+    lateinit var paymentServiceClient: PaymentServiceClient
 
-  @MockkBean
-  lateinit var productPricingClient: ProductPricingClient
+    @MockkBean
+    lateinit var productPricingClient: ProductPricingClient
 
-  @MockkBean
-  lateinit var insuranceInfoService: InsuranceInfoService
+    @MockkBean
+    lateinit var insuranceInfoService: InsuranceInfoService
 
-  @Test
-  fun apikey_with_basic_auth() {
-    mvc
-      .perform(get("/")
-        .with(httpBasic("mrInsplanetUser", "")))
-      .andExpect(status().isNotFound)
-  }
+    @Test
+    fun apikey_with_basic_auth() {
+        mvc
+            .perform(
+                get("/")
+                    .with(httpBasic("mrInsplanetUser", ""))
+            )
+            .andExpect(status().isNotFound)
+    }
 
-  @Test
-  fun apikey_not_found() {
-    mvc
-      .perform(get("/")
-        .with(httpBasic("tokenDoesNotExist", "")))
-      .andExpect(status().isUnauthorized)
-  }
+    @Test
+    fun apikey_not_found() {
+        mvc
+            .perform(
+                get("/")
+                    .with(httpBasic("tokenDoesNotExist", ""))
+            )
+            .andExpect(status().isUnauthorized)
+    }
 
-  @Test
-  fun `fail to access v1 quotes if the role is not ROLE_COMPARISON` () {
+    @Test
+    fun `fail to access v1 quotes if the role is not ROLE_COMPARISON`() {
 
-    every { quoteService.createQuote(any(), any()) } returns Right(quoteResponse)
+        every { quoteService.createQuote(any(), any()) } returns Right(quoteResponse)
 
-    mvc
-      .perform(post("/v1/quotes")
-        .with(httpBasic("mrAvyUser", ""))
-        .content(createApartmentRequestJson)
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON))
-      .andExpect(status().isForbidden)
-  }
+        mvc
+            .perform(
+                post("/v1/quotes")
+                    .with(httpBasic("mrAvyUser", ""))
+                    .content(createApartmentRequestJson)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().isForbidden)
+    }
 
-  @Test
-  fun `succeed to access v1 quotes if the role is ROLE_COMPARISON` () {
+    @Test
+    fun `succeed to access v1 quotes if the role is ROLE_COMPARISON`() {
 
-    every { quoteService.createQuote(any(), any()) } returns Right(quoteResponse)
+        every { quoteService.createQuote(any(), any()) } returns Right(quoteResponse)
 
-    mvc
-      .perform(post("/v1/quotes")
-        .with(httpBasic("mrInsplanetUser", ""))
-        .content(createApartmentRequestJson)
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON))
-      .andExpect(status().is2xxSuccessful)
-  }
+        mvc
+            .perform(
+                post("/v1/quotes")
+                    .with(httpBasic("mrInsplanetUser", ""))
+                    .content(createApartmentRequestJson)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().is2xxSuccessful)
+    }
 
-  @Test
-  fun `fail to access signing quotes if the role is not ROLE_COMPARISON` () {
-    every { quoteService.signQuote(any(), any()) } returns Right(makeSignResponse())
+    @Test
+    fun `fail to access signing quotes if the role is not ROLE_COMPARISON`() {
+        every { quoteService.signQuote(any(), any()) } returns Right(makeSignResponse())
 
-    mvc
-      .perform(post("/v1/quotes/BA483B2A-2549-4C88-9311-F7394BB34D16/sign")
-        .with(httpBasic("mrAvyUser", ""))
-        .content(signRequestJson)
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON))
-      .andExpect(status().isForbidden)
-  }
+        mvc
+            .perform(
+                post("/v1/quotes/BA483B2A-2549-4C88-9311-F7394BB34D16/sign")
+                    .with(httpBasic("mrAvyUser", ""))
+                    .content(signRequestJson)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().isForbidden)
+    }
 
-  @Test
-  fun `succeed to access signing quotes if the role is not ROLE_COMPARISON` () {
-    every { quoteService.signQuote(any(), any()) } returns Right(makeSignResponse())
+    @Test
+    fun `succeed to access signing quotes if the role is not ROLE_COMPARISON`() {
+        every { quoteService.signQuote(any(), any()) } returns Right(makeSignResponse())
 
-    mvc
-      .perform(post("/v1/quotes/BA483B2A-2549-4C88-9311-F7394BB34D16/sign")
-        .with(httpBasic("mrInsplanetUser", ""))
-        .content(signRequestJson)
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON))
-      .andExpect(status().is2xxSuccessful)
-  }
+        mvc
+            .perform(
+                post("/v1/quotes/BA483B2A-2549-4C88-9311-F7394BB34D16/sign")
+                    .with(httpBasic("mrInsplanetUser", ""))
+                    .content(signRequestJson)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().is2xxSuccessful)
+    }
 
-  @Test
-  fun `fail to access insurance info end-point with the role that is not ROLE_INSURANCE_INFO` () {
+    @Test
+    fun `fail to access insurance info end-point with the role that is not ROLE_INSURANCE_INFO`() {
 
-    every { insuranceInfoService.getInsuranceInfo(any())} returns null
+        every { insuranceInfoService.getInsuranceInfo(any()) } returns null
 
-    mvc
-      .perform(get("/v1/members/12345")
-        .with(httpBasic("mrInsplanetUser", "")))
-      .andExpect(status().isForbidden)
-  }
+        mvc
+            .perform(
+                get("/v1/members/12345")
+                    .with(httpBasic("mrInsplanetUser", ""))
+            )
+            .andExpect(status().isForbidden)
+    }
 
-  @Test
-  fun `succeed to access insurance info end-point with the role ROLE_INSURANCE_INFO` () {
+    @Test
+    fun `succeed to access insurance info end-point with the role ROLE_INSURANCE_INFO`() {
 
-    every { insuranceInfoService.getInsuranceInfo(any())} returns null
+        every { insuranceInfoService.getInsuranceInfo(any()) } returns null
 
-    mvc
-      .perform(get("/v1/members/12345")
-        .with(httpBasic("mrAvyUser", "")))
-        .andExpect(status().isNotFound)
-  }
+        mvc
+            .perform(
+                get("/v1/members/12345")
+                    .with(httpBasic("mrAvyUser", ""))
+            )
+            .andExpect(status().isNotFound)
+    }
 }
