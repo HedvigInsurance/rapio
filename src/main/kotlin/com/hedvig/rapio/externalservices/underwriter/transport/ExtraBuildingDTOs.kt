@@ -1,6 +1,6 @@
 package com.hedvig.rapio.externalservices.underwriter.transport
 
-import java.util.*
+import java.util.UUID
 
 data class ExtraBuildingRequestDto(
     val id: UUID?,

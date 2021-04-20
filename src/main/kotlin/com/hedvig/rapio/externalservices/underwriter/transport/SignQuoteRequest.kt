@@ -11,11 +11,6 @@ data class SignQuoteRequest(
     @Masked val email: String
 )
 
-data class DateWithZone(
-    val date: LocalDate,
-    val timeZone: ZoneId
-)
-
 data class Name(
     @Masked val firstName: String,
     @Masked val lastName: String

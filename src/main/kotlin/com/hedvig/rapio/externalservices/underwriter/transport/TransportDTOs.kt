@@ -11,8 +11,7 @@ enum class ApartmentProductSubType {
     BRF,
     RENT,
     STUDENT_BRF,
-    STUDENT_RENT,
-    UNKNOWN
+    STUDENT_RENT
 }
 
 data class IncompleteQuoteDTO(
@@ -120,13 +119,3 @@ data class CompleteQuoteResponse(
     val currency: String,
     val validTo: Instant?
 )
-
-data class PostIncompleteQuoteResult(
-    val id: String
-)
-
-enum class QuoteInitiatedFrom {
-    RAPIO,
-    WEBONBOARDING,
-    APP
-}
