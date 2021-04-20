@@ -32,8 +32,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @TestPropertySource(
     properties = [
         "hedvig.rapio.apikeys.mrInsplanetUser=INSPLANET",
-        "hedvig.rapio.apikeys.mrInsplanetUser2=INSPLANET",
-        "hedvig.rapio.apikeys.mrAvyUser=AVY"
+        "hedvig.rapio.apikeys.mrAvyUser=AVY",
+        "hedvig.rapio.apikeys.mrAvyDistributorUser=AVYDISTRIBUTOR"
     ]
 )
 class ApiKeysTest {
@@ -79,7 +79,7 @@ class ApiKeysTest {
     }
 
     @Test
-    fun `fail to access v1 quotes if the role is not ROLE_COMPARISON`() {
+    fun `fail to access v1 quotes if the role is INSURANCE_INFO`() {
 
         every { quoteService.createQuote(any(), any()) } returns Right(quoteResponse)
 
@@ -111,7 +111,23 @@ class ApiKeysTest {
     }
 
     @Test
-    fun `fail to access signing quotes if the role is not ROLE_COMPARISON`() {
+    fun `succeed to access v1 quotes if the role is ROLE_DISTRIBUTION`() {
+
+        every { quoteService.createQuote(any(), any()) } returns Right(quoteResponse)
+
+        mvc
+            .perform(
+                post("/v1/quotes")
+                    .with(httpBasic("mrAvyDistributorUser", ""))
+                    .content(createApartmentRequestJson)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().is2xxSuccessful)
+    }
+
+    @Test
+    fun `fail to access signing quotes if the role is ROLE_INSURANCE_INFO`() {
         every { quoteService.signQuote(any(), any()) } returns Right(makeSignResponse())
 
         mvc
@@ -126,7 +142,7 @@ class ApiKeysTest {
     }
 
     @Test
-    fun `succeed to access signing quotes if the role is not ROLE_COMPARISON`() {
+    fun `succeed to access signing quotes if the role is ROLE_COMPARISON`() {
         every { quoteService.signQuote(any(), any()) } returns Right(makeSignResponse())
 
         mvc
@@ -141,7 +157,22 @@ class ApiKeysTest {
     }
 
     @Test
-    fun `fail to access insurance info end-point with the role that is not ROLE_INSURANCE_INFO`() {
+    fun `succeed to access signing quotes if the role is ROLE_DISTRIBUTION`() {
+        every { quoteService.signQuote(any(), any()) } returns Right(makeSignResponse())
+
+        mvc
+            .perform(
+                post("/v1/quotes/BA483B2A-2549-4C88-9311-F7394BB34D16/sign")
+                    .with(httpBasic("mrAvyDistributorUser", ""))
+                    .content(signRequestJson)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().is2xxSuccessful)
+    }
+
+    @Test
+    fun `fail to access insurance info end-point with the role that is ROLE_COMPARISON`() {
 
         every { insuranceInfoService.getInsuranceInfo(any()) } returns null
 
@@ -162,6 +193,19 @@ class ApiKeysTest {
             .perform(
                 get("/v1/members/12345")
                     .with(httpBasic("mrAvyUser", ""))
+            )
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `succeed to access insurance info end-point with the role ROLE_DISTRIBUTION`() {
+
+        every { insuranceInfoService.getInsuranceInfo(any()) } returns null
+
+        mvc
+            .perform(
+                get("/v1/members/12345")
+                    .with(httpBasic("mrAvyDistributorUser", ""))
             )
             .andExpect(status().isNotFound)
     }
