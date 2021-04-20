@@ -29,7 +29,7 @@ class QuotesController @Autowired constructor(
 ) {
 
     @PostMapping()
-    @Secured("ROLE_COMPARISON")
+    @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
     @LogCall
     fun createQuote(@Valid @RequestBody request: QuoteRequestDTO): ResponseEntity<*> = logRequestId(request.requestId) {
 
@@ -68,7 +68,7 @@ class QuotesController @Autowired constructor(
     }
 
     @PostMapping("bundle")
-    @Secured("ROLE_COMPARISON")
+    @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
     @LogCall
     fun bundleQuotes(
         @Valid @RequestBody request: BundleQuotesRequestDTO
@@ -86,7 +86,7 @@ class QuotesController @Autowired constructor(
     }
 
     @PostMapping("{quoteId}/sign")
-    @Secured("ROLE_COMPARISON")
+    @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
     @LogCall
     fun signQuote(
         @Valid @PathVariable quoteId: UUID,
@@ -105,7 +105,7 @@ class QuotesController @Autowired constructor(
     }
 
     @PostMapping("bundle/sign")
-    @Secured("ROLE_COMPARISON")
+    @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
     @LogCall
     fun signBundle(
         @Valid @RequestBody request: SignBundleRequestDTO

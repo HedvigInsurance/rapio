@@ -16,7 +16,7 @@ class InsuranceInfoController(
 ) {
 
     @GetMapping("/{memberId}")
-    @Secured("ROLE_INSURANCE_INFO")
+    @Secured("ROLE_INSURANCE_INFO", "ROLE_DISTRIBUTION")
     @LogCall
     fun getInsuranceInfo(
         @Valid @PathVariable memberId: String
