@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
 plugins {
     id("java")
@@ -9,6 +8,7 @@ plugins {
     kotlin("plugin.spring") version "1.3.31"
     kotlin("kapt") version "1.3.31"
     id("org.liquibase.gradle") version "2.0.1"
+    id("org.jetbrains.kotlin.plugin.jpa") version "1.3.31"
 }
 
 extra["springCloudVersion"] = "Greenwich.SR3"

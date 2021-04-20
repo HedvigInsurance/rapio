@@ -3,10 +3,13 @@ package com.hedvig.rapio.external
 import com.hedvig.rapio.apikeys.Partner
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.test.context.junit4.SpringRunner
 import java.util.UUID
 
+@RunWith(SpringRunner::class)
 @DataJpaTest
 internal class ExternalMemberTest {
     @Autowired
@@ -27,7 +30,7 @@ internal class ExternalMemberTest {
         assertThat(result.partner).isEqualTo(Partner.AVY_DISTRIBUTOR)
     }
 
-    @Test(expected = SomeDatabaseException::class)
+    @Test
     fun `cannot create multiple external members with the same member id`() {
         val externalMember = ExternalMember(EXTERNAL_MEMBER_ID, MEMBER_ID, Partner.AVY_DISTRIBUTOR)
         repository.saveAndFlush(externalMember)

@@ -179,6 +179,6 @@ object QuoteData {
         quoteId = id.toString(),
         productId = id.toString(),
         signedAt = Instant.now().epochSecond,
-        completionUrl = "PAYMENT_REDIRECTION"
+        completionUrl = "PAYMENT_REDIRECTION",
     )
 }
