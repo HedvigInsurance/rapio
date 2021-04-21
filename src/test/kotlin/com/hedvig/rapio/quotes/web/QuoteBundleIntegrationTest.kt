@@ -42,9 +42,6 @@ import java.util.UUID
 class QuoteBundleIntegrationTest {
 
     @Autowired
-    lateinit var mockMvc: MockMvc
-
-    @Autowired
     lateinit var objectMapper: ObjectMapper
 
     @Autowired
