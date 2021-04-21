@@ -217,7 +217,7 @@ class ApiKeysTest {
         mvc
             .perform(
                 get("/v1/members/996195e5-4330-4be9-87a9-a2ae8ce60311/extended")
-                    .with(httpBasic("mrAvyDistributorUser", ""))
+                    .with(httpBasic("mrAvyUser", ""))
             )
             .andExpect(status().isForbidden)
     }
