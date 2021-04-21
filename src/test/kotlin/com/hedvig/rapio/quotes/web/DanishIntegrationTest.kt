@@ -318,7 +318,7 @@ class DanishIntegrationTest {
 
         // Why does this not work 😢
         every {
-            externalMemberRepository.save(ExternalMember(any(), any(), any()))
+            externalMemberRepository.save<ExternalMember>(any())
         } returns ExternalMember(UUID.randomUUID(), "12345", Partner.COMPRICER)
 
         val requestData = """

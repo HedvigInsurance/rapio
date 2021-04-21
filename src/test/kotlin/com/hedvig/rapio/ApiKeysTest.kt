@@ -33,7 +33,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
     properties = [
         "hedvig.rapio.apikeys.mrInsplanetUser=INSPLANET",
         "hedvig.rapio.apikeys.mrAvyUser=AVY",
-        "hedvig.rapio.apikeys.mrAvyDistributorUser=AVYDISTRIBUTOR"
+        "hedvig.rapio.apikeys.mrAvyDistributorUser=AVY_DISTRIBUTOR"
     ]
 )
 class ApiKeysTest {
