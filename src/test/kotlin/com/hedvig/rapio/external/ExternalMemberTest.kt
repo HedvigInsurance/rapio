@@ -2,14 +2,11 @@ package com.hedvig.rapio.external
 
 import com.hedvig.rapio.apikeys.Partner
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.springframework.test.context.junit4.SpringRunner
 import java.util.UUID
 
-@RunWith(SpringRunner::class)
 @DataJpaTest
 internal class ExternalMemberTest {
     @Autowired

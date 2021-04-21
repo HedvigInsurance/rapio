@@ -8,3 +8,4 @@ data class SignedQuoteResponseDto(
     val signedAt: Instant,
     val market: String
 )
+

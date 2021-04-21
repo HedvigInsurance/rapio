@@ -8,7 +8,8 @@ plugins {
     kotlin("plugin.spring") version "1.3.31"
     kotlin("kapt") version "1.3.31"
     id("org.liquibase.gradle") version "2.0.1"
-    id("org.jetbrains.kotlin.plugin.jpa") version "1.3.31"
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.3.31"
+    id("org.jetbrains.kotlin.plugin.noarg") version "1.3.31"
 }
 
 extra["springCloudVersion"] = "Greenwich.SR3"
@@ -131,4 +132,12 @@ liquibase {
             )
     }
     runList = "main"
+}
+
+allOpen {
+    annotation("org.springframework.context.annotation.Configuration")
+    annotation("javax.persistence.Entity")
+}
+noArg {
+    annotation("javax.persistence.Entity")
 }

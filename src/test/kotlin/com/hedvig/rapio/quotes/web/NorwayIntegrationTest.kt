@@ -19,7 +19,7 @@ import io.mockk.every
 import io.mockk.slot
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -31,14 +31,14 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.*
+import java.util.UUID
 
-@RunWith(SpringRunner::class)
+@ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc(secure = false)
 @ActiveProfiles(profiles = ["noauth"])
@@ -163,7 +163,8 @@ class NorwayIntegrationTest {
         assertThat(uwQuoteRequest.captured.productType.name).isEqualTo("HOME_CONTENT")
         assertThat(uwQuoteRequest.captured.shouldComplete).isTrue()
 
-        val incompleteQuoteData = uwQuoteRequest.captured.incompleteQuoteData as IncompleteNorwegianHomeContentQuoteDataDto
+        val incompleteQuoteData =
+            uwQuoteRequest.captured.incompleteQuoteData as IncompleteNorwegianHomeContentQuoteDataDto
 
         assertThat(incompleteQuoteData.street).isEqualTo("ApGatan")
         assertThat(incompleteQuoteData.zipCode).isEqualTo("1234")
