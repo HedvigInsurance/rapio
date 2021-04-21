@@ -7,8 +7,8 @@ import javax.money.MonetaryAmount
 @JsonTypeName("QuoteResponse")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "object")
 data class QuoteResponseDTO(
-        val requestId: String,
-        val quoteId: String,
-        val validUntil:Long?,
-        val monthlyPremium:MonetaryAmount
+    val requestId: String,
+    val quoteId: String,
+    val validUntil: Long?,
+    val monthlyPremium: MonetaryAmount
 )

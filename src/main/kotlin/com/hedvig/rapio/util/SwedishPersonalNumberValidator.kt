@@ -60,7 +60,6 @@ object SwedishPersonalNumberValidator {
             if (isValid)
                 return ValidIdNumber(if (isSSN) century + value else value, isValid, isSSN, isCoOrdinationNumber, isMale, isCompany)
             else throw IllegalArgumentException("Personal number is invalid")
-
         } catch (ex: NumberFormatException) {
             throw IllegalArgumentException("Personal number is not a number", ex)
         }

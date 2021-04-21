@@ -7,6 +7,5 @@ import org.springframework.context.annotation.Configuration
 @ConfigurationProperties("hedvig.rapio")
 class Keys {
 
-    var apikeys:Map<String, String>? = null
-
+    var apikeys: Map<String, String>? = null
 }

@@ -14,26 +14,26 @@ import com.hedvig.rapio.quotes.web.dto.SignBundleResponseDTO
 import com.ninjasquad.springmockk.MockkBean
 import feign.FeignException
 import io.mockk.every
+import io.mockk.slot
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.MediaType
-import org.springframework.security.test.context.support.WithMockUser
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
-import io.mockk.slot
-import org.assertj.core.api.Assertions.assertThat
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.test.context.support.WithMockUser
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.web.servlet.MockMvc
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
-
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -64,7 +64,8 @@ class QuoteBundleIntegrationTest {
     fun bundle_quotes() {
 
         val uwQuoteBundleRequest = slot<QuoteBundleRequestDto>()
-        val uwQuoteBundleResponse = objectMapper.readValue("""
+        val uwQuoteBundleResponse = objectMapper.readValue(
+            """
             {
                 "bundleCost": {
                     "monthlyGross": {
@@ -81,11 +82,15 @@ class QuoteBundleIntegrationTest {
                     }
                 }
             }
-        """, QuoteBundleResponseDto::class.java)
+        """,
+            QuoteBundleResponseDto::class.java
+        )
 
-        every { underwriterClient.quoteBundle(
-            capture(uwQuoteBundleRequest)
-        ) } returns ResponseEntity.status(200).body(uwQuoteBundleResponse)
+        every {
+            underwriterClient.quoteBundle(
+                capture(uwQuoteBundleRequest)
+            )
+        } returns ResponseEntity.status(200).body(uwQuoteBundleResponse)
 
         val requestData = """
             {
@@ -136,7 +141,8 @@ class QuoteBundleIntegrationTest {
         val startsAt = LocalDate.now()
 
         val uwQuoteBundleRequest = slot<SignQuoteBundleRequest>()
-        val uwQuoteBundleResponse = objectMapper.readValue("""
+        val uwQuoteBundleResponse = objectMapper.readValue(
+            """
             {
                 "memberId": "1234",
                 "market": "NORWAY",
@@ -149,19 +155,25 @@ class QuoteBundleIntegrationTest {
                     "signedAt": "$signedAt"
                 }]
             }
-        """, SignedQuoteBundleResponseDto::class.java)
+        """,
+            SignedQuoteBundleResponseDto::class.java
+        )
 
-        every { underwriterClient.signQuoteBundle(
-            capture(uwQuoteBundleRequest)
-        ) } returns ResponseEntity.status(200).body(uwQuoteBundleResponse)
+        every {
+            underwriterClient.signQuoteBundle(
+                capture(uwQuoteBundleRequest)
+            )
+        } returns ResponseEntity.status(200).body(uwQuoteBundleResponse)
 
         val agSetupPaymentLinkRequest1 = slot<String>()
         val agSetupPaymentLinkRequest2 = slot<String>()
 
-        every { apiGateway.setupPaymentLink(
-            capture(agSetupPaymentLinkRequest1),
-            capture(agSetupPaymentLinkRequest2)
-        ) } returns "payment-link"
+        every {
+            apiGateway.setupPaymentLink(
+                capture(agSetupPaymentLinkRequest1),
+                capture(agSetupPaymentLinkRequest2)
+            )
+        } returns "payment-link"
 
         val requestData = """
             {
@@ -228,9 +240,11 @@ class QuoteBundleIntegrationTest {
             }
         """
 
-        every { underwriterClient.signQuoteBundle(
-            capture(uwQuoteBundleRequest)
-        ) } throws FeignException.UnprocessableEntity("apa", uwQuoteBundleResponse.toByteArray())
+        every {
+            underwriterClient.signQuoteBundle(
+                capture(uwQuoteBundleRequest)
+            )
+        } throws FeignException.UnprocessableEntity("apa", uwQuoteBundleResponse.toByteArray())
 
         val requestData = """
             {
@@ -257,7 +271,6 @@ class QuoteBundleIntegrationTest {
 
         assertThat(response.statusCode.value()).isEqualTo(500)
         assertThat(response.body!!).isEqualTo("{\"errorMessage\":\"Cannot sign quote, already a Hedvig member\"}")
-
     }
 
     private inline fun <reified T : Any> postJsonToResponseEntity(url: String, data: String): ResponseEntity<T> {

@@ -11,6 +11,5 @@ import org.springframework.web.bind.annotation.RequestHeader
 )
 interface PaymentServiceClient {
     @GetMapping("/directDebit/status")
-    fun getDirectDebitStatusByMemberId(@RequestHeader("Hedvig.Token") memberId: String)
-            : ResponseEntity<DirectDebitStatusDTO?>
+    fun getDirectDebitStatusByMemberId(@RequestHeader("Hedvig.Token") memberId: String): ResponseEntity<DirectDebitStatusDTO?>
 }

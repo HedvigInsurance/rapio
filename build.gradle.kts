@@ -19,7 +19,7 @@ repositories {
     jcenter()
     mavenCentral()
     maven("https://dl.bintray.com/arrow-kt/arrow-kt/")
-    //maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' } // for SNAPSHOT builds
+    // maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' } // for SNAPSHOT builds
     maven {
         url = uri("https://maven.pkg.github.com/HedvigInsurance/libs")
         credentials {
@@ -50,7 +50,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
 
-
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     implementation("org.springframework.cloud:spring-cloud-openfeign-core")
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
@@ -63,7 +62,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.31")
     implementation("io.springfox:springfox-swagger2:2.9.2")
     implementation("io.springfox:springfox-swagger-ui:2.9.2")
-
 
     implementation("org.jdbi:jdbi3-core")
     implementation("org.jdbi:jdbi3-kotlin")
@@ -90,7 +88,6 @@ dependencies {
     api("io.arrow-kt:arrow-syntax:${property("arrowVerions")}")
     api("io.arrow-kt:arrow-optics:${property("arrowVerions")}")
     kapt("io.arrow-kt:arrow-meta:${property("arrowVerions")}")
-            
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
@@ -100,7 +97,6 @@ dependencies {
     testImplementation("com.ninja-squad:springmockk:1.1.2")
     testImplementation("io.mockk:mockk:1.9.1")
     testImplementation("com.h2database:h2:1.4.200")
-
 
     liquibaseRuntime("org.liquibase:liquibase-core:3.6.1")
     liquibaseRuntime("org.postgresql:postgresql:42.2.6")
@@ -126,15 +122,13 @@ tasks.withType<Test> {
 liquibase {
     activities.register("main") {
         this.arguments =
-                        mapOf(
-                                "logLevel" to "info",
-                                "changeLogFile" to "src/main/resources/db/changelog/db.changelog-master.yaml",
-                                "url" to "jdbc:postgresql://localhost:5432/rapio",
-                                "username" to "postgres",
-                                "password" to "hedvig"
-                        )
-
-
-        }
+            mapOf(
+                "logLevel" to "info",
+                "changeLogFile" to "src/main/resources/db/changelog/db.changelog-master.yaml",
+                "url" to "jdbc:postgresql://localhost:5432/rapio",
+                "username" to "postgres",
+                "password" to "hedvig"
+            )
+    }
     runList = "main"
 }

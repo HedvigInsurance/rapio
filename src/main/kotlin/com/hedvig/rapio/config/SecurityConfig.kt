@@ -14,18 +14,18 @@ import org.springframework.security.config.http.SessionCreationPolicy
 @EnableGlobalMethodSecurity(
     prePostEnabled = true,
     securedEnabled = true,
-    jsr250Enabled = true)
+    jsr250Enabled = true
+)
 class SecurityConfig : WebSecurityConfigurerAdapter() {
-
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         http
-                .csrf().disable()
-                .httpBasic().and()
-                .authorizeRequests()
-                .antMatchers("/actuator/health/**").permitAll()
-                .antMatchers("/**").authenticated()
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .csrf().disable()
+            .httpBasic().and()
+            .authorizeRequests()
+            .antMatchers("/actuator/health/**").permitAll()
+            .antMatchers("/**").authenticated()
+            .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     }
 }

@@ -25,112 +25,113 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("v1/quotes")
 class QuotesController @Autowired constructor(
-  val quoteService: QuoteService
+    val quoteService: QuoteService
 ) {
 
-  @PostMapping()
-  @Secured("ROLE_COMPARISON")
-  @LogCall
-  fun createQuote(@Valid @RequestBody request: QuoteRequestDTO): ResponseEntity<*> = logRequestId(request.requestId) {
+    @PostMapping()
+    @Secured("ROLE_COMPARISON")
+    @LogCall
+    fun createQuote(@Valid @RequestBody request: QuoteRequestDTO): ResponseEntity<*> = logRequestId(request.requestId) {
 
-    val currentUserName = SecurityContextHolder.getContext().authentication.name
-    val partner = Partner.valueOf(currentUserName)
+        val currentUserName = SecurityContextHolder.getContext().authentication.name
+        val partner = Partner.valueOf(currentUserName)
 
-    val requestData = when (val data = request.quoteData) {
+        val requestData = when (val data = request.quoteData) {
 
-      is ApartmentQuoteRequestData -> {
-        request.copy(quoteData = data.copy(
-            personalNumber = SwedishPersonalNumberValidator.validate(data.personalNumber).idno
-          )
-        )
-      }
+            is ApartmentQuoteRequestData -> {
+                request.copy(
+                    quoteData = data.copy(
+                        personalNumber = SwedishPersonalNumberValidator.validate(data.personalNumber).idno
+                    )
+                )
+            }
 
-      is HouseQuoteRequestData -> {
-        request.copy(
-          quoteData = data.copy(
-            personalNumber = SwedishPersonalNumberValidator.validate(data.personalNumber).idno
-          )
-        )
-      }
+            is HouseQuoteRequestData -> {
+                request.copy(
+                    quoteData = data.copy(
+                        personalNumber = SwedishPersonalNumberValidator.validate(data.personalNumber).idno
+                    )
+                )
+            }
 
-      is NorwegianTravelQuoteRequestData -> request
-      is NorwegianHomeContentQuoteRequestData -> request
-      is DanishHomeContentQuoteRequestData -> request
-      is DanishTravelQuoteRequestData -> request
-      is DanishAccidentQuoteRequestData -> request
+            is NorwegianTravelQuoteRequestData -> request
+            is NorwegianHomeContentQuoteRequestData -> request
+            is DanishHomeContentQuoteRequestData -> request
+            is DanishTravelQuoteRequestData -> request
+            is DanishAccidentQuoteRequestData -> request
+        }
+
+        return@logRequestId quoteService.createQuote(requestData, partner).bimap(
+            { left -> notAccepted(left) },
+            { right -> ok(right) }
+        ).getOrHandle { it }
     }
 
-    return@logRequestId quoteService.createQuote(requestData, partner).bimap(
-      { left -> notAccepted(left) },
-      { right -> ok(right) }
-    ).getOrHandle { it }
-  }
+    @PostMapping("bundle")
+    @Secured("ROLE_COMPARISON")
+    @LogCall
+    fun bundleQuotes(
+        @Valid @RequestBody request: BundleQuotesRequestDTO
+    ): ResponseEntity<out Any> {
 
-  @PostMapping("bundle")
-  @Secured("ROLE_COMPARISON")
-  @LogCall
-  fun bundleQuotes(
-    @Valid @RequestBody request: BundleQuotesRequestDTO
-  ): ResponseEntity<out Any> {
+        return logRequestId(request.requestId) {
 
-    return logRequestId(request.requestId) {
+            val response = quoteService.bundleQuotes(request)
 
-      val response = quoteService.bundleQuotes(request)
-
-      return@logRequestId response.bimap(
-        { left -> ResponseEntity.status(500).body(ExternalErrorResponseDTO(left)) },
-        { right -> ok(right) }
-      ).getOrHandle { it }
+            return@logRequestId response.bimap(
+                { left -> ResponseEntity.status(500).body(ExternalErrorResponseDTO(left)) },
+                { right -> ok(right) }
+            ).getOrHandle { it }
+        }
     }
-  }
 
-  @PostMapping("{quoteId}/sign")
-  @Secured("ROLE_COMPARISON")
-  @LogCall
-  fun signQuote(
-    @Valid @PathVariable quoteId: UUID,
-    @Valid @RequestBody request: SignRequestDTO
-  ): ResponseEntity<out Any> {
+    @PostMapping("{quoteId}/sign")
+    @Secured("ROLE_COMPARISON")
+    @LogCall
+    fun signQuote(
+        @Valid @PathVariable quoteId: UUID,
+        @Valid @RequestBody request: SignRequestDTO
+    ): ResponseEntity<out Any> {
 
-    return logRequestId(request.requestId) {
+        return logRequestId(request.requestId) {
 
-      val response = quoteService.signQuote(quoteId, request)
+            val response = quoteService.signQuote(quoteId, request)
 
-      return@logRequestId response.bimap(
-        { left -> ResponseEntity.status(500).body(ExternalErrorResponseDTO(left)) },
-        { right -> ok(right) }
-      ).getOrHandle { it }
+            return@logRequestId response.bimap(
+                { left -> ResponseEntity.status(500).body(ExternalErrorResponseDTO(left)) },
+                { right -> ok(right) }
+            ).getOrHandle { it }
+        }
     }
-  }
 
-  @PostMapping("bundle/sign")
-  @Secured("ROLE_COMPARISON")
-  @LogCall
-  fun signBundle(
-    @Valid @RequestBody request: SignBundleRequestDTO
-  ): ResponseEntity<out Any> {
+    @PostMapping("bundle/sign")
+    @Secured("ROLE_COMPARISON")
+    @LogCall
+    fun signBundle(
+        @Valid @RequestBody request: SignBundleRequestDTO
+    ): ResponseEntity<out Any> {
 
-    return logRequestId(request.requestId) {
+        return logRequestId(request.requestId) {
 
-      val response = quoteService.signBundle(request)
+            val response = quoteService.signBundle(request)
 
-      return@logRequestId response.bimap(
-        { left -> ResponseEntity.status(500).body(ExternalErrorResponseDTO(left)) },
-        { right -> ok(right) }
-      ).getOrHandle { it }
+            return@logRequestId response.bimap(
+                { left -> ResponseEntity.status(500).body(ExternalErrorResponseDTO(left)) },
+                { right -> ok(right) }
+            ).getOrHandle { it }
+        }
     }
-  }
 
-  private fun <T> logRequestId(requestId: String, fn: () -> T): T {
-    try {
-      MDC.put("requestId", requestId)
-      return fn()
-    } finally {
-      MDC.remove("requestId")
+    private fun <T> logRequestId(requestId: String, fn: () -> T): T {
+        try {
+            MDC.put("requestId", requestId)
+            return fn()
+        } finally {
+            MDC.remove("requestId")
+        }
     }
-  }
 
-  companion object {
-    val logger = LoggerFactory.getLogger(this::class.java)!!
-  }
+    companion object {
+        val logger = LoggerFactory.getLogger(this::class.java)!!
+    }
 }

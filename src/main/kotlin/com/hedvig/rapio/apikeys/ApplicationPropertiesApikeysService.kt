@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Component
 import io.sentry.event.User as SentryUser
 
-
 private val logger = KotlinLogging.logger {}
 
 @Component

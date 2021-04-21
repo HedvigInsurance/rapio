@@ -37,8 +37,7 @@ data class IncompleteQuoteDTO(
     JsonSubTypes.Type(value = IncompleteDanishTravelQuoteDataDto::class, name = "danishTravel"),
     JsonSubTypes.Type(value = IncompleteDanishAccidentQuoteDataDto::class, name = "danishAccident")
 )
-sealed class IncompleteQuoteRequestData {
-}
+sealed class IncompleteQuoteRequestData
 
 data class IncompleteHouseQuoteDataDto(
     @Masked val street: String?,
@@ -131,4 +130,3 @@ enum class QuoteInitiatedFrom {
     WEBONBOARDING,
     APP
 }
-
