@@ -17,19 +17,26 @@ class InsuranceInfoController(
     val insuranceInfoService: InsuranceInfoService,
     val externalMemberService: ExternalMemberService
 ) {
-    @GetMapping("/{externalMemberId}")
-    @Secured("ROLE_INSURANCE_INFO", "ROLE_DISTRIBUTION")
+    @GetMapping("/{memberId}")
+    @Secured("ROLE_INSURANCE_INFO")
     @LogCall
     fun getInsuranceInfo(
-        @Valid @PathVariable externalMemberId: String
+        @Valid @PathVariable memberId: String
     ): ResponseEntity<InsuranceInfo> {
-        val memberId = try {
-            externalMemberService.getMemberIdByExternalMemberId(UUID.fromString(externalMemberId))
-                ?: return ResponseEntity.notFound().build()
-        } catch (exception: IllegalArgumentException) {
-            // TODO: Do not allow this code path when Avy has only UUID member ids
-            externalMemberId
+        return when (val insuranceInfo = insuranceInfoService.getInsuranceInfo(memberId)) {
+            null -> ResponseEntity.notFound().build()
+            else -> ResponseEntity.ok(insuranceInfo)
         }
+    }
+
+    @GetMapping("/{externalMemberId}/extended")
+    @Secured("ROLE_DISTRIBUTION")
+    @LogCall
+    fun getExtendedInsuranceInfo(
+        @Valid @PathVariable externalMemberId: UUID
+    ): ResponseEntity<InsuranceInfo> {
+        val memberId = externalMemberService.getMemberIdByExternalMemberId(externalMemberId)
+            ?: return ResponseEntity.notFound().build()
         return when (val insuranceInfo = insuranceInfoService.getInsuranceInfo(memberId)) {
             null -> ResponseEntity.notFound().build()
             else -> ResponseEntity.ok(insuranceInfo)

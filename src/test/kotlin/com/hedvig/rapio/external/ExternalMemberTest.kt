@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import java.time.Instant
 import java.util.UUID
 
 @DataJpaTest
@@ -18,13 +19,17 @@ internal class ExternalMemberTest {
     @Test
     fun `can create and find an external member`() {
         val externalMember = ExternalMember(EXTERNAL_MEMBER_ID, MEMBER_ID, Partner.AVY_DISTRIBUTOR)
+        val before = Instant.now()
         repository.saveAndFlush(externalMember)
+        val after = Instant.now()
 
         val result = repository.getOne(EXTERNAL_MEMBER_ID)
         assertThat(result).isNotNull()
         assertThat(result.id).isEqualTo(EXTERNAL_MEMBER_ID)
         assertThat(result.memberId).isEqualTo(MEMBER_ID)
         assertThat(result.partner).isEqualTo(Partner.AVY_DISTRIBUTOR)
+        assertThat(before).isBefore(result.createdAt)
+        assertThat(after).isAfter(result.createdAt)
     }
 
     @Test

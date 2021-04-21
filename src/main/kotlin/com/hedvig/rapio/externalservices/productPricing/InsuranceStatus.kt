@@ -12,7 +12,7 @@ enum class InsuranceStatus {
         fun fromContractStatus(contractStatus: ContractStatus): InsuranceStatus {
             return when (contractStatus) {
                 ContractStatus.PENDING -> PENDING
-                ContractStatus.ACTIVE_IN_FUTURE -> ACTIVE_IN_FUTURE
+                ContractStatus.ACTIVE_IN_FUTURE,
                 ContractStatus.ACTIVE_IN_FUTURE_AND_TERMINATED_IN_FUTURE -> ACTIVE_IN_FUTURE
                 ContractStatus.ACTIVE,
                 ContractStatus.TERMINATED_TODAY,

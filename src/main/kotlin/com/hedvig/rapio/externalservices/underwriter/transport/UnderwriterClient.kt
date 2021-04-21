@@ -20,6 +20,6 @@ interface UnderwriterClient {
     @PostMapping("/_/v1/quotes/{quoteId}/signFromRapio")
     fun signQuote(@PathVariable("quoteId") quoteId: String, @RequestBody body: SignQuoteRequest): ResponseEntity<SignedQuoteResponseDto>
 
-    @PostMapping("/_/v1/quotes/bundle/signFromRapio") // FIXME: This one doesn't exist in underwriter? @osten
+    @PostMapping("/_/v1/quotes/bundle/signFromRapio")
     fun signQuoteBundle(@RequestBody body: SignQuoteBundleRequest): ResponseEntity<SignedQuoteBundleResponseDto>
 }
