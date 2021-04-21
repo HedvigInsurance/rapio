@@ -19,8 +19,8 @@ import java.util.UUID
 @Service
 class QuoteServiceImpl(
     val underwriter: Underwriter,
-    val apiGateway: ApiGateway,
-    val externalMemberRepository: ExternalMemberRepository
+    val externalMemberRepository: ExternalMemberRepository,
+    val apiGateway: ApiGateway
 ) : QuoteService {
 
     override fun createQuote(requestDTO: QuoteRequestDTO, partner: Partner): Either<String, QuoteResponseDTO> {
@@ -163,7 +163,6 @@ class QuoteServiceImpl(
     }
 
     override fun bundleQuotes(request: BundleQuotesRequestDTO): Either<String, BundleQuotesResponseDTO> {
-
         return when (val response = underwriter.quoteBundle(QuoteBundleRequestDto(request.quoteIds))) {
             is Either.Right -> {
                 with(response.b.bundleCost.monthlyNet) {

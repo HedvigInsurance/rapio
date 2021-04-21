@@ -80,7 +80,6 @@ class ApiKeysTest {
 
     @Test
     fun `fail to access v1 quotes if the role is INSURANCE_INFO`() {
-
         every { quoteService.createQuote(any(), any()) } returns Right(quoteResponse)
 
         mvc

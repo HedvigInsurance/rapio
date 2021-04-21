@@ -19,11 +19,9 @@ import com.hedvig.rapio.externalservices.underwriter.transport.UnderwriterClient
 import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
 import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
 import com.ninjasquad.springmockk.MockkBean
-import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.slot
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -316,7 +314,6 @@ class DanishIntegrationTest {
             )
         } returns ResponseEntity.ok(CreateSetupPaymentLinkResponseDto("payment-link"))
 
-        // Why does this not work 😢
         every {
             externalMemberRepository.save<ExternalMember>(any())
         } returns ExternalMember(UUID.randomUUID(), "12345", Partner.COMPRICER)

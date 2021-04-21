@@ -30,7 +30,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.test.web.servlet.MockMvc
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -40,9 +39,6 @@ import java.util.UUID
 @AutoConfigureMockMvc(secure = false)
 @ActiveProfiles(profiles = ["noauth"])
 class QuoteBundleIntegrationTest {
-
-    @Autowired
-    lateinit var mockMvc: MockMvc
 
     @Autowired
     lateinit var objectMapper: ObjectMapper
@@ -119,7 +115,10 @@ class QuoteBundleIntegrationTest {
     @WithMockUser("COMPRICER", roles = ["COMPARISON"])
     fun bundle_quote_with_underwriter_error() {
 
-        every { underwriterClient.quoteBundle(any()) } throws FeignException.InternalServerError("testing", "apa".toByteArray())
+        every { underwriterClient.quoteBundle(any()) } throws FeignException.InternalServerError(
+            "testing",
+            "apa".toByteArray()
+        )
 
         val requestData = """
             {
