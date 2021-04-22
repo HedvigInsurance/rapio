@@ -197,7 +197,7 @@ class ApiKeysTest {
     }
 
     @Test
-    fun `fail to access insurance info end-point with the role ROLE_DISTRIBUTION`() {
+    fun `succeed to access insurance info end-point with the role ROLE_DISTRIBUTION`() {
 
         every { insuranceInfoService.getInsuranceInfo(any()) } returns null
 
@@ -206,20 +206,20 @@ class ApiKeysTest {
                 get("/v1/members/12345")
                     .with(httpBasic("mrAvyDistributorUser", ""))
             )
-            .andExpect(status().isForbidden)
+            .andExpect(status().isNotFound)
     }
 
     @Test
-    fun `fail to access extended insurance info end-point with the role ROLE_INSURANCE_INFO`() {
+    fun `succeed to access extended insurance info end-point with the role ROLE_INSURANCE_INFO`() {
 
         every { insuranceInfoService.getInsuranceInfo(any()) } returns null
 
         mvc
             .perform(
-                get("/v1/members/996195e5-4330-4be9-87a9-a2ae8ce60311/extended")
+                get("/v1/members/996195e5-4330-4be9-87a9-a2ae8ce60311")
                     .with(httpBasic("mrAvyUser", ""))
             )
-            .andExpect(status().isForbidden)
+            .andExpect(status().isNotFound)
     }
 
     @Test
@@ -229,7 +229,7 @@ class ApiKeysTest {
 
         mvc
             .perform(
-                get("/v1/members/996195e5-4330-4be9-87a9-a2ae8ce60311/extended")
+                get("/v1/members/996195e5-4330-4be9-87a9-a2ae8ce60311")
                     .with(httpBasic("mrAvyDistributorUser", ""))
             )
             .andExpect(status().isNotFound)

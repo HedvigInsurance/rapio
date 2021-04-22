@@ -17,29 +17,25 @@ class InsuranceInfoController(
     val insuranceInfoService: InsuranceInfoService,
     val externalMemberService: ExternalMemberService
 ) {
-    @GetMapping("/{memberId}")
-    @Secured("ROLE_INSURANCE_INFO")
+    @GetMapping("/{externalMemberId}")
+    @Secured("ROLE_INSURANCE_INFO", "ROLE_DISTRIBUTION")
     @LogCall
     fun getInsuranceInfo(
-        @Valid @PathVariable memberId: String
+        @Valid @PathVariable externalMemberId: String
     ): ResponseEntity<InsuranceInfo> {
-        return when (val insuranceInfo = insuranceInfoService.getInsuranceInfo(memberId)) {
-            null -> ResponseEntity.notFound().build()
-            else -> ResponseEntity.ok(insuranceInfo)
-        }
-    }
-
-    @GetMapping("/{externalMemberId}/extended")
-    @Secured("ROLE_DISTRIBUTION")
-    @LogCall
-    fun getExtendedInsuranceInfo(
-        @Valid @PathVariable externalMemberId: UUID
-    ): ResponseEntity<InsuranceInfo> {
-        val memberId = externalMemberService.getMemberIdByExternalMemberId(externalMemberId)
-            ?: return ResponseEntity.notFound().build()
-        return when (val insuranceInfo = insuranceInfoService.getInsuranceInfo(memberId)) {
-            null -> ResponseEntity.notFound().build()
-            else -> ResponseEntity.ok(insuranceInfo)
+        try {
+            val memberId = externalMemberService.getMemberIdByExternalMemberId(UUID.fromString(externalMemberId))
+                ?: return ResponseEntity.notFound().build()
+            return when (val insuranceInfo = insuranceInfoService.getExtendedInsuranceInfo(memberId)) {
+                null -> ResponseEntity.notFound().build()
+                else -> ResponseEntity.ok(insuranceInfo)
+            }
+        } catch (exception: IllegalArgumentException) {
+            // FIXME: Do not allow this onward after talking to Avy
+            return when (val insuranceInfo = insuranceInfoService.getInsuranceInfo(externalMemberId)) {
+                null -> ResponseEntity.notFound().build()
+                else -> ResponseEntity.ok(insuranceInfo)
+            }
         }
     }
 }

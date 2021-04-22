@@ -1,6 +1,8 @@
 package com.hedvig.rapio.insuranceinfo
 
+import com.hedvig.libs.logging.masking.Masked
+
 data class InsuranceAddress(
-    val street: String,
+    @Masked val street: String,
     val postalCode: String
 )

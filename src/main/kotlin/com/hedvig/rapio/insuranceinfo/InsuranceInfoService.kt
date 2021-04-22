@@ -31,16 +31,22 @@ class InsuranceInfoService(
             insuranceStatus = InsuranceStatus.fromContractStatus(currentContract.status),
             insurancePremium = currentAgreement.basePremium,
             inceptionDate = currentContract.masterInception,
-            paymentConnected = isDirectDebitConnected
+            terminationDate = null,
+            paymentConnected = isDirectDebitConnected,
+            certificateUrl = null,
+            numberCoInsured = null,
+            insuranceAddress = null,
+            squareMeters = null
         )
     }
 
-    fun getExtendedInsuranceInfo(memberId: String): ExtendedInsuranceInfo? {
+    fun getExtendedInsuranceInfo(memberId: String): InsuranceInfo? {
         val currentContract = getCurrentContract(memberId) ?: return null
         val currentAgreement = currentContract.genericAgreements.find { agreement -> agreement.id == currentContract.currentAgreementId }!!
         val isDirectDebitConnected = paymentService.isDirectDebitConnected(memberId)
 
-        return ExtendedInsuranceInfo(
+        return InsuranceInfo(
+            memberId = null,
             insuranceStatus = InsuranceStatus.fromContractStatus(currentContract.status),
             insurancePremium = currentAgreement.basePremium,
             inceptionDate = currentContract.masterInception,

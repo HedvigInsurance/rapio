@@ -9,13 +9,6 @@ data class ExtraBuildingRequestDto(
     val hasWaterConnected: Boolean
 )
 
-data class ExtraBuilding(
-    val type: ExtraBuildingType,
-    val area: Int,
-    val hasWaterConnected: Boolean,
-    val displayName: String?
-)
-
 enum class ExtraBuildingType {
     GARAGE,
     CARPORT,
