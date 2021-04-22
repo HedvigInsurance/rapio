@@ -272,7 +272,7 @@ class QuoteBundleIntegrationTest {
         val response = postJsonToResponseEntity<String>("/v1/quotes/bundle/sign", requestData)
 
         assertThat(response.statusCode.value()).isEqualTo(500)
-        assertThat(response.body!!).isEqualTo("{\"errorMessage\":\"Cannot sign quote, already a Hedvig member\"}")
+        assertThat(response.body!!).isEqualTo("{\"errorMessage\":\"Cannot sign quote, unable to sign member\"}")
     }
 
     private inline fun <reified T : Any> postJsonToResponseEntity(url: String, data: String): ResponseEntity<T> {
