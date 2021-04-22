@@ -192,7 +192,7 @@ class QuoteServiceImpl(
                 when (it.errorCode) {
                     ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> "Cannot sign quote, breaches underwriting guidelines"
                     ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED -> "Cannot sign quote, quote has expired"
-                    ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> "Cannot sign quote, already a Hedvig member"
+                    ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> "Cannot sign quote, unable to sign member"
                     ErrorCodes.NO_SUCH_QUOTE -> "Quote not found.."
                     ErrorCodes.INVALID_BUNDLING -> "Bundling not supported.."
                     ErrorCodes.UNKNOWN_ERROR_CODE -> "Something went wrong.."
@@ -233,7 +233,7 @@ class QuoteServiceImpl(
                 when (it.errorCode) {
                     ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> "Cannot sign quote, breaches underwriting guidelines"
                     ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED -> "Cannot sign quote, quote has expired"
-                    ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> "Cannot sign quote, already a Hedvig member"
+                    ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> "Cannot sign quote, unable to sign member"
                     ErrorCodes.NO_SUCH_QUOTE -> "Quote not found.."
                     ErrorCodes.INVALID_BUNDLING -> "Bundling not supported.."
                     ErrorCodes.UNKNOWN_ERROR_CODE -> "Something went wrong.."
