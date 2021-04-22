@@ -1,12 +1,11 @@
-package com.hedvig.rapio.insuranceinfo
+package com.hedvig.rapio.insuranceinfo.dto
 
 import com.hedvig.libs.logging.masking.Masked
 import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
 import java.time.LocalDate
 import javax.money.MonetaryAmount
 
-data class InsuranceInfo(
-    val memberId: String?, // TODO: Remove this one
+data class ExtendedInsuranceInfo(
     val insuranceStatus: InsuranceStatus,
     val insurancePremium: MonetaryAmount,
     val inceptionDate: LocalDate?,

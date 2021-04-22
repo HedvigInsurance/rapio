@@ -7,9 +7,34 @@ import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.external.ExternalMemberRepository
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
 import com.hedvig.rapio.externalservices.underwriter.Underwriter
-import com.hedvig.rapio.externalservices.underwriter.transport.*
+import com.hedvig.rapio.externalservices.underwriter.transport.ApartmentProductSubType
+import com.hedvig.rapio.externalservices.underwriter.transport.ErrorCodes
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteApartmentQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteDanishAccidentQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteDanishHomeContentQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteDanishTravelQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHouseQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteNorwegianHomeContentQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteNorwegianTravelQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteQuoteDTO
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
-import com.hedvig.rapio.quotes.web.dto.*
+import com.hedvig.rapio.externalservices.underwriter.transport.QuoteBundleRequestDto
+import com.hedvig.rapio.quotes.web.dto.ApartmentQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.BundleQuotesRequestDTO
+import com.hedvig.rapio.quotes.web.dto.BundleQuotesResponseDTO
+import com.hedvig.rapio.quotes.web.dto.DanishAccidentQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.DanishHomeContentQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.DanishTravelQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.HouseQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.NorwegianHomeContentQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.NorwegianTravelQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.ProductSubType
+import com.hedvig.rapio.quotes.web.dto.QuoteRequestDTO
+import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
+import com.hedvig.rapio.quotes.web.dto.SignBundleRequestDTO
+import com.hedvig.rapio.quotes.web.dto.SignBundleResponseDTO
+import com.hedvig.rapio.quotes.web.dto.SignRequestDTO
+import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
 import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -187,9 +212,9 @@ class QuoteServiceImpl(
         )
 
         return response.bimap(
-            {
-                logger.info("Failed to sign bundle: ${it.errorCode} - ${it.errorMessage}")
-                when (it.errorCode) {
+            { error ->
+                logger.info("Failed to sign bundle: ${error.errorCode} - ${error.errorMessage}")
+                when (error.errorCode) {
                     ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> "Cannot sign quote, breaches underwriting guidelines"
                     ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED -> "Cannot sign quote, quote has expired"
                     ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> "Cannot sign quote, unable to sign member"
@@ -198,17 +223,18 @@ class QuoteServiceImpl(
                     ErrorCodes.UNKNOWN_ERROR_CODE -> "Something went wrong.."
                 }
             },
-            {
-                val completionUrlMaybe: String? = apiGateway.setupPaymentLink(it.memberId, it.market)
+            { response ->
+                val completionUrlMaybe: String? = apiGateway.setupPaymentLink(response.memberId, response.market)
                 val partner = getCurrentlyAuthenticatedPartner()
-                val externalMemberId = externalMemberRepository.save(ExternalMember(UUID.randomUUID(), it.memberId, partner)).id
+                val externalMemberId =
+                    externalMemberRepository.save(ExternalMember(UUID.randomUUID(), response.memberId, partner)).id
 
                 SignResponseDTO(
                     requestId = request.requestId,
-                    quoteId = it.id,
-                    productId = it.id,
+                    quoteId = response.id,
+                    productId = response.id,
                     externalMemberId = if (partner.role == Roles.DISTRIBUTION) externalMemberId else null,
-                    signedAt = it.signedAt.epochSecond,
+                    signedAt = response.signedAt.epochSecond,
                     completionUrl = completionUrlMaybe
                 )
             }
@@ -228,9 +254,9 @@ class QuoteServiceImpl(
         )
 
         return response.bimap(
-            {
-                logger.info("Failed to sign bundle: ${it.errorCode} - ${it.errorMessage}")
-                when (it.errorCode) {
+            { error ->
+                logger.info("Failed to sign bundle: ${error.errorCode} - ${error.errorMessage}")
+                when (error.errorCode) {
                     ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> "Cannot sign quote, breaches underwriting guidelines"
                     ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED -> "Cannot sign quote, quote has expired"
                     ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> "Cannot sign quote, unable to sign member"
@@ -239,17 +265,17 @@ class QuoteServiceImpl(
                     ErrorCodes.UNKNOWN_ERROR_CODE -> "Something went wrong.."
                 }
             },
-            {
-                val completionUrlMaybe: String? = apiGateway.setupPaymentLink(it.memberId, it.market)
+            { response ->
+                val completionUrlMaybe: String? = apiGateway.setupPaymentLink(response.memberId, response.market)
                 val partner = getCurrentlyAuthenticatedPartner()
                 val externalMemberId =
-                    externalMemberRepository.save(ExternalMember(UUID.randomUUID(), it.memberId, partner)).id
+                    externalMemberRepository.save(ExternalMember(UUID.randomUUID(), response.memberId, partner)).id
 
                 SignBundleResponseDTO(
                     requestId = request.requestId,
-                    productIds = it.contracts.map { contract -> contract.id.toString() }.toList(),
+                    productIds = response.contracts.map { contract -> contract.id.toString() }.toList(),
                     externalMemberId = if (partner.role == Roles.DISTRIBUTION) externalMemberId else null,
-                    signedAt = it.contracts.first().signedAt.epochSecond,
+                    signedAt = response.contracts.first().signedAt.epochSecond,
                     completionUrl = completionUrlMaybe
                 )
             }

@@ -5,8 +5,8 @@
 CREATE TABLE "external_member" (
     id UUID PRIMARY KEY,
     created_at TIMESTAMP WITHOUT TIME ZONE,
-    member_id TEXT NOT NULL,
-    partner TEXT NOT NULL
+    member_id VARCHAR(32) NOT NULL,
+    partner TEXT VARCHAR(32) NULL
 )
 
 --rollback DROP TABLE "external_member"
