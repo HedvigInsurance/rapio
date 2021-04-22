@@ -37,12 +37,10 @@ import javax.validation.Valid
 class QuotesController @Autowired constructor(
     val quoteService: QuoteService
 ) {
-
-    @PostMapping()
+    @PostMapping
     @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
     @LogCall
     fun createQuote(@Valid @RequestBody request: QuoteRequestDTO): ResponseEntity<*> = logRequestId(request.requestId) {
-
         val currentUserName = SecurityContextHolder.getContext().authentication.name
         val partner = Partner.valueOf(currentUserName)
 
@@ -77,13 +75,12 @@ class QuotesController @Autowired constructor(
         ).getOrHandle { it }
     }
 
-    @PostMapping("bundle")
+    @PostMapping("/bundle")
     @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
     @LogCall
     fun bundleQuotes(
         @Valid @RequestBody request: BundleQuotesRequestDTO
     ): ResponseEntity<out Any> {
-
         return logRequestId(request.requestId) {
 
             val response = quoteService.bundleQuotes(request)
@@ -95,17 +92,26 @@ class QuotesController @Autowired constructor(
         }
     }
 
-    @PostMapping("{quoteId}/sign")
-    @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
+    @PostMapping("/{quoteId}/sign/forced")
+    @Secured("ROLE_DISTRIBUTION")
     @LogCall
-    fun signQuote(
+    fun signForcedQuote(
         @Valid @PathVariable quoteId: UUID,
         @Valid @RequestBody request: SignRequestDTO
-    ): ResponseEntity<out Any> {
+    ): ResponseEntity<out Any> = signQuote(quoteId, request, true)
 
+    @PostMapping("/{quoteId}/sign")
+    @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
+    @LogCall
+    fun signRegularQuote(
+        @Valid @PathVariable quoteId: UUID,
+        @Valid @RequestBody request: SignRequestDTO
+    ): ResponseEntity<out Any> = signQuote(quoteId, request, false)
+
+    private fun signQuote(quoteId: UUID, request: SignRequestDTO, isForced: Boolean): ResponseEntity<*> {
         return logRequestId(request.requestId) {
 
-            val response = quoteService.signQuote(quoteId, request)
+            val response = quoteService.signQuote(quoteId, request, isForced)
 
             return@logRequestId response.bimap(
                 { left -> ResponseEntity.status(500).body(ExternalErrorResponseDTO(left)) },
@@ -114,7 +120,7 @@ class QuotesController @Autowired constructor(
         }
     }
 
-    @PostMapping("bundle/sign")
+    @PostMapping("/bundle/sign")
     @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
     @LogCall
     fun signBundle(

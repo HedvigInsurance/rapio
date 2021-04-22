@@ -201,7 +201,7 @@ class QuoteServiceImpl(
         }
     }
 
-    override fun signQuote(quoteId: UUID, request: SignRequestDTO): Either<String, SignResponseDTO> {
+    override fun signQuote(quoteId: UUID, request: SignRequestDTO, isForced: Boolean): Either<String, SignResponseDTO> {
         val response = this.underwriter.signQuote(
             quoteId.toString(),
             request.email,
