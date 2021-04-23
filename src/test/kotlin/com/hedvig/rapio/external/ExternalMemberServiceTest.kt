@@ -25,7 +25,7 @@ internal class ExternalMemberServiceTest {
 
     @Test
     fun `get memberId by externalMemberId if exists`() {
-        val externalMember = ExternalMember(EXTERNAL_MEMBER_ID, MEMBER_ID, Partner.AVY_DISTRIBUTOR)
+        val externalMember = ExternalMember(EXTERNAL_MEMBER_ID, MEMBER_ID, Partner.AVY)
         repository.saveAndFlush(externalMember)
 
         val memberId = externalMemberServiceToTest.getMemberIdByExternalMemberId(EXTERNAL_MEMBER_ID)

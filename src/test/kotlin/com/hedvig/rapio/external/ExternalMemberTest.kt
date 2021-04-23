@@ -18,7 +18,7 @@ internal class ExternalMemberTest {
 
     @Test
     fun `can create and find an external member`() {
-        val externalMember = ExternalMember(EXTERNAL_MEMBER_ID, MEMBER_ID, Partner.AVY_DISTRIBUTOR)
+        val externalMember = ExternalMember(EXTERNAL_MEMBER_ID, MEMBER_ID, Partner.AVY)
         val before = Instant.now()
         repository.saveAndFlush(externalMember)
         val after = Instant.now()
@@ -27,17 +27,17 @@ internal class ExternalMemberTest {
         assertThat(result).isNotNull()
         assertThat(result.id).isEqualTo(EXTERNAL_MEMBER_ID)
         assertThat(result.memberId).isEqualTo(MEMBER_ID)
-        assertThat(result.partner).isEqualTo(Partner.AVY_DISTRIBUTOR)
+        assertThat(result.partner).isEqualTo(Partner.AVY)
         assertThat(before).isBefore(result.createdAt)
         assertThat(after).isAfter(result.createdAt)
     }
 
     @Test
     fun `cannot create multiple external members with the same member id`() {
-        val externalMember = ExternalMember(EXTERNAL_MEMBER_ID, MEMBER_ID, Partner.AVY_DISTRIBUTOR)
+        val externalMember = ExternalMember(EXTERNAL_MEMBER_ID, MEMBER_ID, Partner.AVY)
         repository.saveAndFlush(externalMember)
 
-        val externalMemberWithSameMemberId = ExternalMember(UUID.randomUUID(), MEMBER_ID, Partner.AVY_DISTRIBUTOR)
+        val externalMemberWithSameMemberId = ExternalMember(UUID.randomUUID(), MEMBER_ID, Partner.AVY)
         repository.save(externalMemberWithSameMemberId)
     }
 }
