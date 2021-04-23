@@ -14,5 +14,5 @@ interface ProductPricingClient {
     fun getContractsByMemberId(@PathVariable("memberId") memberId: String): ResponseEntity<List<Contract>>
 
     @GetMapping("/_/contracts/members/{memberId}/contract/market/info")
-    fun getContractMarketInfoByMemberId(memberId: String): ContractMarketInfo
+    fun getContractMarketInfoByMemberId(@PathVariable memberId: String): ContractMarketInfo
 }
