@@ -61,7 +61,7 @@ class InsuranceInfoService(
     }
 
     fun getConnectDirectDebitUrl(memberId: String): String? {
-        val contractMarket = productPricingService.getContractMarket(memberId)?.market ?: return null
+        val contractMarket = productPricingService.getContractMarketInfo(memberId)?.market ?: return null
         return apiGateway.setupPaymentLink(memberId, contractMarket)
     }
 }

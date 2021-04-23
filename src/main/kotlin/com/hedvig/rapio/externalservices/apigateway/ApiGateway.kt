@@ -29,7 +29,7 @@ class ApiGateway(
             )
             response.body!!.url
         } catch (e: Exception) {
-            logger.error("Something went wrong with setting up a payment link for member $memberId", e)
+            logger.error("Something went wrong with setting up a payment link for member (memberId=$memberId)", e)
             null
         }
     }
