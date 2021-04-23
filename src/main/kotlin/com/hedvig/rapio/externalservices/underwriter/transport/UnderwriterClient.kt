@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMethod
 
 @FeignClient(name = "underwriterclient", url = "\${hedvig.underwriter.url:underwriter}")
 interface UnderwriterClient {
-
     @PostMapping("/_/v1/quotes")
     fun createQuote(@RequestBody body: IncompleteQuoteDTO): ResponseEntity<CompleteQuoteResponse>
 

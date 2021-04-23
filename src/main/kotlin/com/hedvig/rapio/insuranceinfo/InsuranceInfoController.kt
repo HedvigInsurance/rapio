@@ -20,7 +20,7 @@ class InsuranceInfoController(
     val externalMemberService: ExternalMemberService
 ) {
     @GetMapping("/{memberId}")
-    @Secured("ROLE_INSURANCE_INFO", "ROLE_DISTRIBUTION")
+    @Secured("ROLE_DISTRIBUTION")
     @LogCall
     fun getInsuranceInfo(
         @PathVariable memberId: String

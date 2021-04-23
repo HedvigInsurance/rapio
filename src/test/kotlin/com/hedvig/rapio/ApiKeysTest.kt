@@ -32,8 +32,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @TestPropertySource(
     properties = [
         "hedvig.rapio.apikeys.mrInsplanetUser=INSPLANET",
-        "hedvig.rapio.apikeys.mrAvyUser=AVY",
-        "hedvig.rapio.apikeys.mrAvyDistributorUser=AVY_DISTRIBUTOR"
+        "hedvig.rapio.apikeys.mrAvyUser=AVY"
     ]
 )
 class ApiKeysTest {
@@ -79,21 +78,6 @@ class ApiKeysTest {
     }
 
     @Test
-    fun `fail to access v1 quotes if the role is INSURANCE_INFO`() {
-        every { quoteService.createQuote(any(), any()) } returns Right(quoteResponse)
-
-        mvc
-            .perform(
-                post("/v1/quotes")
-                    .with(httpBasic("mrAvyUser", ""))
-                    .content(createApartmentRequestJson)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-            )
-            .andExpect(status().isForbidden)
-    }
-
-    @Test
     fun `succeed to access v1 quotes if the role is ROLE_COMPARISON`() {
 
         every { quoteService.createQuote(any(), any()) } returns Right(quoteResponse)
@@ -117,27 +101,12 @@ class ApiKeysTest {
         mvc
             .perform(
                 post("/v1/quotes")
-                    .with(httpBasic("mrAvyDistributorUser", ""))
+                    .with(httpBasic("mrAvyUser", ""))
                     .content(createApartmentRequestJson)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
             )
             .andExpect(status().is2xxSuccessful)
-    }
-
-    @Test
-    fun `fail to access signing quotes if the role is ROLE_INSURANCE_INFO`() {
-        every { quoteService.signQuote(any(), any(), any()) } returns Right(makeSignResponse())
-
-        mvc
-            .perform(
-                post("/v1/quotes/BA483B2A-2549-4C88-9311-F7394BB34D16/sign")
-                    .with(httpBasic("mrAvyUser", ""))
-                    .content(signRequestJson)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-            )
-            .andExpect(status().isForbidden)
     }
 
     @Test
@@ -162,7 +131,7 @@ class ApiKeysTest {
         mvc
             .perform(
                 post("/v1/quotes/BA483B2A-2549-4C88-9311-F7394BB34D16/sign")
-                    .with(httpBasic("mrAvyDistributorUser", ""))
+                    .with(httpBasic("mrAvyUser", ""))
                     .content(signRequestJson)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -184,19 +153,6 @@ class ApiKeysTest {
     }
 
     @Test
-    fun `succeed to access insurance info end-point with the role ROLE_INSURANCE_INFO`() {
-
-        every { insuranceInfoService.getInsuranceInfo(any()) } returns null
-
-        mvc
-            .perform(
-                get("/v1/members/12345")
-                    .with(httpBasic("mrAvyUser", ""))
-            )
-            .andExpect(status().isNotFound)
-    }
-
-    @Test
     fun `succeed to access insurance info end-point with the role ROLE_DISTRIBUTION`() {
 
         every { insuranceInfoService.getInsuranceInfo(any()) } returns null
@@ -204,7 +160,7 @@ class ApiKeysTest {
         mvc
             .perform(
                 get("/v1/members/12345")
-                    .with(httpBasic("mrAvyDistributorUser", ""))
+                    .with(httpBasic("mrAvyUser", ""))
             )
             .andExpect(status().isNotFound)
     }
@@ -217,21 +173,8 @@ class ApiKeysTest {
         mvc
             .perform(
                 get("/v1/members/996195e5-4330-4be9-87a9-a2ae8ce60311/extended")
-                    .with(httpBasic("mrAvyDistributorUser", ""))
-            )
-            .andExpect(status().isNotFound)
-    }
-
-    @Test
-    fun `fail to access extended insurance info end-point with the role ROLE_INSURANCE_INFO`() {
-
-        every { insuranceInfoService.getInsuranceInfo(any()) } returns null
-
-        mvc
-            .perform(
-                get("/v1/members/996195e5-4330-4be9-87a9-a2ae8ce60311/extended")
                     .with(httpBasic("mrAvyUser", ""))
             )
-            .andExpect(status().isForbidden)
+            .andExpect(status().isNotFound)
     }
 }
