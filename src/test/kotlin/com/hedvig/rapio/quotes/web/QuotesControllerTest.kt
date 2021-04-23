@@ -29,7 +29,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.util.*
+import java.util.UUID
 
 @WebMvcTest(controllers = [QuotesController::class], secure = false)
 internal class QuotesControllerTest {
@@ -253,7 +253,6 @@ internal class QuotesControllerTest {
 
     @Test
     fun sign_quote() {
-
         val id = UUID.randomUUID()
         every { quoteService.signQuote(id, any(), any()) } returns Right(QuoteData.makeSignResponse(id))
 
