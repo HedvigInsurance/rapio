@@ -2,11 +2,40 @@ package com.hedvig.rapio.quotes
 
 import arrow.core.Either
 import com.hedvig.rapio.apikeys.Partner
+import com.hedvig.rapio.apikeys.Roles
+import com.hedvig.rapio.external.ExternalMember
+import com.hedvig.rapio.external.ExternalMemberRepository
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
 import com.hedvig.rapio.externalservices.underwriter.Underwriter
-import com.hedvig.rapio.externalservices.underwriter.transport.*
+import com.hedvig.rapio.externalservices.underwriter.transport.ApartmentProductSubType
+import com.hedvig.rapio.externalservices.underwriter.transport.ErrorCodes
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteApartmentQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteDanishAccidentQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteDanishHomeContentQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteDanishTravelQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteHouseQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteNorwegianHomeContentQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteNorwegianTravelQuoteDataDto
+import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteQuoteDTO
 import com.hedvig.rapio.externalservices.underwriter.transport.ProductType
-import com.hedvig.rapio.quotes.web.dto.*
+import com.hedvig.rapio.externalservices.underwriter.transport.QuoteBundleRequestDto
+import com.hedvig.rapio.quotes.web.dto.ApartmentQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.BundleQuotesRequestDTO
+import com.hedvig.rapio.quotes.web.dto.BundleQuotesResponseDTO
+import com.hedvig.rapio.quotes.web.dto.DanishAccidentQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.DanishHomeContentQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.DanishTravelQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.HouseQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.NorwegianHomeContentQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.NorwegianTravelQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.ProductSubType
+import com.hedvig.rapio.quotes.web.dto.QuoteRequestDTO
+import com.hedvig.rapio.quotes.web.dto.QuoteResponseDTO
+import com.hedvig.rapio.quotes.web.dto.SignBundleRequestDTO
+import com.hedvig.rapio.quotes.web.dto.SignBundleResponseDTO
+import com.hedvig.rapio.quotes.web.dto.SignRequestDTO
+import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
+import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -15,6 +44,7 @@ import java.util.UUID
 @Service
 class QuoteServiceImpl(
     val underwriter: Underwriter,
+    val externalMemberRepository: ExternalMemberRepository,
     val apiGateway: ApiGateway
 ) : QuoteService {
 
@@ -158,7 +188,6 @@ class QuoteServiceImpl(
     }
 
     override fun bundleQuotes(request: BundleQuotesRequestDTO): Either<String, BundleQuotesResponseDTO> {
-
         return when (val response = underwriter.quoteBundle(QuoteBundleRequestDto(request.quoteIds))) {
             is Either.Right -> {
                 with(response.b.bundleCost.monthlyNet) {
@@ -172,7 +201,7 @@ class QuoteServiceImpl(
         }
     }
 
-    override fun signQuote(quoteId: UUID, request: SignRequestDTO): Either<String, SignResponseDTO> {
+    override fun signQuote(quoteId: UUID, request: SignRequestDTO, isForced: Boolean): Either<String, SignResponseDTO> {
         val response = this.underwriter.signQuote(
             quoteId.toString(),
             request.email,
@@ -182,32 +211,34 @@ class QuoteServiceImpl(
             request.personalNumber
         )
 
-        return when (response) {
-            is Either.Right -> {
-                val completionUrlMaybe: String? = apiGateway.setupPaymentLink(response.b.memberId, response.b.market)
+        return response.bimap(
+            { error ->
+                logger.info("Failed to sign bundle: ${error.errorCode} - ${error.errorMessage}")
+                when (error.errorCode) {
+                    ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> "Cannot sign quote, breaches underwriting guidelines"
+                    ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED -> "Cannot sign quote, quote has expired"
+                    ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> "Cannot sign quote, unable to sign member"
+                    ErrorCodes.NO_SUCH_QUOTE -> "Quote not found.."
+                    ErrorCodes.INVALID_BUNDLING -> "Bundling not supported.."
+                    ErrorCodes.UNKNOWN_ERROR_CODE -> "Something went wrong.."
+                }
+            },
+            { response ->
+                val completionUrlMaybe: String? = apiGateway.setupPaymentLink(response.memberId, response.market)
+                val partner = getCurrentlyAuthenticatedPartner()
+                val externalMemberId =
+                    externalMemberRepository.save(ExternalMember(UUID.randomUUID(), response.memberId, partner)).id
 
-                Either.Right(
-                    SignResponseDTO(
-                        requestId = request.requestId,
-                        quoteId = response.b.id,
-                        productId = response.b.id,
-                        signedAt = response.b.signedAt.epochSecond,
-                        completionUrl = completionUrlMaybe
-                    )
+                SignResponseDTO(
+                    requestId = request.requestId,
+                    quoteId = response.id,
+                    productId = response.id,
+                    externalMemberId = if (partner.role == Roles.DISTRIBUTION) externalMemberId else null,
+                    signedAt = response.signedAt.epochSecond,
+                    completionUrl = completionUrlMaybe
                 )
             }
-            is Either.Left -> {
-                logger.info("Failed to sign bundle: ${response.a.errorCode} - ${response.a.errorMessage}")
-                return when (response.a.errorCode) {
-                    ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> Either.Left("Cannot sign quote, breaches underwriting guidelines")
-                    ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED -> Either.Left("Cannot sign quote, quote has expired")
-                    ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> Either.Left("Cannot sign quote, already a Hedvig member")
-                    ErrorCodes.NO_SUCH_QUOTE -> Either.Left("Quote not found..")
-                    ErrorCodes.INVALID_BUNDLING -> Either.Left("Bundling not supported..")
-                    ErrorCodes.UNKNOWN_ERROR_CODE -> Either.Left("Something went wrong..")
-                }
-            }
-        }
+        )
     }
 
     override fun signBundle(request: SignBundleRequestDTO): Either<String, SignBundleResponseDTO> {
@@ -223,24 +254,28 @@ class QuoteServiceImpl(
         )
 
         return response.bimap(
-            {
-                logger.info("Failed to sign bundle: ${it.errorCode} - ${it.errorMessage}")
-                when (it.errorCode) {
+            { error ->
+                logger.info("Failed to sign bundle: ${error.errorCode} - ${error.errorMessage}")
+                when (error.errorCode) {
                     ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> "Cannot sign quote, breaches underwriting guidelines"
                     ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED -> "Cannot sign quote, quote has expired"
-                    ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> "Cannot sign quote, already a Hedvig member"
+                    ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE -> "Cannot sign quote, unable to sign member"
                     ErrorCodes.NO_SUCH_QUOTE -> "Quote not found.."
                     ErrorCodes.INVALID_BUNDLING -> "Bundling not supported.."
                     ErrorCodes.UNKNOWN_ERROR_CODE -> "Something went wrong.."
                 }
             },
-            {
-                val completionUrlMaybe: String? = apiGateway.setupPaymentLink(it.memberId, it.market)
+            { response ->
+                val completionUrlMaybe: String? = apiGateway.setupPaymentLink(response.memberId, response.market)
+                val partner = getCurrentlyAuthenticatedPartner()
+                val externalMemberId =
+                    externalMemberRepository.save(ExternalMember(UUID.randomUUID(), response.memberId, partner)).id
 
                 SignBundleResponseDTO(
                     requestId = request.requestId,
-                    productIds = it.contracts.map { it.id.toString() }.toList(),
-                    signedAt = it.contracts.first().signedAt.epochSecond,
+                    productIds = response.contracts.map { contract -> contract.id.toString() }.toList(),
+                    externalMemberId = if (partner.role == Roles.DISTRIBUTION) externalMemberId else null,
+                    signedAt = response.contracts.first().signedAt.epochSecond,
                     completionUrl = completionUrlMaybe
                 )
             }

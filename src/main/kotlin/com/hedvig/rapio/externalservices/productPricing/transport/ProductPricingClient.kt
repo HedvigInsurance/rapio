@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable
     url = "\${hedvig.product-pricing.url:product-pricing}"
 )
 interface ProductPricingClient {
-
-    @GetMapping(value = ["/_/contracts/members/{memberId}"])
+    @GetMapping("/_/contracts/members/{memberId}")
     fun getContractsByMemberId(@PathVariable("memberId") memberId: String): ResponseEntity<List<Contract>>
+
+    @GetMapping("/_/contracts/members/{memberId}/contract/market/info")
+    fun getContractMarketInfoByMemberId(memberId: String): ContractMarketInfo
 }

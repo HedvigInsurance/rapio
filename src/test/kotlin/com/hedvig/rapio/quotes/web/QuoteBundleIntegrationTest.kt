@@ -17,7 +17,7 @@ import io.mockk.every
 import io.mockk.slot
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -29,13 +29,12 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
-import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
-@RunWith(SpringRunner::class)
+@ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc(secure = false)
 @ActiveProfiles(profiles = ["noauth"])
@@ -116,7 +115,10 @@ class QuoteBundleIntegrationTest {
     @WithMockUser("COMPRICER", roles = ["COMPARISON"])
     fun bundle_quote_with_underwriter_error() {
 
-        every { underwriterClient.quoteBundle(any()) } throws FeignException.InternalServerError("testing", "apa".toByteArray())
+        every { underwriterClient.quoteBundle(any()) } throws FeignException.InternalServerError(
+            "testing",
+            "apa".toByteArray()
+        )
 
         val requestData = """
             {
@@ -270,7 +272,7 @@ class QuoteBundleIntegrationTest {
         val response = postJsonToResponseEntity<String>("/v1/quotes/bundle/sign", requestData)
 
         assertThat(response.statusCode.value()).isEqualTo(500)
-        assertThat(response.body!!).isEqualTo("{\"errorMessage\":\"Cannot sign quote, already a Hedvig member\"}")
+        assertThat(response.body!!).isEqualTo("{\"errorMessage\":\"Cannot sign quote, unable to sign member\"}")
     }
 
     private inline fun <reified T : Any> postJsonToResponseEntity(url: String, data: String): ResponseEntity<T> {

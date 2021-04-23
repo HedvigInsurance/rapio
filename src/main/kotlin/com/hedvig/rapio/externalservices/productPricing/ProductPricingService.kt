@@ -1,6 +1,7 @@
 package com.hedvig.rapio.externalservices.productPricing
 
 import com.hedvig.rapio.externalservices.productPricing.transport.Contract
+import com.hedvig.rapio.externalservices.productPricing.transport.ContractMarketInfo
 import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
 import org.springframework.stereotype.Service
 
@@ -11,5 +12,11 @@ class ProductPricingService(
 
     fun getContractsByMemberId(memberId: String): List<Contract> {
         return productPricingClient.getContractsByMemberId(memberId).body!!
+    }
+
+    fun getContractMarket(memberId: String): ContractMarketInfo? = try {
+        productPricingClient.getContractMarketInfoByMemberId(memberId)
+    } catch (exception: Exception) {
+        null
     }
 }

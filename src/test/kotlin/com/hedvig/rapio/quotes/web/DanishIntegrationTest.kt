@@ -1,5 +1,8 @@
 package com.hedvig.rapio.quotes.web
 
+import com.hedvig.rapio.apikeys.Partner
+import com.hedvig.rapio.external.ExternalMember
+import com.hedvig.rapio.external.ExternalMemberRepository
 import com.hedvig.rapio.externalservices.apigateway.transport.ApiGatewayClient
 import com.hedvig.rapio.externalservices.apigateway.transport.CreateSetupPaymentLinkRequestDto
 import com.hedvig.rapio.externalservices.apigateway.transport.CreateSetupPaymentLinkResponseDto
@@ -20,7 +23,7 @@ import io.mockk.every
 import io.mockk.slot
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -32,14 +35,14 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.*
+import java.util.UUID
 
-@RunWith(SpringRunner::class)
+@ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc(secure = false)
 @ActiveProfiles(profiles = ["noauth"])
@@ -59,6 +62,9 @@ class DanishIntegrationTest {
 
     @MockkBean(relaxed = true)
     lateinit var underwriterClient: UnderwriterClient
+
+    @MockkBean(relaxed = true)
+    lateinit var externalMemberRepository: ExternalMemberRepository
 
     /*
         Danish test cpr numbers (ssn):
@@ -307,6 +313,10 @@ class DanishIntegrationTest {
                 capture(agSetupPaymentLinkRequest2)
             )
         } returns ResponseEntity.ok(CreateSetupPaymentLinkResponseDto("payment-link"))
+
+        every {
+            externalMemberRepository.save<ExternalMember>(any())
+        } returns ExternalMember(UUID.randomUUID(), "12345", Partner.COMPRICER)
 
         val requestData = """
             {

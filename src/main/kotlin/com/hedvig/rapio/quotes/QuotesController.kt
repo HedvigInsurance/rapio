@@ -4,7 +4,17 @@ import arrow.core.getOrHandle
 import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.comparison.web.dto.ExternalErrorResponseDTO
-import com.hedvig.rapio.quotes.web.dto.*
+import com.hedvig.rapio.quotes.web.dto.ApartmentQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.BundleQuotesRequestDTO
+import com.hedvig.rapio.quotes.web.dto.DanishAccidentQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.DanishHomeContentQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.DanishTravelQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.HouseQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.NorwegianHomeContentQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.NorwegianTravelQuoteRequestData
+import com.hedvig.rapio.quotes.web.dto.QuoteRequestDTO
+import com.hedvig.rapio.quotes.web.dto.SignBundleRequestDTO
+import com.hedvig.rapio.quotes.web.dto.SignRequestDTO
 import com.hedvig.rapio.util.SwedishPersonalNumberValidator
 import com.hedvig.rapio.util.notAccepted
 import org.slf4j.LoggerFactory
@@ -27,12 +37,10 @@ import javax.validation.Valid
 class QuotesController @Autowired constructor(
     val quoteService: QuoteService
 ) {
-
-    @PostMapping()
-    @Secured("ROLE_COMPARISON")
+    @PostMapping
+    @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
     @LogCall
     fun createQuote(@Valid @RequestBody request: QuoteRequestDTO): ResponseEntity<*> = logRequestId(request.requestId) {
-
         val currentUserName = SecurityContextHolder.getContext().authentication.name
         val partner = Partner.valueOf(currentUserName)
 
@@ -67,13 +75,12 @@ class QuotesController @Autowired constructor(
         ).getOrHandle { it }
     }
 
-    @PostMapping("bundle")
-    @Secured("ROLE_COMPARISON")
+    @PostMapping("/bundle")
+    @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
     @LogCall
     fun bundleQuotes(
         @Valid @RequestBody request: BundleQuotesRequestDTO
     ): ResponseEntity<out Any> {
-
         return logRequestId(request.requestId) {
 
             val response = quoteService.bundleQuotes(request)
@@ -85,17 +92,26 @@ class QuotesController @Autowired constructor(
         }
     }
 
-    @PostMapping("{quoteId}/sign")
-    @Secured("ROLE_COMPARISON")
+    @PostMapping("/{quoteId}/sign/forced")
+    @Secured("ROLE_DISTRIBUTION")
     @LogCall
-    fun signQuote(
+    fun signForcedQuote(
         @Valid @PathVariable quoteId: UUID,
         @Valid @RequestBody request: SignRequestDTO
-    ): ResponseEntity<out Any> {
+    ): ResponseEntity<out Any> = signQuote(quoteId, request, true)
 
+    @PostMapping("/{quoteId}/sign")
+    @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
+    @LogCall
+    fun signRegularQuote(
+        @Valid @PathVariable quoteId: UUID,
+        @Valid @RequestBody request: SignRequestDTO
+    ): ResponseEntity<out Any> = signQuote(quoteId, request, false)
+
+    private fun signQuote(quoteId: UUID, request: SignRequestDTO, isForced: Boolean): ResponseEntity<*> {
         return logRequestId(request.requestId) {
 
-            val response = quoteService.signQuote(quoteId, request)
+            val response = quoteService.signQuote(quoteId, request, isForced)
 
             return@logRequestId response.bimap(
                 { left -> ResponseEntity.status(500).body(ExternalErrorResponseDTO(left)) },
@@ -104,8 +120,8 @@ class QuotesController @Autowired constructor(
         }
     }
 
-    @PostMapping("bundle/sign")
-    @Secured("ROLE_COMPARISON")
+    @PostMapping("/bundle/sign")
+    @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
     @LogCall
     fun signBundle(
         @Valid @RequestBody request: SignBundleRequestDTO

@@ -178,6 +178,7 @@ object QuoteData {
         requestId = "jl",
         quoteId = id.toString(),
         productId = id.toString(),
+        externalMemberId = null,
         signedAt = Instant.now().epochSecond,
         completionUrl = "PAYMENT_REDIRECTION"
     )
