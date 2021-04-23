@@ -15,7 +15,7 @@ spring:
   datasource.username: postgres
 
   liquibase:
-    enabled: false
+    enabled: true
   jackson.deserialization.read-unknown-enum-values-using-default-value: true
 
 
