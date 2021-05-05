@@ -3,6 +3,7 @@ package com.hedvig.rapio.insuranceinfo
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.external.ExternalMemberService
+import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
 import com.ninjasquad.springmockk.MockkBean
@@ -35,6 +36,9 @@ internal class InsuranceInfoControllerTest {
 
     @MockkBean
     lateinit var externalMemberService: ExternalMemberService
+
+    @MockkBean
+    lateinit var memberServiceClient: MemberServiceClient
 
     @Test
     @WithMockUser("AVY")

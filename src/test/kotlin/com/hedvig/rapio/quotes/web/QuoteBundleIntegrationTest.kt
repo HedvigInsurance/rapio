@@ -2,6 +2,7 @@ package com.hedvig.rapio.quotes.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
+import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.hedvig.rapio.externalservices.paymentService.PaymentService
 import com.hedvig.rapio.externalservices.productPricing.ProductPricingService
 import com.hedvig.rapio.externalservices.underwriter.transport.QuoteBundleRequestDto
@@ -57,6 +58,9 @@ class QuoteBundleIntegrationTest {
 
     @MockkBean
     lateinit var underwriterClient: UnderwriterClient
+
+    @MockkBean(relaxed = true)
+    lateinit var memberServiceClient: MemberServiceClient
 
     @Test
     @WithMockUser("COMPRICER", roles = ["COMPARISON"])

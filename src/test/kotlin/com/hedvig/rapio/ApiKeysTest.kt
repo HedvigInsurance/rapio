@@ -2,6 +2,7 @@ package com.hedvig.rapio
 
 import arrow.core.Right
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
+import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.hedvig.rapio.externalservices.paymentService.transport.PaymentServiceClient
 import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
 import com.hedvig.rapio.externalservices.underwriter.transport.UnderwriterClient
@@ -44,6 +45,9 @@ class ApiKeysTest {
 
     @MockkBean
     lateinit var underwriterClient: UnderwriterClient
+
+    @MockkBean
+    lateinit var memberServiceClient: MemberServiceClient
 
     @MockkBean
     lateinit var apiGateway: ApiGateway

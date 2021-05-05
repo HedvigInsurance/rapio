@@ -6,6 +6,7 @@ import com.hedvig.rapio.external.ExternalMemberRepository
 import com.hedvig.rapio.externalservices.apigateway.transport.ApiGatewayClient
 import com.hedvig.rapio.externalservices.apigateway.transport.CreateSetupPaymentLinkRequestDto
 import com.hedvig.rapio.externalservices.apigateway.transport.CreateSetupPaymentLinkResponseDto
+import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.hedvig.rapio.externalservices.paymentService.transport.PaymentServiceClient
 import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
 import com.hedvig.rapio.externalservices.underwriter.transport.CompleteQuoteResponse
@@ -65,6 +66,9 @@ class DanishIntegrationTest {
 
     @MockkBean(relaxed = true)
     lateinit var externalMemberRepository: ExternalMemberRepository
+
+    @MockkBean(relaxed = true)
+    lateinit var memberServiceClient: MemberServiceClient
 
     /*
         Danish test cpr numbers (ssn):

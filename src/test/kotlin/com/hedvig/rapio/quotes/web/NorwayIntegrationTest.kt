@@ -3,6 +3,7 @@ package com.hedvig.rapio.quotes.web
 import com.hedvig.rapio.externalservices.apigateway.transport.ApiGatewayClient
 import com.hedvig.rapio.externalservices.apigateway.transport.CreateSetupPaymentLinkRequestDto
 import com.hedvig.rapio.externalservices.apigateway.transport.CreateSetupPaymentLinkResponseDto
+import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.hedvig.rapio.externalservices.paymentService.transport.PaymentServiceClient
 import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
 import com.hedvig.rapio.externalservices.underwriter.transport.CompleteQuoteResponse
@@ -58,6 +59,9 @@ class NorwayIntegrationTest {
 
     @MockkBean(relaxed = true)
     lateinit var underwriterClient: UnderwriterClient
+
+    @MockkBean(relaxed = true)
+    lateinit var memberServiceClient: MemberServiceClient
 
     @Test
     @WithMockUser("COMPRICER", roles = ["COMPARISON"])
