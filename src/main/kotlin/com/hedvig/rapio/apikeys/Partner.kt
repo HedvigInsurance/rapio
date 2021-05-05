@@ -8,5 +8,6 @@ enum class Partner(val role: Roles) {
     KEYSOLUTIONS(role = Roles.COMPARISON),
     SPIFF(role = Roles.COMPARISON),
     TJENSTETORGET(role = Roles.COMPARISON),
-    AVY(role = Roles.DISTRIBUTION)
+    AVY(role = Roles.DISTRIBUTION),
+    FORSIKRINGSPORTALEN(role = Roles.COMPARISON)
 }
