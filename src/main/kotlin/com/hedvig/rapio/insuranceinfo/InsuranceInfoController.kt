@@ -54,8 +54,14 @@ class InsuranceInfoController(
         @PathVariable memberId: String
     ): ResponseEntity<UUID> {
         val partner = getCurrentlyAuthenticatedPartner()
-        val externalMember = externalMemberService.createExternalMember(memberId, partner)
-        return ResponseEntity.ok(externalMember.id)
+        val isValidMember = insuranceInfoService.getInsuranceInfo(memberId) != null
+
+        return if (isValidMember) {
+            val externalMember = externalMemberService.createExternalMember(memberId, partner)
+            ResponseEntity.ok(externalMember.id)
+        } else {
+            ResponseEntity.notFound().build()
+        }
     }
 
     @GetMapping("/{externalMemberId}/direct-debit/url")

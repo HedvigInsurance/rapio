@@ -51,7 +51,21 @@ internal class InsuranceInfoControllerTest {
         assertThat(trimmedContent).isEqualTo(EXTERNAL_MEMBER_ID.toString())
     }
 
+    @Test
+    @WithMockUser("AVY")
+    fun `member id that is not connected to a contract should not be converted`() {
+        every { insuranceInfoService.getInsuranceInfo(any()) } returns null
+
+        val request = post("/v1/members/123456/to-external-member-id")
+            .with(user("AVY"))
+
+        val result = mockMvc.perform(request)
+
+        result.andExpect(status().isNotFound)
+    }
+
+
     // 1. Can convert a member id to a external member id ✅
-    // 2. Should not convert a member id that does not have a contract (insurance)
+    // 2. Should not convert a member id that does not have a contract (insurance) ✅
     // 3. Cannot convert a member id that has already been converted
 }
