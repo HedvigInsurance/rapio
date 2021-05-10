@@ -7,10 +7,7 @@ import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
 @RestController
@@ -43,6 +40,15 @@ class InsuranceInfoController(
             null -> ResponseEntity.notFound().build()
             else -> ResponseEntity.ok(insuranceInfo)
         }
+    }
+
+    @PostMapping("/{memberId}/to-external-member-id")
+    @Secured("ROLE_DISTRIBUTION")
+    @LogCall
+    fun createExternalMember(
+        @PathVariable memberId: String
+    ): ResponseEntity<UUID> {
+        return ResponseEntity.ok(UUID.randomUUID())
     }
 
     @GetMapping("/{externalMemberId}/direct-debit/url")
