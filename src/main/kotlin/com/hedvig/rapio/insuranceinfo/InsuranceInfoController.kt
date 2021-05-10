@@ -5,9 +5,14 @@ import com.hedvig.rapio.external.ExternalMemberService
 import com.hedvig.rapio.insuranceinfo.dto.DirectDebitLinkResponse
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
+import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 @RestController
@@ -48,7 +53,9 @@ class InsuranceInfoController(
     fun createExternalMember(
         @PathVariable memberId: String
     ): ResponseEntity<UUID> {
-        return ResponseEntity.ok(UUID.randomUUID())
+        val partner = getCurrentlyAuthenticatedPartner()
+        val externalMember = externalMemberService.createExternalMember(memberId, partner)
+        return ResponseEntity.ok(externalMember.id)
     }
 
     @GetMapping("/{externalMemberId}/direct-debit/url")

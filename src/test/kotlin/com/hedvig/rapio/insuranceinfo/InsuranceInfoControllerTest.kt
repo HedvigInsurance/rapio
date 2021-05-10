@@ -1,22 +1,20 @@
 package com.hedvig.rapio.insuranceinfo
 
+import com.hedvig.rapio.apikeys.Partner
+import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.external.ExternalMemberService
 import com.ninjasquad.springmockk.MockkBean
-import org.hamcrest.Matchers
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-
+import io.mockk.every
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.util.*
+import java.util.UUID
 
 @WebMvcTest(controllers = [InsuranceInfoController::class], secure = false)
 internal class InsuranceInfoControllerTest {
@@ -32,13 +30,28 @@ internal class InsuranceInfoControllerTest {
 
     @Test
     @WithMockUser("AVY")
-    fun create_external_member() {
+    fun `a Partner with Role of Distribution can successfully access conversion endpoint`() {
+        val EXTERNAL_MEMBER_ID = UUID.randomUUID()
+        every { externalMemberService.createExternalMember("123456", Partner.AVY) } returns ExternalMember(
+            id = EXTERNAL_MEMBER_ID,
+            memberId = "123456",
+            partner = Partner.AVY
+        )
         val request = post("/v1/members/123456/to-external-member-id")
             .with(user("AVY"))
 
         val result = mockMvc.perform(request)
 
         result.andExpect(status().is2xxSuccessful)
+
+        val content = result.andReturn().response.contentAsString
+
+        val trimmedContent = content.substring(1, content.length - 1)
+
+        assertThat(trimmedContent).isEqualTo(EXTERNAL_MEMBER_ID.toString())
     }
 
+    // 1. Can convert a member id to a external member id ✅
+    // 2. Should not convert a member id that does not have a contract (insurance)
+    // 3. Cannot convert a member id that has already been converted
 }
