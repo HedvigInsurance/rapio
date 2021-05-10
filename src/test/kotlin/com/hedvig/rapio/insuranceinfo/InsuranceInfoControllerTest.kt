@@ -3,9 +3,12 @@ package com.hedvig.rapio.insuranceinfo
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.external.ExternalMemberService
+import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
+import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
+import org.javamoney.moneta.Money
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -14,6 +17,8 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.math.BigDecimal
+import java.time.LocalDate
 import java.util.UUID
 
 @WebMvcTest(controllers = [InsuranceInfoController::class], secure = false)
@@ -36,6 +41,13 @@ internal class InsuranceInfoControllerTest {
             id = EXTERNAL_MEMBER_ID,
             memberId = "123456",
             partner = Partner.AVY
+        )
+        every { insuranceInfoService.getInsuranceInfo(memberId = "123456") } returns InsuranceInfo(
+            memberId = "123456",
+            insuranceStatus = InsuranceStatus.ACTIVE,
+            insurancePremium = Money.of(BigDecimal.TEN, "SEK"),
+            inceptionDate = LocalDate.now(),
+            paymentConnected = true
         )
         val request = post("/v1/members/123456/to-external-member-id")
             .with(user("AVY"))
@@ -63,9 +75,4 @@ internal class InsuranceInfoControllerTest {
 
         result.andExpect(status().isNotFound)
     }
-
-
-    // 1. Can convert a member id to a external member id ✅
-    // 2. Should not convert a member id that does not have a contract (insurance) ✅
-    // 3. Cannot convert a member id that has already been converted
 }
