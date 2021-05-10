@@ -21,12 +21,18 @@ class InsuranceInfoController(
     val insuranceInfoService: InsuranceInfoService,
     val externalMemberService: ExternalMemberService
 ) {
-    @GetMapping("/{memberId}")
+    @GetMapping("/{externalMemberId}")
     @Secured("ROLE_DISTRIBUTION")
     @LogCall
     fun getInsuranceInfo(
-        @PathVariable memberId: String
+        @PathVariable externalMemberId: String
     ): ResponseEntity<InsuranceInfo> {
+        val memberId = try {
+            externalMemberService.getMemberIdByExternalMemberId(UUID.fromString(externalMemberId))
+                ?: return ResponseEntity.notFound().build()
+        } catch (exception: IllegalArgumentException) {
+            externalMemberId
+        }
         return when (val insuranceInfo = insuranceInfoService.getInsuranceInfo(memberId)) {
             null -> ResponseEntity.notFound().build()
             else -> ResponseEntity.ok(insuranceInfo)
