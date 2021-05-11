@@ -5,10 +5,12 @@ import com.hedvig.rapio.external.ExternalMemberService
 import com.hedvig.rapio.insuranceinfo.dto.DirectDebitLinkResponse
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
+import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
@@ -19,12 +21,18 @@ class InsuranceInfoController(
     val insuranceInfoService: InsuranceInfoService,
     val externalMemberService: ExternalMemberService
 ) {
-    @GetMapping("/{memberId}")
+    @GetMapping("/{externalMemberId}")
     @Secured("ROLE_DISTRIBUTION")
     @LogCall
     fun getInsuranceInfo(
-        @PathVariable memberId: String
+        @PathVariable externalMemberId: String
     ): ResponseEntity<InsuranceInfo> {
+        val memberId = try {
+            externalMemberService.getMemberIdByExternalMemberId(UUID.fromString(externalMemberId))
+                ?: return ResponseEntity.notFound().build()
+        } catch (exception: IllegalArgumentException) {
+            externalMemberId
+        }
         return when (val insuranceInfo = insuranceInfoService.getInsuranceInfo(memberId)) {
             null -> ResponseEntity.notFound().build()
             else -> ResponseEntity.ok(insuranceInfo)
@@ -42,6 +50,23 @@ class InsuranceInfoController(
         return when (val insuranceInfo = insuranceInfoService.getExtendedInsuranceInfo(memberId)) {
             null -> ResponseEntity.notFound().build()
             else -> ResponseEntity.ok(insuranceInfo)
+        }
+    }
+
+    @PostMapping("/{memberId}/to-external-member-id")
+    @Secured("ROLE_DISTRIBUTION")
+    @LogCall
+    fun createExternalMember(
+        @PathVariable memberId: String
+    ): ResponseEntity<UUID> {
+        val partner = getCurrentlyAuthenticatedPartner()
+        val isValidMember = insuranceInfoService.getInsuranceInfo(memberId) != null
+
+        return if (isValidMember) {
+            val externalMember = externalMemberService.createExternalMember(memberId, partner)
+            ResponseEntity.ok(externalMember.id)
+        } else {
+            ResponseEntity.notFound().build()
         }
     }
 
