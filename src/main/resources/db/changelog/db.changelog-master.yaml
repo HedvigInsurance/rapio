@@ -3,3 +3,6 @@ databaseChangeLog:
   - include:
       file: ./migrations/20210421-2333-create-external-member.sql
       relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20210511-1353-make-memberid-unique.sql
+      relativeToChangelogFile: true
