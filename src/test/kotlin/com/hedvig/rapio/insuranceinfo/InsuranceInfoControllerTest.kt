@@ -107,24 +107,22 @@ internal class InsuranceInfoControllerTest {
             inceptionDate = LocalDate.now(),
             paymentConnected = true
         )
+        every { externalMemberService.getExternalMemberByMemberId(MEMBER_ID) } returns null
+
         val request = post("/v1/members/123456/to-external-member-id")
             .with(user("AVY"))
 
         val result = mockMvc.perform(request)
 
         result.andExpect(status().is2xxSuccessful)
-
-        val content = result.andReturn().response.contentAsString
-
-        val trimmedContent = content.substring(1, content.length - 1)
-
-        assertThat(trimmedContent).isEqualTo(EXTERNAL_MEMBER_ID.toString())
+            .andExpect(jsonPath("$.id", Matchers.`is`(EXTERNAL_MEMBER_ID.toString())))
     }
 
     @Test
     @WithMockUser("AVY")
     fun `member id that is not connected to a contract should not be converted`() {
         every { insuranceInfoService.getInsuranceInfo(any()) } returns null
+        every { externalMemberService.getExternalMemberByMemberId(any()) } returns null
 
         val request = post("/v1/members/123456/to-external-member-id")
             .with(user("AVY"))
@@ -132,5 +130,33 @@ internal class InsuranceInfoControllerTest {
         val result = mockMvc.perform(request)
 
         result.andExpect(status().isNotFound)
+    }
+
+    @Test
+    @WithMockUser("AVY")
+    fun `existing external member should be returned when attempting to create new external user`() {
+        val MEMBER_ID = "123456"
+        val EXTERNAL_MEMBER_ID = UUID.randomUUID()
+
+        every { insuranceInfoService.getInsuranceInfo(memberId = MEMBER_ID) } returns InsuranceInfo(
+            memberId = MEMBER_ID,
+            insuranceStatus = InsuranceStatus.ACTIVE,
+            insurancePremium = Money.of(BigDecimal.TEN, "SEK"),
+            inceptionDate = LocalDate.now(),
+            paymentConnected = true
+        )
+        every { externalMemberService.getExternalMemberByMemberId(MEMBER_ID) } returns ExternalMember(
+            id = EXTERNAL_MEMBER_ID,
+            memberId = "123456",
+            partner = Partner.AVY
+        )
+
+        val request = post("/v1/members/123456/to-external-member-id")
+            .with(user("AVY"))
+
+        val result = mockMvc.perform(request)
+
+        result.andExpect(status().is2xxSuccessful)
+            .andExpect(jsonPath("$.id", Matchers.`is`(EXTERNAL_MEMBER_ID.toString())))
     }
 }

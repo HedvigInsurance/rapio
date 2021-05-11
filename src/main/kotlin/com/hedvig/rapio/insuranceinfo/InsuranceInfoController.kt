@@ -4,6 +4,7 @@ import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.rapio.external.ExternalMemberService
 import com.hedvig.rapio.insuranceinfo.dto.DirectDebitLinkResponse
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
+import com.hedvig.rapio.insuranceinfo.dto.ExternalMemberId
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
 import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
 import org.springframework.http.ResponseEntity
@@ -58,15 +59,17 @@ class InsuranceInfoController(
     @LogCall
     fun createExternalMember(
         @PathVariable memberId: String
-    ): ResponseEntity<UUID> {
+    ): ResponseEntity<ExternalMemberId> {
         val partner = getCurrentlyAuthenticatedPartner()
+        val externalMemberMaybe = externalMemberService.getExternalMemberByMemberId(memberId)
         val isValidMember = insuranceInfoService.getInsuranceInfo(memberId) != null
-
-        return if (isValidMember) {
-            val externalMember = externalMemberService.createExternalMember(memberId, partner)
-            ResponseEntity.ok(externalMember.id)
-        } else {
-            ResponseEntity.notFound().build()
+        return when {
+            externalMemberMaybe != null -> ResponseEntity.ok(ExternalMemberId(externalMemberMaybe.id))
+            isValidMember -> {
+                val externalMember = externalMemberService.createExternalMember(memberId, partner)
+                ResponseEntity.ok(ExternalMemberId(externalMember.id))
+            }
+            else -> ResponseEntity.notFound().build()
         }
     }
 

@@ -28,6 +28,10 @@ class ExternalMemberService(
         )
     }
 
+    fun getExternalMemberByMemberId(memberId: String): ExternalMember? {
+        return repository.findByMemberId(memberId)
+    }
+
     companion object {
         private val logger = KotlinLogging.logger {}
     }
