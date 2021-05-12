@@ -2,10 +2,12 @@ package com.hedvig.rapio.insuranceinfo
 
 import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.rapio.external.ExternalMemberService
+import com.hedvig.rapio.externalservices.memberService.MemberService
 import com.hedvig.rapio.insuranceinfo.dto.DirectDebitLinkResponse
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.ExternalMemberId
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
+import com.hedvig.rapio.insuranceinfo.dto.IsMemberResponse
 import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
@@ -20,7 +22,8 @@ import java.util.UUID
 @RequestMapping("v1/members")
 class InsuranceInfoController(
     val insuranceInfoService: InsuranceInfoService,
-    val externalMemberService: ExternalMemberService
+    val externalMemberService: ExternalMemberService,
+    val memberService: MemberService
 ) {
     @GetMapping("/{externalMemberId}")
     @Secured("ROLE_DISTRIBUTION")
@@ -85,5 +88,15 @@ class InsuranceInfoController(
             null -> ResponseEntity.notFound().build()
             else -> ResponseEntity.ok(DirectDebitLinkResponse(directDebitUrl))
         }
+    }
+
+    @GetMapping("/{ssn}/is-member")
+    @Secured("ROLE_DISTRIBUTION")
+    @LogCall
+    fun getIsMember(
+        @PathVariable ssn: String
+    ): ResponseEntity<IsMemberResponse> {
+        val isMember = memberService.isMember(null, ssn, null)
+        return ResponseEntity.ok(IsMemberResponse(isMember))
     }
 }
