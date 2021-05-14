@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
+import org.springframework.http.MediaType
 
 @WebMvcTest(controllers = [InsuranceInfoController::class], secure = false)
 internal class InsuranceInfoControllerTest {
@@ -171,8 +172,10 @@ internal class InsuranceInfoControllerTest {
 
         every { memberService.isMember(null, SSN, null) } returns true
 
-        val request = get("/v1/members/$SSN/is-member")
+        val request = get("/v1/members/is-member")
             .with(user("AVY"))
+            .content("{\"personalNumber\":\"$SSN\"}")
+            .contentType(MediaType.APPLICATION_JSON)
 
         val result = mockMvc.perform(request)
         result.andExpect(status().is2xxSuccessful)
@@ -186,8 +189,11 @@ internal class InsuranceInfoControllerTest {
 
         every { memberService.isMember(null, SSN, null) } returns false
 
-        val request = get("/v1/members/$SSN/is-member")
+        val request = get("/v1/members/is-member")
             .with(user("AVY"))
+            .content("{\"personalNumber\":\"$SSN\"}")
+            .contentType(MediaType.APPLICATION_JSON)
+
 
         val result = mockMvc.perform(request)
         result.andExpect(status().is2xxSuccessful)

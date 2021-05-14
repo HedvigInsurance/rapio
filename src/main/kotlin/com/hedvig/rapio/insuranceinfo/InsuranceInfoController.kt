@@ -98,7 +98,7 @@ class InsuranceInfoController(
     fun getIsMember(
         @RequestBody request: IsMemberRequest
     ): ResponseEntity<IsMemberResponse> {
-        val isMember = memberService.isMember(null, request.ssn, null)
+        val isMember = memberService.isMember(null, request.personalNumber, null)
         return ResponseEntity.ok(IsMemberResponse(isMember))
     }
 }
