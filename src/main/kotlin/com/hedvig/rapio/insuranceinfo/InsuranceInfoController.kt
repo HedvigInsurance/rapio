@@ -7,6 +7,7 @@ import com.hedvig.rapio.insuranceinfo.dto.DirectDebitLinkResponse
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.ExternalMemberId
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
+import com.hedvig.rapio.insuranceinfo.dto.IsMemberRequest
 import com.hedvig.rapio.insuranceinfo.dto.IsMemberResponse
 import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
 import org.springframework.http.ResponseEntity
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import org.springframework.web.bind.annotation.RequestBody
 
 @RestController
 @RequestMapping("v1/members")
@@ -90,13 +92,13 @@ class InsuranceInfoController(
         }
     }
 
-    @GetMapping("/{ssn}/is-member")
+    @GetMapping("/is-member")
     @Secured("ROLE_DISTRIBUTION")
     @LogCall
     fun getIsMember(
-        @PathVariable ssn: String
+        @RequestBody request: IsMemberRequest
     ): ResponseEntity<IsMemberResponse> {
-        val isMember = memberService.isMember(null, ssn, null)
+        val isMember = memberService.isMember(null, request.ssn, null)
         return ResponseEntity.ok(IsMemberResponse(isMember))
     }
 }
