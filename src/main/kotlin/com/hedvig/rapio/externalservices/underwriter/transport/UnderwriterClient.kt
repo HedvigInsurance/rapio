@@ -1,7 +1,9 @@
 package com.hedvig.rapio.externalservices.underwriter.transport
 
+import com.neovisionaries.i18n.CountryCode
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -21,4 +23,7 @@ interface UnderwriterClient {
 
     @PostMapping("/_/v1/quotes/bundle/signFromRapio")
     fun signQuoteBundle(@RequestBody body: SignQuoteBundleRequest): ResponseEntity<SignedQuoteBundleResponseDto>
+
+    @GetMapping("/insurance-companies")
+    fun getInsuranceCompanies(countryCode:CountryCode) : ResponseEntity<List<InsuranceCompanyDto>>
 }

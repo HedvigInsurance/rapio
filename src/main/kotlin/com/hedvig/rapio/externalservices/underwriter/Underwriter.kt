@@ -3,10 +3,12 @@ package com.hedvig.rapio.externalservices.underwriter
 import arrow.core.Either
 import com.hedvig.rapio.externalservices.underwriter.transport.ErrorResponse
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteQuoteDTO
+import com.hedvig.rapio.externalservices.underwriter.transport.InsuranceCompanyDto
 import com.hedvig.rapio.externalservices.underwriter.transport.QuoteBundleRequestDto
 import com.hedvig.rapio.externalservices.underwriter.transport.QuoteBundleResponseDto
 import com.hedvig.rapio.externalservices.underwriter.transport.SignedQuoteBundleResponseDto
 import com.hedvig.rapio.externalservices.underwriter.transport.SignedQuoteResponseDto
+import com.neovisionaries.i18n.CountryCode
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -34,6 +36,10 @@ interface Underwriter {
         price: String?,
         currency: String?
     ): Either<ErrorResponse, SignedQuoteBundleResponseDto>
+
+    fun getInsuranceCompanies(
+        countryCode: CountryCode
+    ): List<InsuranceCompanyDto>
 }
 
 data class CompleteQuoteReference(

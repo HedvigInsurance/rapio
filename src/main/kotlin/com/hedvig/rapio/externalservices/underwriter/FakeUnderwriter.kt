@@ -4,10 +4,12 @@ import arrow.core.Either
 import arrow.core.Right
 import com.hedvig.rapio.externalservices.underwriter.transport.ErrorResponse
 import com.hedvig.rapio.externalservices.underwriter.transport.IncompleteQuoteDTO
+import com.hedvig.rapio.externalservices.underwriter.transport.InsuranceCompanyDto
 import com.hedvig.rapio.externalservices.underwriter.transport.QuoteBundleRequestDto
 import com.hedvig.rapio.externalservices.underwriter.transport.QuoteBundleResponseDto
 import com.hedvig.rapio.externalservices.underwriter.transport.SignedQuoteBundleResponseDto
 import com.hedvig.rapio.externalservices.underwriter.transport.SignedQuoteResponseDto
+import com.neovisionaries.i18n.CountryCode
 import org.javamoney.moneta.Money
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
@@ -57,4 +59,6 @@ class FakeUnderwriter : Underwriter {
             )
         )
     }
+
+    override fun getInsuranceCompanies(countryCode: CountryCode): List<InsuranceCompanyDto> = emptyList()
 }

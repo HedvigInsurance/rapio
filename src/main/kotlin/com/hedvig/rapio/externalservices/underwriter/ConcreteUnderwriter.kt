@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.rapio.externalservices.underwriter.transport.*
 import com.hedvig.rapio.externalservices.underwriter.transport.ErrorResponse
+import com.neovisionaries.i18n.CountryCode
 import feign.FeignException
 import mu.KotlinLogging
 import org.javamoney.moneta.Money
@@ -66,7 +67,14 @@ class ConcreteUnderwriter(
         }
     }
 
-    override fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String, ssn: String?): Either<ErrorResponse, SignedQuoteResponseDto> {
+    override fun signQuote(
+        id: String,
+        email: String,
+        startsAt: LocalDate?,
+        firstName: String,
+        lastName: String,
+        ssn: String?
+    ): Either<ErrorResponse, SignedQuoteResponseDto> {
         try {
             val response = this.client.signQuote(id, SignQuoteRequest(Name(firstName, lastName), ssn, startsAt, email))
             return Either.right(response.body!!)
@@ -97,7 +105,17 @@ class ConcreteUnderwriter(
     ): Either<ErrorResponse, SignedQuoteBundleResponseDto> {
 
         try {
-            val response = client.signQuoteBundle(SignQuoteBundleRequest(ids, SignQuoteBundleRequest.Name(firstName, lastName), ssn, startsAt, email, price, currency))
+            val response = client.signQuoteBundle(
+                SignQuoteBundleRequest(
+                    ids,
+                    SignQuoteBundleRequest.Name(firstName, lastName),
+                    ssn,
+                    startsAt,
+                    email,
+                    price,
+                    currency
+                )
+            )
             return Either.right(response.body!!)
         } catch (ex: FeignException) {
             logger.warn { "Failed to get quote bundle calling Underwriter: $ex" }
@@ -112,5 +130,9 @@ class ConcreteUnderwriter(
 
             throw ex
         }
+    }
+
+    override fun getInsuranceCompanies(countryCode: CountryCode): List<InsuranceCompanyDto> {
+        return client.getInsuranceCompanies(countryCode).body!!
     }
 }
