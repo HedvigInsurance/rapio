@@ -205,7 +205,7 @@ class QuoteServiceImpl(
         val response = this.underwriter.signQuote(
             quoteId.toString(),
             request.email,
-            request.startsAt.date,
+            request.startsAt?.date,
             request.firstName,
             request.lastName,
             request.personalNumber

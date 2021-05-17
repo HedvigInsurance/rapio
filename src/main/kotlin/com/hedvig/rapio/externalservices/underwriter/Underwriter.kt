@@ -18,7 +18,7 @@ interface Underwriter {
     fun signQuote(
         id: String,
         email: String,
-        startsAt: LocalDate,
+        startsAt: LocalDate?,
         firstName: String,
         lastName: String,
         ssn: String?

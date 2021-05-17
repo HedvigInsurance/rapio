@@ -66,7 +66,7 @@ class ConcreteUnderwriter(
         }
     }
 
-    override fun signQuote(id: String, email: String, startsAt: LocalDate, firstName: String, lastName: String, ssn: String?): Either<ErrorResponse, SignedQuoteResponseDto> {
+    override fun signQuote(id: String, email: String, startsAt: LocalDate?, firstName: String, lastName: String, ssn: String?): Either<ErrorResponse, SignedQuoteResponseDto> {
         try {
             val response = this.client.signQuote(id, SignQuoteRequest(Name(firstName, lastName), ssn, startsAt, email))
             return Either.right(response.body!!)

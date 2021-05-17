@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank
 
 data class SignRequestDTO(
     val requestId: String,
-    @get:Valid val startsAt: Date,
+    @get:Valid val startsAt: Date?,
 
     @get:Email @Masked val email: String,
 
