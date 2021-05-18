@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 
 @FeignClient(name = "underwriterclient", url = "\${hedvig.underwriter.url:underwriter}")
 interface UnderwriterClient {
@@ -25,5 +26,5 @@ interface UnderwriterClient {
     fun signQuoteBundle(@RequestBody body: SignQuoteBundleRequest): ResponseEntity<SignedQuoteBundleResponseDto>
 
     @GetMapping("/insurance-companies")
-    fun getInsuranceCompanies(countryCode:CountryCode) : ResponseEntity<List<InsuranceCompanyDto>>
+    fun getInsuranceCompanies(@RequestParam countryCode:CountryCode) : ResponseEntity<List<InsuranceCompanyDto>>
 }
