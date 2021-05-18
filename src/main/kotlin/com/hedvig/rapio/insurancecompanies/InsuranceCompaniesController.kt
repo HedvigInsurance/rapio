@@ -23,7 +23,7 @@ class InsuranceCompaniesController(
 ) {
 
     @GetMapping
-    @Secured("ROLE_DISTRIBUTION")
+    @Secured("ROLE_DISTRIBUTION", "ROLE_COMPARISON")
     @LogCall
     fun getInsuranceCompanies(@RequestParam countryCode: CountryCode): ResponseEntity<List<InsuranceCompanyDto>> {
         return try {
