@@ -203,12 +203,13 @@ class QuoteServiceImpl(
 
     override fun signQuote(quoteId: UUID, request: SignRequestDTO, isForced: Boolean): Either<String, SignResponseDTO> {
         val response = this.underwriter.signQuote(
-            quoteId.toString(),
-            request.email,
-            request.startsAt?.date,
-            request.firstName,
-            request.lastName,
-            request.personalNumber
+            id = quoteId.toString(),
+            email = request.email,
+            startsAt = request.startsAt?.date,
+            insuranceCompany = request.currentInsuranceCompanyId,
+            firstName = request.firstName,
+            lastName = request.lastName,
+            ssn = request.personalNumber
         )
 
         return response.bimap(

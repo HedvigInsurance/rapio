@@ -71,12 +71,16 @@ class ConcreteUnderwriter(
         id: String,
         email: String,
         startsAt: LocalDate?,
+        insuranceCompany: String?,
         firstName: String,
         lastName: String,
         ssn: String?
     ): Either<ErrorResponse, SignedQuoteResponseDto> {
         try {
-            val response = this.client.signQuote(id, SignQuoteRequest(Name(firstName, lastName), ssn, startsAt, email))
+            val response = this.client.signQuote(
+                id,
+                SignQuoteRequest(Name(firstName, lastName), ssn, startsAt, insuranceCompany, email)
+            )
             return Either.right(response.body!!)
         } catch (ex: FeignException) {
             logger.warn { "Failed to sign quote calling Underwriter: $ex" }

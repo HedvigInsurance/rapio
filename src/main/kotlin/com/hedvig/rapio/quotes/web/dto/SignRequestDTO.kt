@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank
 data class SignRequestDTO(
     val requestId: String,
     @get:Valid val startsAt: Date?,
+    val currentInsuranceCompanyId: String?,
 
     @get:Email @Masked val email: String,
 

@@ -21,6 +21,7 @@ interface Underwriter {
         id: String,
         email: String,
         startsAt: LocalDate?,
+        insuranceCompany: String?,
         firstName: String,
         lastName: String,
         ssn: String?

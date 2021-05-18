@@ -109,6 +109,9 @@ class QuotesController @Autowired constructor(
     ): ResponseEntity<out Any> = signQuote(quoteId, request, false)
 
     private fun signQuote(quoteId: UUID, request: SignRequestDTO, isForced: Boolean): ResponseEntity<*> {
+        if (request.startsAt == null && request.currentInsuranceCompanyId == null) {
+            return ResponseEntity.badRequest().body("currentInsuranceCompanyId is required when startsAt is null")
+        }
         return logRequestId(request.requestId) {
 
             val response = quoteService.signQuote(quoteId, request, isForced)
