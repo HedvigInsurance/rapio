@@ -111,13 +111,13 @@ class ConcreteUnderwriter(
         try {
             val response = client.signQuoteBundle(
                 SignQuoteBundleRequest(
-                    ids,
-                    SignQuoteBundleRequest.Name(firstName, lastName),
-                    ssn,
-                    startsAt,
-                    email,
-                    price,
-                    currency
+                    quoteIds = ids,
+                    name = SignQuoteBundleRequest.Name(firstName, lastName),
+                    ssn = ssn,
+                    startDate = startsAt,
+                    email = email,
+                    price = price,
+                    currency = currency
                 )
             )
             return Either.right(response.body!!)
