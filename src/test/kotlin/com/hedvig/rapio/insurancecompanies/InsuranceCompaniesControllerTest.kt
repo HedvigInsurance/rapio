@@ -87,5 +87,6 @@ internal class InsuranceCompaniesControllerTest {
                 .param("countryCode", "Sweden")
         )
         result.andExpect(status().`is`(400))
+        result.andExpect(content().string(""))
     }
 }
