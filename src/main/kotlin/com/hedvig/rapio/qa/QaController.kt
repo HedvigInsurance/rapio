@@ -18,11 +18,12 @@ class QaController(
     @PostMapping("unsign-member")
     fun unsignMember(
         @RequestBody request: UnsignMemberRequest
-    ): ResponseEntity<UnsignMemberResponse> = ResponseEntity.ok(
-        UnsignMemberResponse(
-            qaService.unsignMember(
-                personalNumber = request.personalNumber
-            )
-        )
-    )
+    ): ResponseEntity<Void> {
+        val success = qaService.unsignMember(personalNumber = request.personalNumber)
+        if (success) {
+          return ResponseEntity.noContent().build()
+        } else {
+          return ResponseEntity.badGateway().build()
+        }
+    }
 }
