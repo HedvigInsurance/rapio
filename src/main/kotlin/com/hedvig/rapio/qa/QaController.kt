@@ -23,7 +23,7 @@ class QaController(
         if (success) {
           return ResponseEntity.noContent().build()
         } else {
-          return ResponseEntity.badGateway().build()
+          return ResponseEntity.notFound().build()
         }
     }
 }
