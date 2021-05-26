@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 class QaController(
     private val qaService: QaService
 ) {
-    @PostMapping("unsignMember")
+    @PostMapping("unsign-member")
     fun unsignMember(
         @RequestBody request: UnsignMemberRequest
     ): ResponseEntity<UnsignMemberResponse> = ResponseEntity.ok(
