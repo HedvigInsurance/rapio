@@ -20,6 +20,7 @@ enum class Partner(val role: Roles) {
     PAMIND(role = Roles.COMPARISON),
     MECENAT(role = Roles.COMPARISON),
     HAPPENS(role = Roles.COMPARISON),
+    HEMAVI(role = Roles.COMPARISON),
     SAMBLA(role = Roles.COMPARISON),
     PEACH(role = Roles.COMPARISON),
     MMG(role = Roles.COMPARISON),
