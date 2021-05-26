@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody
     name = "member-service",
     url = "\${hedvig.member-service.url:member-service}"
 )
-interface QaMemberServiceClient {
+interface QualityAssuranceMemberServiceClient {
 
     @PostMapping("/_/staging/unsignMember")
     fun unsignMember(@RequestBody request: MemberServiceUnsignMemberRequest): ResponseEntity<Boolean>
 }
-
