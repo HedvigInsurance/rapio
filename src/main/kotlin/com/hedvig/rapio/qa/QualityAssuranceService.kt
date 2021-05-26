@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service
 
 @Service
 @Profile("staging", "development")
-class QaService(
-    val qaMemberServiceClient: QaMemberServiceClient
+class QualityAssuranceService(
+    val qaMemberServiceClient: QualityAssuranceMemberServiceClient
 ) {
 
     fun unsignMember(personalNumber: String): Boolean = qaMemberServiceClient.unsignMember(
