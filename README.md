@@ -25,7 +25,7 @@ To manually test rAPIo locally:
 
 - Start `RapioApplication` with:
     - Environment variables: POSTGRES_USERNAME=\<user\>;POSTGRES_PASSWORD=\<pass\>
-    - Activ profiles: development, noauth, runtime, fakes, staging
+    - Active profiles: development, noauth, runtime, fakes, staging
   
 - Create and sign a Swedish Apartment quote: 
   ```bash
