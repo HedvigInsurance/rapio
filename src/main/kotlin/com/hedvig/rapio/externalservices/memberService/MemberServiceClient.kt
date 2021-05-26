@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
 @FeignClient(
-    name = "payment-service",
+    name = "member-service",
     url = "\${hedvig.member-service.url:member-service}"
 )
 interface MemberServiceClient {
