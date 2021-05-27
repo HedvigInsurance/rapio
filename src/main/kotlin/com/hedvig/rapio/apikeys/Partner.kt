@@ -14,5 +14,14 @@ enum class Partner(val role: Roles) {
     FINDFORSIKRING(role = Roles.COMPARISON),
     FORSIKRINGSGUIDEN(role = Roles.COMPARISON),
     KEY_HOLE(role = Roles.COMPARISON),
-    COPENHAGEN_SALES(role = Roles.COMPARISON)
+    COPENHAGEN_SALES(role = Roles.COMPARISON),
+    CHARLIE(role = Roles.COMPARISON),
+    FLYTTSMART(role = Roles.COMPARISON),
+    PAMIND(role = Roles.COMPARISON),
+    MECENAT(role = Roles.COMPARISON),
+    HAPPENS(role = Roles.COMPARISON),
+    HEMAVI(role = Roles.COMPARISON),
+    SAMBLA(role = Roles.COMPARISON),
+    PEACH(role = Roles.COMPARISON),
+    MMG(role = Roles.COMPARISON),
 }
