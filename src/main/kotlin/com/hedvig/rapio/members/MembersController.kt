@@ -19,7 +19,7 @@ class MembersController(
     val externalMemberService: ExternalMemberService
 ) {
 
-    @PostMapping
+    @PostMapping("/trial-insurance")
     @Secured("ROLE_DISTRIBUTION")
     @LogCall
     fun createMember(
