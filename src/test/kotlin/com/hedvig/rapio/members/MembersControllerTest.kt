@@ -8,7 +8,6 @@ import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import java.util.UUID
-import org.apache.tomcat.util.http.parser.AcceptLanguage
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -55,7 +54,7 @@ class MembersControllerTest {
             Partner.AVY
         )
 
-        val request = post("/v1/members")
+        val request = post("/v1/members/trial-insurance")
             .with(user("AVY"))
             .content(
                 """
