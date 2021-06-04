@@ -3,7 +3,7 @@ package com.hedvig.rapio.insuranceinfo
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.external.ExternalMemberService
-import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
+import com.hedvig.rapio.externalservices.memberService.MemberService
 import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
 import com.ninjasquad.springmockk.MockkBean
@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
+import org.springframework.http.MediaType
 
 @WebMvcTest(controllers = [InsuranceInfoController::class], secure = false)
 internal class InsuranceInfoControllerTest {
@@ -38,7 +39,7 @@ internal class InsuranceInfoControllerTest {
     lateinit var externalMemberService: ExternalMemberService
 
     @MockkBean
-    lateinit var memberServiceClient: MemberServiceClient
+    lateinit var memberService: MemberService
 
     @Test
     @WithMockUser("AVY")
@@ -113,7 +114,7 @@ internal class InsuranceInfoControllerTest {
         )
         every { externalMemberService.getExternalMemberByMemberId(MEMBER_ID) } returns null
 
-        val request = post("/v1/members/123456/to-external-member-id")
+        val request = post("/v1/members/$MEMBER_ID/to-external-member-id")
             .with(user("AVY"))
 
         val result = mockMvc.perform(request)
@@ -155,12 +156,47 @@ internal class InsuranceInfoControllerTest {
             partner = Partner.AVY
         )
 
-        val request = post("/v1/members/123456/to-external-member-id")
+        val request = post("/v1/members/$MEMBER_ID/to-external-member-id")
             .with(user("AVY"))
 
         val result = mockMvc.perform(request)
 
         result.andExpect(status().is2xxSuccessful)
             .andExpect(jsonPath("$.id", Matchers.`is`(EXTERNAL_MEMBER_ID.toString())))
+    }
+
+    @Test
+    @WithMockUser("AVY")
+    fun `isMember returns true when memberService returns true`() {
+        val SSN = "123"
+
+        every { memberService.isMember(null, SSN, null) } returns true
+
+        val request = get("/v1/members/is-member")
+            .with(user("AVY"))
+            .content("{\"personalNumber\":\"$SSN\"}")
+            .contentType(MediaType.APPLICATION_JSON)
+
+        val result = mockMvc.perform(request)
+        result.andExpect(status().is2xxSuccessful)
+            .andExpect(jsonPath("$.isMember", Matchers.`is`(true)))
+    }
+
+    @Test
+    @WithMockUser("AVY")
+    fun `isMember returns false when memberService returns false`() {
+        val SSN = "123"
+
+        every { memberService.isMember(null, SSN, null) } returns false
+
+        val request = get("/v1/members/is-member")
+            .with(user("AVY"))
+            .content("{\"personalNumber\":\"$SSN\"}")
+            .contentType(MediaType.APPLICATION_JSON)
+
+
+        val result = mockMvc.perform(request)
+        result.andExpect(status().is2xxSuccessful)
+            .andExpect(jsonPath("$.isMember", Matchers.`is`(false)))
     }
 }

@@ -65,6 +65,9 @@ class DanishIntegrationTest {
     lateinit var underwriterClient: UnderwriterClient
 
     @MockkBean(relaxed = true)
+    lateinit var memberServiceClient: MemberServiceClient
+
+    @MockkBean(relaxed = true)
     lateinit var externalMemberRepository: ExternalMemberRepository
 
     @MockkBean(relaxed = true)

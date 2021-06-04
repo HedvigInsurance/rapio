@@ -61,6 +61,9 @@ class ApiKeysTest {
     @MockkBean
     lateinit var insuranceInfoService: InsuranceInfoService
 
+    @MockkBean
+    lateinit var memberServiceClient: MemberServiceClient
+
     @Test
     fun apikey_with_basic_auth() {
         mvc
