@@ -43,8 +43,8 @@ class MembersControllerTest {
         every { memberServiceClient.createMember(any()) } returns
             (ResponseEntity.ok(CreateMemberResponse(memberId = memberId)))
 
-        every { memberServiceClient.startOnboardingWithSSN(memberId,any()) } returns ResponseEntity.ok(Unit)
-            (ResponseEntity.ok(CreateMemberResponse(memberId = memberId)))
+        every { memberServiceClient.startOnboardingWithSSN(memberId, any()) } returns ResponseEntity.ok(Unit)
+        (ResponseEntity.ok(CreateMemberResponse(memberId = memberId)))
 
         every { memberServiceClient.finalizeOnboarding(memberId, any()) } returns ResponseEntity.ok(Unit)
 
