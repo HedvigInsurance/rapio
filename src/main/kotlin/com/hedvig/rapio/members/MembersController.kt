@@ -2,6 +2,7 @@ package com.hedvig.rapio.members
 
 import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.rapio.apikeys.Partner
+import com.hedvig.rapio.external.ExternalMemberService
 import com.hedvig.rapio.externalservices.memberService.*
 import com.hedvig.rapio.members.dto.CreateMemberRequest
 import com.hedvig.rapio.members.dto.CreateMemberResponse
@@ -13,7 +14,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("v1/members")
 class MembersController(
-    val memberServiceClient: MemberServiceClient
+    val memberServiceClient: MemberServiceClient,
+    val externalMemberService: ExternalMemberService
 ) {
 
     @PostMapping
@@ -33,16 +35,20 @@ class MembersController(
         if (response.statusCode.is2xxSuccessful && response.body != null) {
             val memberId = response.body!!.memberId
             memberServiceClient.startOnboardingWithSSN(memberId, StartOnboardingWithSSNRequest(body.personalNumber))
-            memberServiceClient.finalizeOnboarding(memberId, UpdateContactInformationRequest(
-                memberId = memberId.toString(),
-                firstName = body.firstName,
-                lastName = body.lastName,
-                email = body.email,
-                phoneNumber = body.phoneNumber,
-                address = addressFromDTO(body.address),
-                birthDate = body.birthDate
-            ))
-            return ResponseEntity.ok(CreateMemberResponse(memberId))
+            memberServiceClient.finalizeOnboarding(
+                memberId, UpdateContactInformationRequest(
+                    memberId = memberId.toString(),
+                    firstName = body.firstName,
+                    lastName = body.lastName,
+                    email = body.email,
+                    phoneNumber = body.phoneNumber,
+                    address = addressFromDTO(body.address),
+                    birthDate = body.birthDate
+                )
+            )
+            val externalMember = externalMemberService.getExternalMemberByMemberId(memberId.toString())
+            return externalMember?.let { ResponseEntity.ok(CreateMemberResponse(it.id)) } ?: ResponseEntity.notFound()
+                .build()
         } else {
             return ResponseEntity.badRequest().build()
         }

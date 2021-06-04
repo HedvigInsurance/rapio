@@ -9,5 +9,11 @@ data class CreateMemberRequest(
     val email: String,
     val phoneNumber: String,
     val address: Address,
-    val birthDate: LocalDate
+    val birthDate: LocalDate,
+    val fromDate: LocalDate,
+    val ownership: Ownership
 )
+
+enum class Ownership {
+    BRF, RENT
+}
