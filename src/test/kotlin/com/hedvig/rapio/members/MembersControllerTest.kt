@@ -1,6 +1,5 @@
 package com.hedvig.rapio.members
 
-import arrow.core.Right
 import com.hedvig.rapio.externalservices.memberService.CreateMemberResponse
 import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.ninjasquad.springmockk.MockkBean
@@ -9,13 +8,13 @@ import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.test.context.support.WithMockUser
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 
 @WebMvcTest(controllers = [MembersController::class], secure = false)
@@ -33,11 +32,12 @@ class MembersControllerTest {
         val memberId = 1337L
 
         every { memberServiceClient.createMember(any()) } returns
-                (ResponseEntity.ok(CreateMemberResponse(memberId = memberId)))
+            (ResponseEntity.ok(CreateMemberResponse(memberId = memberId)))
 
-        val request = MockMvcRequestBuilders.post("/v1/members")
-            .with(SecurityMockMvcRequestPostProcessors.user("avy"))
-            .content("""
+        val request = post("/v1/members")
+            .with(user("AVY"))
+            .content(
+                """
                 {"personalNumber": "191212121212",
                  "firstName": "Testy",
                  "lastName": "Tester",
@@ -52,14 +52,13 @@ class MembersControllerTest {
                  },
                  "birthDate": "1900-01-01"
                 }
-            """.trimIndent())
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
+            """.trimIndent()
+            )
 
         val result = mockMvc.perform(request)
 
         result
-            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
-            .andExpect(MockMvcResultMatchers.jsonPath("$.memberId", Matchers.any(String::class.java)))
+            .andExpect(status().is2xxSuccessful)
+            .andExpect(jsonPath("$.memberId", Matchers.any(String::class.java)))
     }
 }

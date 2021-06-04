@@ -1,5 +1,6 @@
 package com.hedvig.rapio.members
 
+import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.externalservices.memberService.*
 import com.hedvig.rapio.members.dto.CreateMemberRequest
@@ -17,6 +18,7 @@ class MembersController(
 
     @PostMapping
     @Secured("ROLE_DISTRIBUTION")
+    @LogCall
     fun createMember(
         @RequestHeader(value = "Accept-Language", required = true) acceptLanguage: String,
         @RequestBody body: CreateMemberRequest

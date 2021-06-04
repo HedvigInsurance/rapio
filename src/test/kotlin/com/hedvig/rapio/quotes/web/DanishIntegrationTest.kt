@@ -70,9 +70,6 @@ class DanishIntegrationTest {
     @MockkBean(relaxed = true)
     lateinit var externalMemberRepository: ExternalMemberRepository
 
-    @MockkBean(relaxed = true)
-    lateinit var memberServiceClient: MemberServiceClient
-
     /*
         Danish test cpr numbers (ssn):
             0505059996
