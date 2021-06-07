@@ -2,6 +2,7 @@ package com.hedvig.rapio.members
 
 import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.rapio.apikeys.Partner
+import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.external.ExternalMemberService
 import com.hedvig.rapio.externalservices.memberService.*
 import com.hedvig.rapio.members.dto.CreateMemberRequest
@@ -46,9 +47,9 @@ class MembersController(
                     birthDate = body.birthDate
                 )
             )
-            val externalMember = externalMemberService.getExternalMemberByMemberId(memberId.toString())
-            return externalMember?.let { ResponseEntity.ok(CreateMemberResponse(it.id)) } ?: ResponseEntity.notFound()
-                .build()
+
+            val externalMember = externalMemberService.createExternalMember(memberId.toString(), partner)
+            return ResponseEntity.ok(CreateMemberResponse(externalMember.id))
         } else {
             return ResponseEntity.badRequest().build()
         }
