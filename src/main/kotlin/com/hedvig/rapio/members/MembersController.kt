@@ -6,7 +6,6 @@ import com.hedvig.rapio.external.ExternalMemberService
 import com.hedvig.rapio.externalservices.memberService.*
 import com.hedvig.rapio.members.dto.CreateMemberRequest
 import com.hedvig.rapio.members.dto.CreateMemberResponse
-import java.util.UUID
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
@@ -28,9 +27,6 @@ class MembersController(
     ): ResponseEntity<CreateMemberResponse> {
         val currentUserName = SecurityContextHolder.getContext().authentication.name
         val partner = Partner.valueOf(currentUserName)
-
-        return ResponseEntity.ok(CreateMemberResponse(UUID.randomUUID()))
-
         val response = memberServiceClient.createMember(
             CreateMemberRequest(
                 acceptLanguage, partner.toString()
