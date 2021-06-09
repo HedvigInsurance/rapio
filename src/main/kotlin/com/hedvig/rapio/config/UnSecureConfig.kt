@@ -21,18 +21,7 @@ class UnSecureConfig : WebSecurityConfigurerAdapter() {
             .httpBasic().and()
             .authorizeRequests()
             .antMatchers("/actuator/health/**").permitAll()
-            .antMatchers("/**").anonymous() // .hasAnyRole(Roles.COMPARISON.name)
-
-            // .authorizeRequests()//and()
-            // .antMatchers("/**").permitAll().and()//.securityContext().disable()
-
-            // .antMatchers("/v1/quotes")
-            // .authenticated().and()
+            .antMatchers("/**").anonymous()
             .and().anonymous().principal(userDetails)
-
-        // .and()
-        // .httpBasic()
-        // .realmName("hedvig")
-        // .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     }
 }
