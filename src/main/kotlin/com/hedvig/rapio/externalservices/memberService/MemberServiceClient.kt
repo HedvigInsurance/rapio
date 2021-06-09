@@ -1,5 +1,6 @@
 package com.hedvig.rapio.externalservices.memberService
 
+import com.hedvig.rapio.externalservices.memberService.dto.AttachTrialInsuranceRequest
 import com.hedvig.rapio.externalservices.memberService.dto.CreateMemberRequest
 import com.hedvig.rapio.externalservices.memberService.dto.CreateMemberResponse
 import com.hedvig.rapio.externalservices.memberService.dto.IsMemberRequest
@@ -33,6 +34,11 @@ interface MemberServiceClient {
     fun finalizeOnboarding(
         @PathVariable memberId: Long,
         @RequestBody body: UpdateContactInformationRequest
+    ): ResponseEntity<Unit>
+
+    @PostMapping("/_/member/{memberId}/trial-insurance")
+    fun attachTemporaryInsurance(
+        @RequestBody body: AttachTrialInsuranceRequest
     ): ResponseEntity<Unit>
 
 }

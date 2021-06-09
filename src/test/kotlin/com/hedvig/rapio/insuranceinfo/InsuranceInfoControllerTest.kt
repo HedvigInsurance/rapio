@@ -37,9 +37,6 @@ internal class InsuranceInfoControllerTest {
     @MockkBean
     lateinit var externalMemberService: ExternalMemberService
 
-    @MockkBean
-    lateinit var memberService: MemberService
-
     @Test
     @WithMockUser("AVY")
     fun `retrieving member info returns not found if no insurance info`() {
@@ -162,40 +159,5 @@ internal class InsuranceInfoControllerTest {
 
         result.andExpect(status().is2xxSuccessful)
             .andExpect(jsonPath("$.id", Matchers.`is`(EXTERNAL_MEMBER_ID.toString())))
-    }
-
-    @Test
-    @WithMockUser("AVY")
-    fun `isMember returns true when memberService returns true`() {
-        val SSN = "123"
-
-        every { memberService.isMember(null, SSN, null) } returns true
-
-        val request = get("/v1/members/is-member")
-            .with(user("AVY"))
-            .content("{\"personalNumber\":\"$SSN\"}")
-            .contentType(MediaType.APPLICATION_JSON)
-
-        val result = mockMvc.perform(request)
-        result.andExpect(status().is2xxSuccessful)
-            .andExpect(jsonPath("$.isMember", Matchers.`is`(true)))
-    }
-
-    @Test
-    @WithMockUser("AVY")
-    fun `isMember returns false when memberService returns false`() {
-        val SSN = "123"
-
-        every { memberService.isMember(null, SSN, null) } returns false
-
-        val request = get("/v1/members/is-member")
-            .with(user("AVY"))
-            .content("{\"personalNumber\":\"$SSN\"}")
-            .contentType(MediaType.APPLICATION_JSON)
-
-
-        val result = mockMvc.perform(request)
-        result.andExpect(status().is2xxSuccessful)
-            .andExpect(jsonPath("$.isMember", Matchers.`is`(false)))
     }
 }
