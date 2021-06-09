@@ -1,5 +1,6 @@
 package com.hedvig.rapio.externalservices.memberService
 
+import com.hedvig.rapio.externalservices.memberService.dto.Address
 import com.hedvig.rapio.externalservices.memberService.dto.IsMemberRequest
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

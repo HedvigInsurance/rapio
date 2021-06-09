@@ -3,7 +3,7 @@ package com.hedvig.rapio.members
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.external.ExternalMemberService
-import com.hedvig.rapio.externalservices.memberService.CreateMemberResponse
+import com.hedvig.rapio.externalservices.memberService.dto.CreateMemberResponse
 import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every

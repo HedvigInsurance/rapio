@@ -5,6 +5,11 @@ import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.external.ExternalMemberService
 import com.hedvig.rapio.externalservices.memberService.*
+import com.hedvig.rapio.externalservices.memberService.dto.Address
+import com.hedvig.rapio.externalservices.memberService.dto.StartOnboardingWithSSNRequest
+import com.hedvig.rapio.externalservices.memberService.dto.UpdateContactInformationRequest
+import com.hedvig.rapio.insuranceinfo.dto.IsMemberRequest
+import com.hedvig.rapio.insuranceinfo.dto.IsMemberResponse
 import com.hedvig.rapio.members.dto.CreateMemberRequest
 import com.hedvig.rapio.members.dto.CreateMemberResponse
 import org.springframework.http.ResponseEntity

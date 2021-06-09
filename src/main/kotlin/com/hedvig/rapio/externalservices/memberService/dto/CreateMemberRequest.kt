@@ -1,4 +1,4 @@
-package com.hedvig.rapio.externalservices.memberService
+package com.hedvig.rapio.externalservices.memberService.dto
 
 data class CreateMemberRequest(
     val acceptLanguage: String,

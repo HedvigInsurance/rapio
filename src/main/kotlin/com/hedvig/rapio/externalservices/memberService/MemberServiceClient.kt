@@ -1,6 +1,10 @@
 package com.hedvig.rapio.externalservices.memberService
 
+import com.hedvig.rapio.externalservices.memberService.dto.CreateMemberRequest
+import com.hedvig.rapio.externalservices.memberService.dto.CreateMemberResponse
 import com.hedvig.rapio.externalservices.memberService.dto.IsMemberRequest
+import com.hedvig.rapio.externalservices.memberService.dto.StartOnboardingWithSSNRequest
+import com.hedvig.rapio.externalservices.memberService.dto.UpdateContactInformationRequest
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
