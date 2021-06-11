@@ -2,7 +2,7 @@ package com.hedvig.rapio.quotes
 
 import arrow.core.Either
 import com.hedvig.rapio.apikeys.Partner
-import com.hedvig.rapio.apikeys.Roles
+import com.hedvig.rapio.apikeys.Role
 import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.external.ExternalMemberRepository
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
@@ -234,7 +234,7 @@ class QuoteServiceImpl(
                     requestId = request.requestId,
                     quoteId = response.id,
                     productId = response.id,
-                    externalMemberId = if (partner.role == Roles.DISTRIBUTION) externalMemberId else null,
+                    externalMemberId = if (partner.role == Role.DISTRIBUTION) externalMemberId else null,
                     signedAt = response.signedAt.epochSecond,
                     completionUrl = completionUrlMaybe
                 )
@@ -275,7 +275,7 @@ class QuoteServiceImpl(
                 SignBundleResponseDTO(
                     requestId = request.requestId,
                     productIds = response.contracts.map { contract -> contract.id.toString() }.toList(),
-                    externalMemberId = if (partner.role == Roles.DISTRIBUTION) externalMemberId else null,
+                    externalMemberId = if (partner.role == Role.DISTRIBUTION) externalMemberId else null,
                     signedAt = response.contracts.first().signedAt.epochSecond,
                     completionUrl = completionUrlMaybe
                 )

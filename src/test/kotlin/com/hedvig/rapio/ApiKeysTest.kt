@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import org.springframework.test.context.ActiveProfiles
@@ -44,6 +45,9 @@ class ApiKeysTest {
     lateinit var quoteService: QuoteService
 
     @MockkBean
+    lateinit var apiGateway: ApiGateway
+
+    @MockkBean
     lateinit var underwriterClient: UnderwriterClient
 
     @MockkBean
@@ -57,6 +61,9 @@ class ApiKeysTest {
 
     @MockkBean
     lateinit var memberServiceClient: MemberServiceClient
+
+    @MockkBean
+    lateinit var testRestTemplate: TestRestTemplate
 
     @Test
     fun apikey_with_basic_auth() {

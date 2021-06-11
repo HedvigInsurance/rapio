@@ -1,6 +1,6 @@
 package com.hedvig.rapio.apikeys
 
-enum class Roles {
+enum class Role {
     COMPARISON,
     DISTRIBUTION
 }

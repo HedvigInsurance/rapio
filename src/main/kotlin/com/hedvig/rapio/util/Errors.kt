@@ -4,4 +4,4 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.client.HttpServerErrorException
 
 fun internalServerError() = HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error")
-object Forbidden : HttpServerErrorException(HttpStatus.FORBIDDEN, "Forbidden")
+fun forbidden() = HttpServerErrorException(HttpStatus.FORBIDDEN, "Forbidden")

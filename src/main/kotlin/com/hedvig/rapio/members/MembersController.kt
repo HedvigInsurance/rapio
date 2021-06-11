@@ -4,14 +4,13 @@ import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.external.ExternalMemberService
 import com.hedvig.rapio.externalservices.memberService.MemberService
-import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.hedvig.rapio.externalservices.memberService.model.Address
 import com.hedvig.rapio.externalservices.memberService.model.NewMemberInfo
 import com.hedvig.rapio.insuranceinfo.dto.IsMemberRequest
 import com.hedvig.rapio.insuranceinfo.dto.IsMemberResponse
 import com.hedvig.rapio.members.dto.CreateTrialMemberRequest
 import com.hedvig.rapio.members.dto.CreateTrialMemberResponse
-import com.hedvig.rapio.util.Forbidden
+import com.hedvig.rapio.util.forbidden
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
@@ -31,8 +30,7 @@ class MembersController(
 ) {
 
     @PostMapping("/trial-insurance")
-//    @Secured("ROLE_DISTRIBUTION")
-    @Secured("ROLE_COMPARISON")
+    @Secured("ROLE_DISTRIBUTION")
     @LogCall
     fun createMember(
         @RequestHeader(value = "Accept-Language", required = true) acceptLanguage: String,
@@ -41,9 +39,9 @@ class MembersController(
         val currentUserName = SecurityContextHolder.getContext().authentication.name
         val partner = Partner.valueOf(currentUserName)
 
-//        if (partner != Partner.AVY) {
-//            throw Forbidden
-//        }
+        if (partner != Partner.AVY) {
+            throw forbidden()
+        }
 
         val memberId = memberService.createMemberWithTrialInsurance(
             language = acceptLanguage,
@@ -57,8 +55,7 @@ class MembersController(
     }
 
     @GetMapping("/is-member")
-//    @Secured("ROLE_DISTRIBUTION")
-    @Secured("ROLE_COMPARISON")
+    @Secured("ROLE_DISTRIBUTION")
     @LogCall
     fun getIsMember(
         @RequestBody request: IsMemberRequest

@@ -5,31 +5,26 @@ import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.hedvig.rapio.externalservices.paymentService.transport.PaymentServiceClient
 import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
 import com.hedvig.rapio.externalservices.underwriter.transport.UnderwriterClient
-import com.hedvig.rapio.members.MembersController
 import com.hedvig.rapio.qa.QualityAssuranceMemberServiceClient
 import com.ninjasquad.springmockk.MockkBean
 import javax.persistence.EntityManager
 import org.hibernate.Session
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.data.repository.CrudRepository
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 
-//@ExtendWith(SpringExtension::class)
-//@ActiveProfiles(profiles = ["noauth"])
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@AutoConfigureTestDatabase
-//@AutoConfigureMockMvc(secure = false)
+@ActiveProfiles(profiles = ["noauth"])
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase
+@AutoConfigureMockMvc(secure = false)
 abstract class IntegrationTest {
 
     @Autowired
@@ -37,9 +32,6 @@ abstract class IntegrationTest {
 
     @Autowired
     lateinit var transactionManager: PlatformTransactionManager
-
-    @Autowired
-    lateinit var mockMvc: MockMvc
 
     @MockkBean(relaxed = true)
     lateinit var memberServiceClient: MemberServiceClient
