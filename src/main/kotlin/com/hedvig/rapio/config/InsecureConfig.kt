@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.User
 @Profile("noauth")
 @Configuration
 @EnableWebSecurity
-class UnSecureConfig : WebSecurityConfigurerAdapter() {
+class InsecureConfig : WebSecurityConfigurerAdapter() {
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
