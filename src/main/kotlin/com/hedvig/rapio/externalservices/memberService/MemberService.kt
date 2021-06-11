@@ -8,7 +8,7 @@ import com.hedvig.rapio.externalservices.memberService.dto.StartOnboardingWithSS
 import com.hedvig.rapio.externalservices.memberService.dto.UpdateContactInformationRequest
 import com.hedvig.rapio.externalservices.memberService.model.Address
 import com.hedvig.rapio.externalservices.memberService.model.NewMemberInfo
-import com.hedvig.rapio.util.InternalServerError
+import com.hedvig.rapio.util.internalServerError
 import java.time.LocalDate
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
@@ -48,17 +48,17 @@ class MemberService(
     ) : Long {
         val memberId = memberServiceClient.createMember(
             CreateMemberRequest(language, partner.toString())
-        ).bodyOrNull()?.memberId ?: throw InternalServerError
+        ).bodyOrNull()?.memberId ?: throw internalServerError()
 
         memberServiceClient.startOnboardingWithSSN(
             memberId,
             StartOnboardingWithSSNRequest(newMemberInfo.personalNumber)
-        ).bodyOrNull() ?: throw InternalServerError
+        ).bodyOrNull() ?: throw internalServerError()
 
         memberServiceClient.finalizeOnboarding(
             memberId,
             newMemberInfo.toUpdateRequest()
-        ).bodyOrNull() ?: throw InternalServerError
+        ).bodyOrNull() ?: throw internalServerError()
 
         memberServiceClient.attachTemporaryInsurance(
             AttachTrialInsuranceRequest(
@@ -67,7 +67,7 @@ class MemberService(
                 ownership = newMemberInfo.ownership,
                 partner = partner
             )
-        ).bodyOrNull() ?: throw InternalServerError
+        ).bodyOrNull() ?: throw internalServerError()
 
         return memberId
     }

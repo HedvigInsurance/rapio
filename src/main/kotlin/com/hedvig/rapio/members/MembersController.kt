@@ -31,7 +31,8 @@ class MembersController(
 ) {
 
     @PostMapping("/trial-insurance")
-    @Secured("ROLE_DISTRIBUTION")
+//    @Secured("ROLE_DISTRIBUTION")
+    @Secured("ROLE_COMPARISON")
     @LogCall
     fun createMember(
         @RequestHeader(value = "Accept-Language", required = true) acceptLanguage: String,
@@ -40,9 +41,9 @@ class MembersController(
         val currentUserName = SecurityContextHolder.getContext().authentication.name
         val partner = Partner.valueOf(currentUserName)
 
-        if (partner != Partner.AVY) {
-            throw Forbidden
-        }
+//        if (partner != Partner.AVY) {
+//            throw Forbidden
+//        }
 
         val memberId = memberService.createMemberWithTrialInsurance(
             language = acceptLanguage,
@@ -56,7 +57,8 @@ class MembersController(
     }
 
     @GetMapping("/is-member")
-    @Secured("ROLE_DISTRIBUTION")
+//    @Secured("ROLE_DISTRIBUTION")
+    @Secured("ROLE_COMPARISON")
     @LogCall
     fun getIsMember(
         @RequestBody request: IsMemberRequest

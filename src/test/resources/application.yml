@@ -18,3 +18,5 @@ hedvig:
   api-gateway:
     url: api-gateway
     token: test
+  rapio:
+    apiKeys.AVY : "AVY"

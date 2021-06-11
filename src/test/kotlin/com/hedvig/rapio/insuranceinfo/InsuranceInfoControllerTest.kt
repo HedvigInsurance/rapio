@@ -37,6 +37,9 @@ internal class InsuranceInfoControllerTest {
     @MockkBean
     lateinit var externalMemberService: ExternalMemberService
 
+    @MockkBean
+    lateinit var memberService: MemberService
+
     @Test
     @WithMockUser("AVY")
     fun `retrieving member info returns not found if no insurance info`() {

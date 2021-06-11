@@ -47,9 +47,6 @@ class ApiKeysTest {
     lateinit var underwriterClient: UnderwriterClient
 
     @MockkBean
-    lateinit var apiGateway: ApiGateway
-
-    @MockkBean
     lateinit var paymentServiceClient: PaymentServiceClient
 
     @MockkBean
