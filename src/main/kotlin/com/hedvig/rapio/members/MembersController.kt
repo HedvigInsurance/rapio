@@ -58,9 +58,9 @@ class MembersController(
     @Secured("ROLE_DISTRIBUTION")
     @LogCall
     fun getIsMember(
-        @RequestBody request: IsMemberRequest
+        @RequestBody request: IsMemberRequest?
     ): ResponseEntity<IsMemberResponse> {
-        val isMember = memberService.isMember(null, request.personalNumber, null)
+        val isMember = memberService.isMember(null, request!!.personalNumber, null)
         return ResponseEntity.ok(IsMemberResponse(isMember))
     }
 }

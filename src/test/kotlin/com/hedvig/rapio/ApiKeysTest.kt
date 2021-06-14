@@ -62,7 +62,7 @@ class ApiKeysTest {
     @MockkBean
     lateinit var memberServiceClient: MemberServiceClient
 
-    @MockkBean
+    @MockkBean(relaxed = true)
     lateinit var testRestTemplate: TestRestTemplate
 
     @Test

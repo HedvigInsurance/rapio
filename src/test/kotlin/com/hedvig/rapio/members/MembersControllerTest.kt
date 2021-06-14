@@ -9,24 +9,16 @@ import com.hedvig.rapio.externalservices.memberService.dto.CreateMemberResponse
 import com.hedvig.rapio.externalservices.memberService.dto.IsMemberRequest
 import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
-import org.hamcrest.Matchers
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.test.context.support.WithMockUser
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @ContextConfiguration(classes = [MemberControllerTestUserConfiguration::class])
 class MembersControllerTest : IntegrationTest() {
-
 
     @Autowired
     private lateinit var client: TestHttpClient
@@ -39,7 +31,6 @@ class MembersControllerTest : IntegrationTest() {
     }
 
     @Test
-    @WithMockUser("AVY", roles = ["DISTRIBUTION"])
     fun `Can create member with trial insurance`() {
         val memberId = 1337L
 
@@ -83,37 +74,27 @@ class MembersControllerTest : IntegrationTest() {
     }
 
     @Test
-    @WithMockUser("AVY", roles = ["DISTRIBUTION"])
     fun `isMember returns true when memberService returns true`() {
-        val SSN = "123"
+        every { memberServiceClient.getIsMember(IsMemberRequest(null, "123", null)) } returns ResponseEntity.ok(true)
 
-        every { memberServiceClient.getIsMember(IsMemberRequest(null, SSN, null)) } returns ResponseEntity.ok(true)
-
-        val request = MockMvcRequestBuilders.get("/v1/members/is-member")
-            .with(user("AVY"))
-            .content("{\"personalNumber\":\"$SSN\"}")
-            .contentType(MediaType.APPLICATION_JSON)
-
-//        val result = mockMvc.perform(request)
-//        result.andExpect(status().is2xxSuccessful)
-//            .andExpect(jsonPath("$.isMember", Matchers.`is`(true)))
+        val response = client.get(
+            uri = "/v1/members/is-member",
+            headers = mapOf("Content-Type" to "Application/json"),
+            body = mapOf("personalNumber" to "123")
+        )
+        assertThat(response.body<Map<String, Any>>()["isMember"]).isEqualTo(true)
     }
 
     @Test
-    @WithMockUser("AVY", roles = ["DISTRIBUTION"])
     fun `isMember returns false when memberService returns false`() {
-        val SSN = "123"
+        every { memberServiceClient.getIsMember(IsMemberRequest(null, "123", null)) } returns ResponseEntity.ok(false)
 
-        every { memberServiceClient.getIsMember(IsMemberRequest(null, SSN, null)) } returns ResponseEntity.ok(false)
-
-        val request = MockMvcRequestBuilders.get("/v1/members/is-member")
-            .with(user("AVY"))
-            .content("{\"personalNumber\":\"$SSN\"}")
-            .contentType(MediaType.APPLICATION_JSON)
-
-//        val result = mockMvc.perform(request)
-//        result.andExpect(status().is2xxSuccessful)
-//            .andExpect(jsonPath("$.isMember", Matchers.`is`(false)))
+        val response = client.get(
+            uri = "/v1/members/is-member",
+            headers = mapOf("Content-Type" to "Application/json"),
+            body = mapOf("personalNumber" to "123")
+        ).assert2xx()
+        assertThat(response.body<Map<String, Any>>()["isMember"]).isEqualTo(false)
     }
 }
 
@@ -125,5 +106,4 @@ private class MemberControllerTestUserConfiguration {
 
     @Bean("insecureUserRole")
     fun userRole(): Role = Role.DISTRIBUTION
-
 }

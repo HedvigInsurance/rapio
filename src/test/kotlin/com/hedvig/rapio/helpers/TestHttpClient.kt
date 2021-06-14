@@ -2,6 +2,9 @@ package com.hedvig.productPricing.testHelpers
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import java.net.URI
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
+import org.apache.http.client.methods.HttpUriRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
@@ -9,6 +12,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.stereotype.Component
 
 @Component
@@ -17,8 +21,12 @@ class TestHttpClient(
     private val template: TestRestTemplate
 ) {
 
-    fun get(uri: String, headers: Map<String, String> = emptyMap()): Response {
-        return exchange(HttpMethod.GET, uri, null, headers)
+    init {
+        template.restTemplate.requestFactory = GetRequestWithBodyAllowingRequestFactory()
+    }
+
+    fun get(uri: String, headers: Map<String, String> = emptyMap(), body: Any? = null): Response {
+        return exchange(HttpMethod.GET, uri, body, headers)
     }
 
     fun post(uri: String, body: Any? = null, headers: Map<String, String> = emptyMap()): Response {
@@ -66,4 +74,22 @@ class TestHttpClient(
             return mapper.convertValue(entity.body, type)
         }
     }
+}
+
+private class GetRequestWithBodyAllowingRequestFactory : HttpComponentsClientHttpRequestFactory() {
+    override fun createHttpUriRequest(httpMethod: HttpMethod, uri: URI): HttpUriRequest {
+        if (httpMethod == HttpMethod.GET) {
+            return HttpGetRequestWithEntity(uri)
+        }
+        return super.createHttpUriRequest(httpMethod, uri)
+    }
+}
+
+private class HttpGetRequestWithEntity(uri: URI) : HttpEntityEnclosingRequestBase() {
+    init {
+        super.setURI(uri)
+    }
+
+    override fun getMethod(): String = HttpMethod.GET.name
+
 }
