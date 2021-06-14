@@ -43,13 +43,14 @@ class MemberService(
     }
 
     fun createMemberWithTrialInsurance(
+        language: String,
         countryCode: CountryCode,
         partner: Partner,
         fromDate: LocalDate,
         newMemberInfo: NewMemberInfo
     ): Long {
         val memberId = memberServiceClient.createMember(
-            CreateMemberRequest(countryCode, partner.toString())
+            CreateMemberRequest(language, partner.toString())
         ).bodyOrNull()?.memberId ?: throw internalServerError()
 
         memberServiceClient.updateMember(
@@ -59,7 +60,10 @@ class MemberService(
         memberServiceClient.createUser(
             CreateUserRequest(
                 memberId.toString(),
-                SimpleSignConnectionDto(newMemberInfo.personalNumber, countryCode)
+                SimpleSignConnectionDto(
+                    newMemberInfo.personalNumber,
+                    countryCode
+                )
             )
         ).bodyOrNull() ?: throw internalServerError()
 

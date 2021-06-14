@@ -32,7 +32,7 @@ class MembersController(
     @Secured("ROLE_DISTRIBUTION")
     @LogCall
     fun createMember(
-        @RequestHeader(value = "Accept-Language", required = true) acceptLanguage: CountryCode,
+        @RequestHeader(value = "Accept-Language", required = true) acceptLanguage: String,
         @RequestBody body: CreateTrialMemberRequest
     ): ResponseEntity<CreateTrialMemberResponse> {
         val currentUserName = SecurityContextHolder.getContext().authentication.name
@@ -43,7 +43,8 @@ class MembersController(
         }
 
         val memberId = memberService.createMemberWithTrialInsurance(
-            countryCode = acceptLanguage,
+            language = acceptLanguage,
+            countryCode = body.countryCode,
             partner = partner,
             fromDate = body.fromDate,
             newMemberInfo = body.toNewMemberInfo()
