@@ -21,5 +21,3 @@ data class NewMemberInfo(
         val floor: Int?
     )
 }
-
-
