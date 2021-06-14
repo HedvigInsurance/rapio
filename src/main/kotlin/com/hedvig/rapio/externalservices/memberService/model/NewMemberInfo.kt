@@ -6,17 +6,20 @@ data class NewMemberInfo(
     val personalNumber: String,
     val firstName: String,
     val lastName: String,
-    val email: String? = null,
-    val phoneNumber: String? = null,
+    val email: String?,
+    val phoneNumber: String?,
     val address: Address,
     val birthDate: LocalDate,
-    val ownership: Ownership
-)
+    val type: TrialType
+) {
+    data class Address(
+        val street: String,
+        val city: String,
+        val zipCode: String,
+        val apartmentNo: String?,
+        val livingSpace: Int?,
+        val floor: Int?
+    )
+}
 
-data class Address(
-    val street: String,
-    val city: String,
-    val zipCode: String,
-    val apartmentNo: String?,
-    val floor: Int?
-)
+

@@ -1,6 +1,6 @@
 package com.hedvig.rapio.members.dto
 
-import com.hedvig.rapio.externalservices.memberService.model.Ownership
+import com.hedvig.rapio.externalservices.memberService.model.TrialType
 import java.time.LocalDate
 
 data class CreateTrialMemberRequest(
@@ -12,15 +12,18 @@ data class CreateTrialMemberRequest(
     val address: Address,
     val birthDate: LocalDate,
     val fromDate: LocalDate,
-    val ownership: Ownership
-)
+    val type: TrialType
+) {
+    data class Address(
+        val street: String,
+        val city: String,
+        val zipCode: String,
+        val apartmentNo: String?,
+        val livingSpace: Int?,
+        val floor: Int?
+    )
+}
 
-data class Address(
-    val street: String,
-    val city: String,
-    val zipCode: String,
-    val apartmentNo: String?,
-    val floor: Int?
-)
+
 
 

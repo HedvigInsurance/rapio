@@ -4,13 +4,13 @@ import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.external.ExternalMemberService
 import com.hedvig.rapio.externalservices.memberService.MemberService
-import com.hedvig.rapio.externalservices.memberService.model.Address
 import com.hedvig.rapio.externalservices.memberService.model.NewMemberInfo
 import com.hedvig.rapio.insuranceinfo.dto.IsMemberRequest
 import com.hedvig.rapio.insuranceinfo.dto.IsMemberResponse
 import com.hedvig.rapio.members.dto.CreateTrialMemberRequest
 import com.hedvig.rapio.members.dto.CreateTrialMemberResponse
 import com.hedvig.rapio.util.forbidden
+import com.neovisionaries.i18n.CountryCode
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import com.hedvig.rapio.members.dto.Address as DtoAddress
 
 @RestController
 @RequestMapping("v1/members")
@@ -29,11 +28,11 @@ class MembersController(
     val memberService: MemberService
 ) {
 
-    @PostMapping("/trial-insurance")
+    @PostMapping("/trial")
     @Secured("ROLE_DISTRIBUTION")
     @LogCall
     fun createMember(
-        @RequestHeader(value = "Accept-Language", required = true) acceptLanguage: String,
+        @RequestHeader(value = "Accept-Language", required = true) acceptLanguage: CountryCode,
         @RequestBody body: CreateTrialMemberRequest
     ): ResponseEntity<CreateTrialMemberResponse> {
         val currentUserName = SecurityContextHolder.getContext().authentication.name
@@ -44,7 +43,7 @@ class MembersController(
         }
 
         val memberId = memberService.createMemberWithTrialInsurance(
-            language = acceptLanguage,
+            countryCode = acceptLanguage,
             partner = partner,
             fromDate = body.fromDate,
             newMemberInfo = body.toNewMemberInfo()
@@ -74,7 +73,15 @@ private fun CreateTrialMemberRequest.toNewMemberInfo(): NewMemberInfo =
         phoneNumber = phoneNumber,
         address = address.toAddress(),
         birthDate = birthDate,
-        ownership = ownership
+        type = type
     )
 
-private fun DtoAddress.toAddress(): Address = Address(street, city, zipCode, apartmentNo, floor)
+private fun CreateTrialMemberRequest.Address.toAddress(): NewMemberInfo.Address =
+    NewMemberInfo.Address(
+        street = street,
+        city = city,
+        zipCode = zipCode,
+        apartmentNo = apartmentNo,
+        livingSpace = livingSpace,
+        floor = floor
+    )
