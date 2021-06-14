@@ -13,20 +13,19 @@ data class CreateTrialMemberRequest(
     @Masked val phoneNumber: String?,
     val countryCode: CountryCode,
     val address: Address,
-    @Masked val birthDate: LocalDate,
+    val birthDate: LocalDate,
     val fromDate: LocalDate,
     val type: TrialType
 ) {
     data class Address(
         @Masked val street: String,
-        @Masked val city: String,
-        @Masked val zipCode: String,
+        val city: String,
+        val zipCode: String,
         @Masked val apartmentNo: String?,
-        @Masked val livingSpace: Int?,
-        @Masked val floor: Int?
+        val livingSpace: Int?,
+        val floor: Int?
     )
 }
-
 
 
 
