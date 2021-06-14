@@ -1,4 +1,4 @@
-package com.hedvig.productPricing.testHelpers
+package com.hedvig.rapio.helpers
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper

@@ -1,13 +1,16 @@
 package com.hedvig.rapio.members
 
 import com.hedvig.memberservice.helpers.IntegrationTest
-import com.hedvig.productPricing.testHelpers.TestHttpClient
+import com.hedvig.rapio.helpers.TestHttpClient
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.apikeys.Role
 import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.externalservices.memberService.dto.CreateMemberResponse
+import com.hedvig.rapio.externalservices.memberService.dto.CreateTrialResponse
+import com.hedvig.rapio.externalservices.memberService.dto.CreateUserResponse
 import com.hedvig.rapio.externalservices.memberService.dto.IsMemberRequest
 import io.mockk.every
+import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -31,39 +34,42 @@ class MembersControllerTest : IntegrationTest() {
     }
 
     @Test
-    fun `Can create member with trial insurance`() {
+    fun `Can create trial insurance`() {
         val memberId = 1337L
 
-        every { memberServiceClient.createMember(any()) } returns
-            (ResponseEntity.ok(CreateMemberResponse(memberId = memberId)))
+        every { memberServiceClient.createMember(any()) } returns ResponseEntity.ok(
+            CreateMemberResponse(memberId = memberId)
+        )
 
-        every { memberServiceClient.startOnboardingWithSSN(memberId, any()) } returns ResponseEntity.ok(Unit)
-        (ResponseEntity.ok(CreateMemberResponse(memberId = memberId)))
+        every { memberServiceClient.updateMember(memberId, any()) } returns ResponseEntity.ok(Unit)
 
-        every { memberServiceClient.finalizeOnboarding(memberId, any()) } returns ResponseEntity.ok(Unit)
+        every { memberServiceClient.createUser(any()) } returns ResponseEntity.ok(
+            CreateUserResponse((UUID.randomUUID()))
+        )
 
-        every { memberServiceClient.attachTemporaryInsurance(any()) } returns ResponseEntity.ok(Unit)
+        every { productPricingClient.createTrial(any()) } returns ResponseEntity.ok(CreateTrialResponse(UUID.randomUUID()))
 
         val result = client.post(
-            uri = "/v1/members/trial-insurance",
-            body = """
-            {"personalNumber": "191212121212",
-             "firstName": "Testy",
-             "lastName": "Tester",
-             "email": "test@example.com",
-             "phoneNumber": "08-8888",
-             "address": {
-                "street": "testgatan",
-                "zipCode": "12345",
-                "city": "Stockholm",
-                "apartmentNo": "1",
-                "floor": 2
-             },
-             "fromDate":"2021-04-04",
-             "ownership":"SE_BRF",
-             "birthDate": "1900-01-01"
-            }
-        """.trimIndent(),
+            uri = "/v1/members/trial",
+            body = mapOf(
+                "personalNumber" to "191212121212",
+                "firstName" to "Testy",
+                "lastName" to "Tester",
+                "email" to "test@example.com",
+                "countryCode" to "SE",
+                "phoneNumber" to "08-8888",
+                "address" to mapOf(
+                    "street" to "testgatan",
+                    "zipCode" to "12345",
+                    "city" to "Stockholm",
+                    "livingSpace" to 40,
+                    "apartmentNo" to "1",
+                    "floor" to 2
+                ),
+                "fromDate" to "2021-04-04",
+                "type" to "SE_APARTMENT_BRF",
+                "birthDate" to "1900-01-01"
+            ),
             headers = mapOf(
                 "Content-Type" to "Application/json",
                 "Accept-Language" to "en"
