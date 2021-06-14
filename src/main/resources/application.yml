@@ -31,3 +31,10 @@ hedvig:
   api-gateway:
     url: api-gateway
     token: test
+
+---
+
+spring:
+  profiles: development, staging
+
+hedvig.new-avy-api.enabled: true

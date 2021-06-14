@@ -3,6 +3,7 @@ package com.hedvig.rapio.externalservices
 import com.hedvig.rapio.externalservices.memberService.MemberService
 import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.hedvig.rapio.externalservices.memberService.dto.IsMemberRequest
+import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -19,17 +20,20 @@ class MemberServiceTest {
     private lateinit var service: MemberService
 
     @MockK
-    lateinit var client: MemberServiceClient
+    lateinit var memberServiceClient: MemberServiceClient
+
+    @MockK
+    lateinit var productPricingClient: ProductPricingClient
 
     @BeforeEach
     fun setup() {
-        service = MemberService(client)
+        service = MemberService(memberServiceClient, productPricingClient)
     }
 
     @Test
     fun `successful true response returns expected true`() {
         val SSN = "123"
-        every { client.getIsMember(IsMemberRequest(null, SSN, null)) } returns ResponseEntity.ok(true)
+        every { memberServiceClient.getIsMember(IsMemberRequest(null, SSN, null)) } returns ResponseEntity.ok(true)
         val result = service.isMember(null, SSN, null)
         assertThat(result).isTrue()
     }
@@ -37,7 +41,7 @@ class MemberServiceTest {
     @Test
     fun `successful false response returns expected false`() {
         val SSN = "123"
-        every { client.getIsMember(IsMemberRequest(null, SSN, null)) } returns ResponseEntity.ok(false)
+        every { memberServiceClient.getIsMember(IsMemberRequest(null, SSN, null)) } returns ResponseEntity.ok(false)
         val result = service.isMember(null, SSN, null)
         assertThat(result).isFalse()
     }
@@ -45,7 +49,7 @@ class MemberServiceTest {
     @Test
     fun `failed call returns false`() {
         val SSN = "123"
-        every { client.getIsMember(IsMemberRequest(null, SSN, null)) } returns ResponseEntity.status(500).build()
+        every { memberServiceClient.getIsMember(IsMemberRequest(null, SSN, null)) } returns ResponseEntity.status(500).build()
         val result = service.isMember(null, SSN, null)
         assertThat(result).isFalse()
     }
@@ -53,7 +57,7 @@ class MemberServiceTest {
     @Test
     fun `unreachable member service returns false`() {
         val SSN = "123"
-        every { client.getIsMember(IsMemberRequest(null, SSN, null)) } throws IOException("MemberService is down!")
+        every { memberServiceClient.getIsMember(IsMemberRequest(null, SSN, null)) } throws IOException("MemberService is down!")
         val result = service.isMember(null, SSN, null)
         assertThat(result).isFalse()
     }

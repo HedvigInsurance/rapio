@@ -91,14 +91,4 @@ class InsuranceInfoController(
             else -> ResponseEntity.ok(DirectDebitLinkResponse(directDebitUrl))
         }
     }
-
-    @GetMapping("/is-member")
-    @Secured("ROLE_DISTRIBUTION")
-    @LogCall
-    fun getIsMember(
-        @RequestBody request: IsMemberRequest
-    ): ResponseEntity<IsMemberResponse> {
-        val isMember = memberService.isMember(null, request.personalNumber, null)
-        return ResponseEntity.ok(IsMemberResponse(isMember))
-    }
 }

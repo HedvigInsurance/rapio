@@ -54,6 +54,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     implementation("org.springframework.cloud:spring-cloud-openfeign-core")
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
+    implementation("io.github.openfeign:feign-httpclient")
 
     implementation("org.liquibase:liquibase-core:3.6.3")
     implementation("com.vladmihalcea:hibernate-types-52:2.6.1")
@@ -98,6 +99,7 @@ dependencies {
     testImplementation("com.ninja-squad:springmockk:1.1.2")
     testImplementation("io.mockk:mockk:1.9.1")
     testImplementation("com.h2database:h2:1.4.200")
+    testImplementation("org.apache.httpcomponents:httpclient:4.5.13")
 
     liquibaseRuntime("org.liquibase:liquibase-core:3.6.1")
     liquibaseRuntime("org.postgresql:postgresql:42.2.6")

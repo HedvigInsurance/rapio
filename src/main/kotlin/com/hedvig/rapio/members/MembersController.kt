@@ -3,69 +3,87 @@ package com.hedvig.rapio.members
 import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.external.ExternalMemberService
-import com.hedvig.rapio.externalservices.memberService.*
-import com.hedvig.rapio.members.dto.CreateMemberRequest
-import com.hedvig.rapio.members.dto.CreateMemberResponse
-import java.util.UUID
+import com.hedvig.rapio.externalservices.memberService.MemberService
+import com.hedvig.rapio.externalservices.memberService.model.NewMemberInfo
+import com.hedvig.rapio.insuranceinfo.dto.IsMemberRequest
+import com.hedvig.rapio.insuranceinfo.dto.IsMemberResponse
+import com.hedvig.rapio.members.dto.CreateTrialMemberRequest
+import com.hedvig.rapio.members.dto.CreateTrialMemberResponse
+import com.hedvig.rapio.util.forbidden
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("v1/members")
+@ConditionalOnProperty("hedvig.new-avy-api.enabled", havingValue = "true")
 class MembersController(
-    val memberServiceClient: MemberServiceClient,
-    val externalMemberService: ExternalMemberService
+    val externalMemberService: ExternalMemberService,
+    val memberService: MemberService
 ) {
 
-    @PostMapping("/trial-insurance")
+    @PostMapping("/trial")
     @Secured("ROLE_DISTRIBUTION")
     @LogCall
     fun createMember(
         @RequestHeader(value = "Accept-Language", required = true) acceptLanguage: String,
-        @RequestBody body: CreateMemberRequest
-    ): ResponseEntity<CreateMemberResponse> {
+        @RequestBody body: CreateTrialMemberRequest
+    ): ResponseEntity<CreateTrialMemberResponse> {
         val currentUserName = SecurityContextHolder.getContext().authentication.name
         val partner = Partner.valueOf(currentUserName)
 
-        return ResponseEntity.ok(CreateMemberResponse(UUID.randomUUID()))
-
-        val response = memberServiceClient.createMember(
-            CreateMemberRequest(
-                acceptLanguage, partner.toString()
-            )
-        )
-        if (response.statusCode.is2xxSuccessful && response.body != null) {
-            val memberId = response.body!!.memberId
-            memberServiceClient.startOnboardingWithSSN(memberId, StartOnboardingWithSSNRequest(body.personalNumber))
-            memberServiceClient.finalizeOnboarding(
-                memberId, UpdateContactInformationRequest(
-                    memberId = memberId.toString(),
-                    firstName = body.firstName,
-                    lastName = body.lastName,
-                    email = body.email,
-                    phoneNumber = body.phoneNumber,
-                    address = addressFromDTO(body.address),
-                    birthDate = body.birthDate
-                )
-            )
-            val externalMember = externalMemberService.getExternalMemberByMemberId(memberId.toString())
-            return externalMember?.let { ResponseEntity.ok(CreateMemberResponse(it.id)) } ?: ResponseEntity.notFound()
-                .build()
-        } else {
-            return ResponseEntity.badRequest().build()
+        if (partner != Partner.AVY) {
+            throw forbidden()
         }
-    }
 
-    private fun addressFromDTO(address: com.hedvig.rapio.members.dto.Address): Address {
-        return Address(
-            street = address.street,
-            city = address.city,
-            zipCode = address.zipCode,
-            apartmentNo = address.apartmentNo,
-            floor = address.floor
+        val memberId = memberService.createMemberWithTrialInsurance(
+            language = acceptLanguage,
+            countryCode = body.countryCode,
+            partner = partner,
+            fromDate = body.fromDate,
+            newMemberInfo = body.toNewMemberInfo()
         )
+
+        val externalMember = externalMemberService.createExternalMember(memberId.toString(), partner)
+        return ResponseEntity.ok(CreateTrialMemberResponse(externalMember.id))
     }
 
+    @GetMapping("/is-member")
+    @Secured("ROLE_DISTRIBUTION")
+    @LogCall
+    fun getIsMember(
+        @RequestBody request: IsMemberRequest?
+    ): ResponseEntity<IsMemberResponse> {
+        val isMember = memberService.isMember(null, request!!.personalNumber, null)
+        return ResponseEntity.ok(IsMemberResponse(isMember))
+    }
 }
+
+private fun CreateTrialMemberRequest.toNewMemberInfo(): NewMemberInfo =
+    NewMemberInfo(
+        personalNumber = personalNumber,
+        lastName = lastName,
+        firstName = firstName,
+        email = email,
+        phoneNumber = phoneNumber,
+        address = address.toAddress(),
+        birthDate = birthDate,
+        type = type
+    )
+
+private fun CreateTrialMemberRequest.Address.toAddress(): NewMemberInfo.Address =
+    NewMemberInfo.Address(
+        street = street,
+        city = city,
+        zipCode = zipCode,
+        apartmentNo = apartmentNo,
+        livingSpace = livingSpace,
+        floor = floor
+    )

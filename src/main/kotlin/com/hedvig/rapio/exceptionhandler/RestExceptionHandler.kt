@@ -10,11 +10,12 @@ import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.MissingRequestHeaderException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.context.request.WebRequest
-import org.springframework.web.multipart.support.MissingServletRequestPartException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 @ControllerAdvice
@@ -82,5 +83,15 @@ class RestExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler
     fun handle(e: Exception): ResponseEntity<ExternalErrorResponseDTO> {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ExternalErrorResponseDTO(e.message ?: ""))
+    }
+
+    @ExceptionHandler
+    fun handle(e: HttpServerErrorException): ResponseEntity<ExternalErrorResponseDTO> {
+        return ResponseEntity.status(e.statusCode).body(ExternalErrorResponseDTO(e.message ?: ""))
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException::class)
+    fun handle(e: MissingRequestHeaderException): ResponseEntity<ExternalErrorResponseDTO> {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExternalErrorResponseDTO(e.message ?: ""))
     }
 }

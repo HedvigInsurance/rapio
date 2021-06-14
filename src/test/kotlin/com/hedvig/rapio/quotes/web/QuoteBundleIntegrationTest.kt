@@ -6,6 +6,7 @@ import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.hedvig.rapio.externalservices.paymentService.PaymentService
 import com.hedvig.rapio.externalservices.paymentService.transport.PaymentServiceClient
 import com.hedvig.rapio.externalservices.productPricing.ProductPricingService
+import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
 import com.hedvig.rapio.externalservices.underwriter.transport.QuoteBundleRequestDto
 import com.hedvig.rapio.externalservices.underwriter.transport.QuoteBundleResponseDto
 import com.hedvig.rapio.externalservices.underwriter.transport.SignQuoteBundleRequest
@@ -56,6 +57,9 @@ class QuoteBundleIntegrationTest {
 
     @MockkBean(relaxed = true)
     lateinit var productPricingService: ProductPricingService
+
+    @MockkBean(relaxed = true)
+    lateinit var productPricingClient: ProductPricingClient
 
     @MockkBean
     lateinit var underwriterClient: UnderwriterClient
