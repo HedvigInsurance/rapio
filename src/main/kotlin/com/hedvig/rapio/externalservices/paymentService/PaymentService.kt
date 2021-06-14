@@ -1,5 +1,6 @@
 package com.hedvig.rapio.externalservices.paymentService
 
+import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatusDTO
 import com.hedvig.rapio.externalservices.paymentService.transport.PaymentServiceClient
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -8,16 +9,16 @@ import org.springframework.stereotype.Service
 class PaymentService(
     val paymentServiceClient: PaymentServiceClient
 ) {
-    fun isDirectDebitConnected(memberId: String): Boolean {
+    fun getDirectDebitStatus(memberId: String): DirectDebitStatusDTO? {
         try {
             val response = paymentServiceClient.getDirectDebitStatusByMemberId(memberId)
             if (response.statusCode.is2xxSuccessful) {
-                return response.body!!.directDebitActivated
+                return response.body!!
             }
         } catch (ex: Exception) {
             logger.error("Payment service exploded while fetching direct debit status. MemberId: $memberId")
         }
-        return false
+        return null
     }
 
     companion object {

@@ -2,6 +2,7 @@ package com.hedvig.rapio.insuranceinfo
 
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
 import com.hedvig.rapio.externalservices.paymentService.PaymentService
+import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatus
 import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
 import com.hedvig.rapio.externalservices.productPricing.ProductPricingService
 import com.hedvig.rapio.externalservices.productPricing.transport.Contract
@@ -30,14 +31,14 @@ class InsuranceInfoService(
         val currentContract = getCurrentContract(memberId) ?: return null
         val currentAgreement =
             currentContract.genericAgreements.find { agreement -> agreement.id == currentContract.currentAgreementId }!!
-        val isDirectDebitConnected = paymentService.isDirectDebitConnected(memberId)
+        val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
 
         return InsuranceInfo(
             memberId = memberId, // TODO: Remove this after talking to Avy about their usage
             insuranceStatus = InsuranceStatus.fromContractStatus(currentContract.status),
             insurancePremium = currentAgreement.basePremium,
             inceptionDate = currentContract.masterInception,
-            paymentConnected = isDirectDebitConnected
+            paymentConnected = directDebitStatus?.directDebitActivated ?: false
         )
     }
 
@@ -45,14 +46,15 @@ class InsuranceInfoService(
         val currentContract = getCurrentContract(memberId) ?: return null
         val currentAgreement =
             currentContract.genericAgreements.find { agreement -> agreement.id == currentContract.currentAgreementId }!!
-        val isDirectDebitConnected = paymentService.isDirectDebitConnected(memberId)
+        val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
 
         return ExtendedInsuranceInfo(
             insuranceStatus = InsuranceStatus.fromContractStatus(currentContract.status),
             insurancePremium = currentAgreement.basePremium,
             inceptionDate = currentContract.masterInception,
             terminationDate = currentContract.terminationDate,
-            paymentConnected = isDirectDebitConnected,
+            paymentConnected = directDebitStatus?.directDebitActivated ?: false,
+            paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
             certificateUrl = currentAgreement.certificateUrl,
             numberCoInsured = currentAgreement.numberCoInsured,
             insuranceAddress = currentAgreement.address?.let { InsuranceAddress(it.street, it.postalCode) },
