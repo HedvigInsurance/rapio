@@ -10,8 +10,6 @@ import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceAddress
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
 import java.math.BigDecimal
-import javax.money.Monetary
-import org.javamoney.moneta.FastMoney
 import org.javamoney.moneta.Money
 import org.springframework.stereotype.Service
 
@@ -65,6 +63,32 @@ class InsuranceInfoService(
     }
 
     fun getExtendedInsuranceInfo(memberId: String): ExtendedInsuranceInfo? {
+        return getExtendedInsuranceInfoFromContract(memberId)
+            ?: getExtendedInsuranceInfoFromTrial(memberId)
+    }
+
+    private fun getExtendedInsuranceInfoFromTrial(memberId: String): ExtendedInsuranceInfo? {
+        val trial = productPricingService.getTrialForMemberId(memberId)
+        return trial?.let {
+            ExtendedInsuranceInfo(
+                insuranceStatus = InsuranceStatus.ACTIVE,
+                insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
+                inceptionDate = trial.fromDate,
+                paymentConnected = false,
+                terminationDate = trial.toDate,
+                paymentConnectionStatus = DirectDebitStatus.NEEDS_SETUP,
+                certificateUrl = null,
+                numberCoInsured = null,
+                insuranceAddress = InsuranceAddress(
+                    trial.address.street,
+                    trial.address.zipCode
+                ),
+                squareMeters = trial.address.livingSpace?.toLong()
+            )
+        }
+    }
+
+    fun getExtendedInsuranceInfoFromContract(memberId: String): ExtendedInsuranceInfo? {
         val currentContract = getCurrentContract(memberId) ?: return null
         val currentAgreement =
             currentContract.genericAgreements.find { agreement -> agreement.id == currentContract.currentAgreementId }!!

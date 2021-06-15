@@ -4,11 +4,14 @@ import com.hedvig.memberservice.helpers.IntegrationTest
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.external.ExternalMemberRepository
+import com.hedvig.rapio.externalservices.memberService.model.TrialType
 import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatus
 import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatusDTO
+import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
 import com.hedvig.rapio.externalservices.productPricing.transport.Contract
 import com.hedvig.rapio.externalservices.productPricing.transport.ContractStatus
 import com.hedvig.rapio.externalservices.productPricing.transport.GenericAgreement
+import com.hedvig.rapio.externalservices.productPricing.transport.TrialDto
 import io.mockk.every
 import java.math.BigDecimal
 import java.time.Instant
@@ -21,7 +24,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.test.context.support.WithMockUser
 
 internal class InsuranceInfoControllerTest : IntegrationTest() {
 
@@ -227,8 +229,55 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
             .body<Map<String, Any>>()
         assertThat(response["memberId"]).isEqualTo(memberId)
         assertThat(response["insuranceStatus"]).isEqualTo(InsuranceStatus.ACTIVE.name)
-        assertThat(response["insurancePremium"]).isEqualTo(mapOf("amount" to "0.00", "currency" to "SEK"))
+        assertThat(response["insurancePremium"]).isEqualToComparingFieldByField(mapOf("amount" to "0.00", "currency" to "SEK"))
         assertThat(response["inceptionDate"]).isEqualTo(LocalDate.now().toString())
         assertThat(response["paymentConnected"]).isEqualTo(false)
+    }
+
+    @Test
+    fun `can get extended insurance info for trial members`() {
+        val externalMemberId = UUID.randomUUID()
+        val memberId = "123456"
+        every { productPricingClient.getContractsByMemberId(memberId) } returns ResponseEntity.ok(emptyList())
+        every { productPricingClient.getTrialByMemberId(memberId) } returns ResponseEntity.ok(
+            listOf(
+                TrialDto(
+                    id = UUID.randomUUID(),
+                    memberId = memberId,
+                    fromDate = LocalDate.now(),
+                    toDate = LocalDate.now().plusDays(30),
+                    type = TrialType.SE_APARTMENT_BRF,
+                    address = TrialDto.Address(
+                        street = "Teststreet 1",
+                        city = "Testtown",
+                        zipCode = "12345",
+                        livingSpace = 45,
+                        apartmentNo = null,
+                        floor = null
+                    ),
+                    partner = Partner.HEDVIG.name
+                )
+            )
+        )
+        externalMemberRepository.save(ExternalMember(externalMemberId, memberId, Partner.HEDVIG))
+
+        val response = client.get("/v1/members/$externalMemberId/extended")
+            .assert2xx()
+            .body<Map<String, Any>>()
+        assertThat(response["insuranceStatus"]).isEqualTo(InsuranceStatus.ACTIVE.name)
+        assertThat(response["insurancePremium"]).isEqualTo(mapOf("amount" to "0.00", "currency" to "SEK"))
+        assertThat(response["inceptionDate"]).isEqualTo(LocalDate.now().toString())
+        assertThat(response["terminationDate"]).isEqualTo(LocalDate.now().plusDays(30).toString())
+        assertThat(response["paymentConnected"]).isEqualTo(false)
+        assertThat(response["paymentConnectionStatus"]).isEqualTo(DirectDebitStatus.NEEDS_SETUP.toString())
+        assertThat(response["certificateUrl"]).isEqualTo(null)
+        assertThat(response["numberCoInsured"]).isEqualTo(null)
+        assertThat(response["insuranceAddress"]).isEqualToComparingFieldByField(
+            mapOf(
+                "street" to "Teststreet 1",
+                "postalCode" to "12345"
+            )
+        )
+        assertThat(response["squareMeters"]).isEqualTo(45)
     }
 }
