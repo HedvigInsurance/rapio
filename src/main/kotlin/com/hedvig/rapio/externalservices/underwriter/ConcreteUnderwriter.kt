@@ -74,12 +74,13 @@ class ConcreteUnderwriter(
         insuranceCompany: String?,
         firstName: String,
         lastName: String,
-        ssn: String?
+        ssn: String?,
+        memberId: String?
     ): Either<ErrorResponse, SignedQuoteResponseDto> {
         try {
             val response = this.client.signQuote(
                 id,
-                SignQuoteRequest(Name(firstName, lastName), ssn, startsAt, insuranceCompany, email)
+                SignQuoteRequest(SignQuoteRequest.Name(firstName, lastName), ssn, startsAt, insuranceCompany, email, memberId)
             )
             return Either.right(response.body!!)
         } catch (ex: FeignException) {
@@ -105,7 +106,8 @@ class ConcreteUnderwriter(
         lastName: String,
         ssn: String?,
         price: String?,
-        currency: String?
+        currency: String?,
+        memberId: String?
     ): Either<ErrorResponse, SignedQuoteBundleResponseDto> {
 
         try {
@@ -117,7 +119,8 @@ class ConcreteUnderwriter(
                     startDate = startsAt,
                     email = email,
                     price = price,
-                    currency = currency
+                    currency = currency,
+                    memberId = memberId
                 )
             )
             return Either.right(response.body!!)

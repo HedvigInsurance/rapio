@@ -1,6 +1,7 @@
 package com.hedvig.rapio.quotes
 
 import arrow.core.Either
+import arrow.core.Left
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.apikeys.Role
 import com.hedvig.rapio.external.ExternalMember
@@ -37,6 +38,7 @@ import com.hedvig.rapio.quotes.web.dto.SignRequestDTO
 import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
 import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
 import org.slf4j.LoggerFactory
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.UUID
@@ -201,7 +203,10 @@ class QuoteServiceImpl(
         }
     }
 
-    override fun signQuote(quoteId: UUID, request: SignRequestDTO, isForced: Boolean): Either<String, SignResponseDTO> {
+    override fun signQuote(quoteId: UUID, request: SignRequestDTO): Either<String, SignResponseDTO> {
+        val member = request.externalMemberId?.let {
+            externalMemberRepository.findByIdOrNull(it) ?: return Left("No such member: $it")
+        }
         val response = this.underwriter.signQuote(
             id = quoteId.toString(),
             email = request.email,
@@ -209,7 +214,8 @@ class QuoteServiceImpl(
             insuranceCompany = request.currentInsuranceCompanyId,
             firstName = request.firstName,
             lastName = request.lastName,
-            ssn = request.personalNumber
+            ssn = request.personalNumber,
+            memberId = member?.memberId
         )
 
         return response.bimap(
@@ -227,14 +233,14 @@ class QuoteServiceImpl(
             { response ->
                 val completionUrlMaybe: String? = apiGateway.setupPaymentLink(response.memberId, response.market)
                 val partner = getCurrentlyAuthenticatedPartner()
-                val externalMemberId =
-                    externalMemberRepository.save(ExternalMember(UUID.randomUUID(), response.memberId, partner)).id
+                val externalMember =
+                    member ?: externalMemberRepository.save(ExternalMember(UUID.randomUUID(), response.memberId, partner))
 
                 SignResponseDTO(
                     requestId = request.requestId,
                     quoteId = response.id,
                     productId = response.id,
-                    externalMemberId = if (partner.role == Role.DISTRIBUTION) externalMemberId else null,
+                    externalMemberId = if (partner.role == Role.DISTRIBUTION) externalMember.id else null,
                     signedAt = response.signedAt.epochSecond,
                     completionUrl = completionUrlMaybe
                 )
@@ -243,6 +249,9 @@ class QuoteServiceImpl(
     }
 
     override fun signBundle(request: SignBundleRequestDTO): Either<String, SignBundleResponseDTO> {
+        val member = request.externalMemberId?.let {
+            externalMemberRepository.findByIdOrNull(it) ?: return Left("No such member: $it")
+        }
         val response = underwriter.signBundle(
             request.quoteIds,
             request.email,
@@ -251,7 +260,8 @@ class QuoteServiceImpl(
             request.lastName,
             request.personalNumber,
             request.monthlyPremium.amount,
-            request.monthlyPremium.currency
+            request.monthlyPremium.currency,
+            member?.memberId
         )
 
         return response.bimap(
@@ -269,13 +279,13 @@ class QuoteServiceImpl(
             { response ->
                 val completionUrlMaybe: String? = apiGateway.setupPaymentLink(response.memberId, response.market)
                 val partner = getCurrentlyAuthenticatedPartner()
-                val externalMemberId =
-                    externalMemberRepository.save(ExternalMember(UUID.randomUUID(), response.memberId, partner)).id
+                val externalMember =
+                    member ?: externalMemberRepository.save(ExternalMember(UUID.randomUUID(), response.memberId, partner))
 
                 SignBundleResponseDTO(
                     requestId = request.requestId,
                     productIds = response.contracts.map { contract -> contract.id.toString() }.toList(),
-                    externalMemberId = if (partner.role == Role.DISTRIBUTION) externalMemberId else null,
+                    externalMemberId = if (partner.role == Role.DISTRIBUTION) externalMember.id else null,
                     signedAt = response.contracts.first().signedAt.epochSecond,
                     completionUrl = completionUrlMaybe
                 )

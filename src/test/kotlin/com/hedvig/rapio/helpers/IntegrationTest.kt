@@ -1,4 +1,4 @@
-package com.hedvig.memberservice.helpers
+package com.hedvig.rapio.helpers
 
 import com.hedvig.rapio.externalservices.apigateway.transport.ApiGatewayClient
 import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
@@ -18,11 +18,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.data.repository.CrudRepository
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 
-@ActiveProfiles(profiles = ["noauth"])
+@ActiveProfiles(profiles = ["noauth", "test"])
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
 @AutoConfigureMockMvc(secure = false)

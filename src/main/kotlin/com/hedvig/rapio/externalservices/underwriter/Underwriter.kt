@@ -24,7 +24,8 @@ interface Underwriter {
         insuranceCompany: String?,
         firstName: String,
         lastName: String,
-        ssn: String?
+        ssn: String?,
+        memberId: String?
     ): Either<ErrorResponse, SignedQuoteResponseDto>
 
     fun signBundle(
@@ -35,7 +36,8 @@ interface Underwriter {
         lastName: String,
         ssn: String?,
         price: String?,
-        currency: String?
+        currency: String?,
+        memberId: String?
     ): Either<ErrorResponse, SignedQuoteBundleResponseDto>
 
     fun getInsuranceCompanies(
