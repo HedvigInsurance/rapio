@@ -36,7 +36,6 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
     }
 
     @Test
-    @WithMockUser("AVY")
     fun `retrieving member info returns not found if no insurance info`() {
         val memberId = "123456"
         every { productPricingClient.getContractsByMemberId(memberId) } returns ResponseEntity.ok(emptyList())
@@ -45,7 +44,6 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
     }
 
     @Test
-    @WithMockUser("AVY")
     fun `can use regular insurance endpoint with member id`() {
         val memberId = "123456"
         val agreementId = UUID.randomUUID()
@@ -82,7 +80,6 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
     }
 
     @Test
-    @WithMockUser("AVY")
     fun `can use regular insurance endpoint with external member id`() {
         val externalMemberId = UUID.randomUUID()
         val memberId = "123456"
@@ -130,13 +127,11 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
     }
 
     @Test
-    @WithMockUser("AVY")
     fun `retrieving member info returns not found if no member for external member id`() {
         client.get("/v1/members/${UUID.randomUUID()}").assertStatus(HttpStatus.NOT_FOUND)
     }
 
     @Test
-    @WithMockUser("AVY")
     fun `can successfully convert memberId to externalMemberId`() {
         val memberId = "123456"
         val agreementId = UUID.randomUUID()
@@ -178,7 +173,6 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
     }
 
     @Test
-    @WithMockUser("AVY")
     fun `member id that is not connected to a contract should not be converted`() {
         val memberId = "123456"
         every { productPricingClient.getContractsByMemberId(memberId) } returns ResponseEntity.ok(emptyList())
@@ -187,7 +181,6 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
     }
 
     @Test
-    @WithMockUser("AVY")
     fun `existing external member should be returned when attempting to create new external user`() {
         val memberId = "123456"
         val externalMemberId = UUID.randomUUID()
