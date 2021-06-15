@@ -17,6 +17,7 @@ data class ExtendedInsuranceInfo(
     val paymentConnected: Boolean,
     val paymentConnectionStatus: DirectDebitStatus,
     @Masked val certificateUrl: String?,
+    val termsAndConditions: String,
     val numberCoInsured: Int?,
     @Masked val insuranceAddress: InsuranceAddress?,
     val squareMeters: Long?

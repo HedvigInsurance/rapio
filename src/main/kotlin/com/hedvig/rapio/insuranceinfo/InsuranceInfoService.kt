@@ -13,6 +13,8 @@ import java.math.BigDecimal
 import org.javamoney.moneta.Money
 import org.springframework.stereotype.Service
 
+const val dummyTermsAndConditions = "https://cdn.hedvig.com/info/se/sv/forsakringsvillkor-bostadsratt-2020-08.pdf" // TODO replace with real terms
+
 @Service
 class InsuranceInfoService(
     val productPricingService: ProductPricingService,
@@ -85,7 +87,8 @@ class InsuranceInfoService(
                     trial.address.street,
                     trial.address.zipCode
                 ),
-                squareMeters = trial.address.livingSpace?.toLong()
+                squareMeters = trial.address.livingSpace?.toLong(),
+                termsAndConditions = dummyTermsAndConditions
             )
         }
     }
@@ -107,7 +110,8 @@ class InsuranceInfoService(
             certificateUrl = currentAgreement.certificateUrl,
             numberCoInsured = currentAgreement.numberCoInsured,
             insuranceAddress = currentAgreement.address?.let { InsuranceAddress(it.street, it.postalCode) },
-            squareMeters = currentAgreement.squareMeters
+            squareMeters = currentAgreement.squareMeters,
+            termsAndConditions = dummyTermsAndConditions
         )
     }
 
