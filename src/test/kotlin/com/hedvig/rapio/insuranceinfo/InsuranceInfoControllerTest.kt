@@ -264,6 +264,7 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
         val response = client.get("/v1/members/$externalMemberId/extended")
             .assert2xx()
             .body<Map<String, Any>>()
+        assertThat(response["isTrial"]).isEqualTo(true)
         assertThat(response["insuranceStatus"]).isEqualTo(InsuranceStatus.ACTIVE.name)
         assertThat(response["insurancePremium"]).isEqualTo(mapOf("amount" to "0.00", "currency" to "SEK"))
         assertThat(response["inceptionDate"]).isEqualTo(LocalDate.now().toString())

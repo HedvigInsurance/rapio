@@ -70,6 +70,7 @@ class InsuranceInfoService(
         val trial = productPricingService.getTrialForMemberId(memberId)
         return trial?.let {
             ExtendedInsuranceInfo(
+                isTrial = true,
                 insuranceStatus = InsuranceStatus.ACTIVE,
                 insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
                 inceptionDate = trial.fromDate,
@@ -94,6 +95,7 @@ class InsuranceInfoService(
         val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
 
         return ExtendedInsuranceInfo(
+            isTrial = false,
             insuranceStatus = InsuranceStatus.fromContractStatus(currentContract.status),
             insurancePremium = currentAgreement.basePremium,
             inceptionDate = currentContract.masterInception,
