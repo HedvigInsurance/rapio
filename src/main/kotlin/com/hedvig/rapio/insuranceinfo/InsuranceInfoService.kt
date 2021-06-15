@@ -30,8 +30,7 @@ class InsuranceInfoService(
     }
 
     fun getInsuranceInfo(memberId: String): InsuranceInfo? {
-        val infoFromContract = getInsuranceInfoFromContract(memberId)
-        return infoFromContract ?: getInsuranceInfoFromTrial(memberId)
+        return getInsuranceInfoFromContract(memberId) ?: getInsuranceInfoFromTrial(memberId)
     }
 
     fun getInsuranceInfoFromTrial(memberId: String): InsuranceInfo? {
