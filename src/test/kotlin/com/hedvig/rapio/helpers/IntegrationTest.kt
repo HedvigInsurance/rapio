@@ -5,6 +5,7 @@ import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.hedvig.rapio.externalservices.paymentService.transport.PaymentServiceClient
 import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
 import com.hedvig.rapio.externalservices.underwriter.transport.UnderwriterClient
+import com.hedvig.rapio.helpers.TestHttpClient
 import com.hedvig.rapio.qa.QualityAssuranceMemberServiceClient
 import com.ninjasquad.springmockk.MockkBean
 import javax.persistence.EntityManager
@@ -26,6 +27,9 @@ import org.springframework.transaction.support.TransactionTemplate
 @AutoConfigureTestDatabase
 @AutoConfigureMockMvc(secure = false)
 abstract class IntegrationTest {
+
+    @Autowired
+    lateinit var client: TestHttpClient
 
     @Autowired
     lateinit var context: ApplicationContext
