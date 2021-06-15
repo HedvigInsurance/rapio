@@ -9,7 +9,11 @@ import com.hedvig.rapio.externalservices.productPricing.transport.Contract
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceAddress
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
+import java.math.BigDecimal
+import org.javamoney.moneta.Money
 import org.springframework.stereotype.Service
+
+const val dummyTermsAndConditions = "https://cdn.hedvig.com/info/se/sv/forsakringsvillkor-bostadsratt-2020-08.pdf" // TODO replace with real terms
 
 @Service
 class InsuranceInfoService(
@@ -28,6 +32,24 @@ class InsuranceInfoService(
     }
 
     fun getInsuranceInfo(memberId: String): InsuranceInfo? {
+        return getInsuranceInfoFromContract(memberId) ?: getInsuranceInfoFromTrial(memberId)
+    }
+
+    fun getInsuranceInfoFromTrial(memberId: String): InsuranceInfo? {
+        val trial = productPricingService.getTrialForMemberId(memberId)
+        val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
+        return trial?.let {
+            InsuranceInfo(
+                memberId = memberId,
+                insuranceStatus = InsuranceStatus.ACTIVE,
+                insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
+                inceptionDate = trial.fromDate,
+                paymentConnected = directDebitStatus?.directDebitActivated ?: false
+            )
+        }
+    }
+
+    fun getInsuranceInfoFromContract(memberId: String): InsuranceInfo? {
         val currentContract = getCurrentContract(memberId) ?: return null
         val currentAgreement =
             currentContract.genericAgreements.find { agreement -> agreement.id == currentContract.currentAgreementId }!!
@@ -43,12 +65,42 @@ class InsuranceInfoService(
     }
 
     fun getExtendedInsuranceInfo(memberId: String): ExtendedInsuranceInfo? {
+        return getExtendedInsuranceInfoFromContract(memberId)
+            ?: getExtendedInsuranceInfoFromTrial(memberId)
+    }
+
+    private fun getExtendedInsuranceInfoFromTrial(memberId: String): ExtendedInsuranceInfo? {
+        val trial = productPricingService.getTrialForMemberId(memberId)
+        val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
+        return trial?.let {
+            ExtendedInsuranceInfo(
+                isTrial = true,
+                insuranceStatus = InsuranceStatus.ACTIVE,
+                insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
+                inceptionDate = trial.fromDate,
+                paymentConnected = directDebitStatus?.directDebitActivated ?: false,
+                terminationDate = trial.toDate,
+                paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
+                certificateUrl = null,
+                numberCoInsured = null,
+                insuranceAddress = InsuranceAddress(
+                    trial.address.street,
+                    trial.address.zipCode
+                ),
+                squareMeters = trial.address.livingSpace?.toLong(),
+                termsAndConditions = dummyTermsAndConditions
+            )
+        }
+    }
+
+    fun getExtendedInsuranceInfoFromContract(memberId: String): ExtendedInsuranceInfo? {
         val currentContract = getCurrentContract(memberId) ?: return null
         val currentAgreement =
             currentContract.genericAgreements.find { agreement -> agreement.id == currentContract.currentAgreementId }!!
         val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
 
         return ExtendedInsuranceInfo(
+            isTrial = false,
             insuranceStatus = InsuranceStatus.fromContractStatus(currentContract.status),
             insurancePremium = currentAgreement.basePremium,
             inceptionDate = currentContract.masterInception,
@@ -58,7 +110,8 @@ class InsuranceInfoService(
             certificateUrl = currentAgreement.certificateUrl,
             numberCoInsured = currentAgreement.numberCoInsured,
             insuranceAddress = currentAgreement.address?.let { InsuranceAddress(it.street, it.postalCode) },
-            squareMeters = currentAgreement.squareMeters
+            squareMeters = currentAgreement.squareMeters,
+            termsAndConditions = dummyTermsAndConditions
         )
     }
 

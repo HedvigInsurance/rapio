@@ -23,9 +23,6 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(classes = [MemberControllerTestUserConfiguration::class])
 class MembersControllerTest : IntegrationTest() {
 
-    @Autowired
-    private lateinit var client: TestHttpClient
-
     @AfterEach
     fun teardown() {
         reset {
