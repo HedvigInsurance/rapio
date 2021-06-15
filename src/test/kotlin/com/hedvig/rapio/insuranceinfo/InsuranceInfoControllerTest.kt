@@ -194,4 +194,41 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
             .body<Map<String, Any>>()
         assertThat(response["id"]).isEqualTo("$externalMemberId")
     }
+
+    @Test
+    fun `can get insurance info for trial members`() {
+        val externalMemberId = UUID.randomUUID()
+        val memberId = "123456"
+        every { productPricingClient.getContractsByMemberId(memberId) } returns ResponseEntity.ok(emptyList())
+        every { productPricingClient.getTrialByMemberId(memberId) } returns ResponseEntity.ok(
+            listOf(
+                TrialDto(
+                    id = UUID.randomUUID(),
+                    memberId = memberId,
+                    fromDate = LocalDate.now(),
+                    toDate = LocalDate.now().plusDays(30),
+                    type = TrialType.SE_APARTMENT_BRF,
+                    address = TrialDto.Address(
+                        street = "Teststreet 1",
+                        city = "Testtown",
+                        zipCode = "12345",
+                        livingSpace = null,
+                        apartmentNo = null,
+                        floor = null
+                    ),
+                    partner = Partner.HEDVIG.name
+                )
+            )
+        )
+        externalMemberRepository.save(ExternalMember(externalMemberId, memberId, Partner.HEDVIG))
+
+        val response = client.get("/v1/members/$externalMemberId")
+            .assert2xx()
+            .body<Map<String, Any>>()
+        assertThat(response["memberId"]).isEqualTo(memberId)
+        assertThat(response["insuranceStatus"]).isEqualTo(InsuranceStatus.ACTIVE.name)
+        assertThat(response["insurancePremium"]).isEqualTo(mapOf("amount" to "0.00", "currency" to "SEK"))
+        assertThat(response["inceptionDate"]).isEqualTo(LocalDate.now().toString())
+        assertThat(response["paymentConnected"]).isEqualTo(false)
+    }
 }

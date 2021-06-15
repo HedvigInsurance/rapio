@@ -3,7 +3,7 @@ package com.hedvig.rapio.externalservices.productPricing
 import com.hedvig.rapio.externalservices.productPricing.transport.Contract
 import com.hedvig.rapio.externalservices.productPricing.transport.ContractMarketInfo
 import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
-import com.hedvig.rapio.insuranceinfo.InsuranceInfoService
+import com.hedvig.rapio.externalservices.productPricing.transport.TrialDto
 import feign.FeignException
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
@@ -20,7 +20,14 @@ class ProductPricingService(
     fun getContractMarketInfo(memberId: String): ContractMarketInfo? = try {
         productPricingClient.getContractMarketInfoByMemberId(memberId)
     } catch (exception: FeignException) {
-        logger.error (exception) { "Unable to get contract market info for member (memberId=$memberId)" }
+        logger.error(exception) { "Unable to get contract market info for member (memberId=$memberId)" }
+        null
+    }
+
+    fun getTrialForMemberId(memberId: String): TrialDto? = try {
+        productPricingClient.getTrialByMemberId(memberId).body?.firstOrNull()
+    } catch (e: FeignException) {
+        logger.error(e) { "Unable to get Trial for member (memberId=$memberId)" }
         null
     }
 

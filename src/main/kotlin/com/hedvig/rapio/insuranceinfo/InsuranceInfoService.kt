@@ -9,6 +9,10 @@ import com.hedvig.rapio.externalservices.productPricing.transport.Contract
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceAddress
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
+import java.math.BigDecimal
+import javax.money.Monetary
+import org.javamoney.moneta.FastMoney
+import org.javamoney.moneta.Money
 import org.springframework.stereotype.Service
 
 @Service
@@ -28,6 +32,24 @@ class InsuranceInfoService(
     }
 
     fun getInsuranceInfo(memberId: String): InsuranceInfo? {
+        val infoFromContract = getInsuranceInfoFromContract(memberId)
+        return infoFromContract ?: getInsuranceInfoFromTrial(memberId)
+    }
+
+    fun getInsuranceInfoFromTrial(memberId: String): InsuranceInfo? {
+        val trial = productPricingService.getTrialForMemberId(memberId)
+        return trial?.let {
+            InsuranceInfo(
+                memberId = memberId,
+                insuranceStatus = InsuranceStatus.ACTIVE,
+                insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
+                inceptionDate = trial.fromDate,
+                paymentConnected = false
+            )
+        }
+    }
+
+    fun getInsuranceInfoFromContract(memberId: String): InsuranceInfo? {
         val currentContract = getCurrentContract(memberId) ?: return null
         val currentAgreement =
             currentContract.genericAgreements.find { agreement -> agreement.id == currentContract.currentAgreementId }!!

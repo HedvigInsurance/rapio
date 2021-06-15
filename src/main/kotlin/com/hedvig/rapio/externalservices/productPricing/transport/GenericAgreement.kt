@@ -13,4 +13,9 @@ data class GenericAgreement(
     val address: Address?,
     val numberCoInsured: Int?,
     val squareMeters: Long?
-)
+) {
+    data class Address(
+        val street: String,
+        val postalCode: String
+    )
+}
