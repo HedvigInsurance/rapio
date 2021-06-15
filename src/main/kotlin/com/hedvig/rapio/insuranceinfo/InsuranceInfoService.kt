@@ -35,13 +35,14 @@ class InsuranceInfoService(
 
     fun getInsuranceInfoFromTrial(memberId: String): InsuranceInfo? {
         val trial = productPricingService.getTrialForMemberId(memberId)
+        val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
         return trial?.let {
             InsuranceInfo(
                 memberId = memberId,
                 insuranceStatus = InsuranceStatus.ACTIVE,
                 insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
                 inceptionDate = trial.fromDate,
-                paymentConnected = false
+                paymentConnected = directDebitStatus?.directDebitActivated ?: false
             )
         }
     }
@@ -68,15 +69,16 @@ class InsuranceInfoService(
 
     private fun getExtendedInsuranceInfoFromTrial(memberId: String): ExtendedInsuranceInfo? {
         val trial = productPricingService.getTrialForMemberId(memberId)
+        val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
         return trial?.let {
             ExtendedInsuranceInfo(
                 isTrial = true,
                 insuranceStatus = InsuranceStatus.ACTIVE,
                 insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
                 inceptionDate = trial.fromDate,
-                paymentConnected = false,
+                paymentConnected = directDebitStatus?.directDebitActivated ?: false,
                 terminationDate = trial.toDate,
-                paymentConnectionStatus = DirectDebitStatus.NEEDS_SETUP,
+                paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
                 certificateUrl = null,
                 numberCoInsured = null,
                 insuranceAddress = InsuranceAddress(
