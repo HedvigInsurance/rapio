@@ -92,29 +92,19 @@ class QuotesController @Autowired constructor(
         }
     }
 
-    @PostMapping("/{quoteId}/sign/forced")
-    @Secured("ROLE_DISTRIBUTION")
-    @LogCall
-    fun signForcedQuote(
-        @Valid @PathVariable quoteId: UUID,
-        @Valid @RequestBody request: SignRequestDTO
-    ): ResponseEntity<out Any> = signQuote(quoteId, request, true)
-
     @PostMapping("/{quoteId}/sign")
     @Secured("ROLE_COMPARISON", "ROLE_DISTRIBUTION")
     @LogCall
     fun signRegularQuote(
         @Valid @PathVariable quoteId: UUID,
         @Valid @RequestBody request: SignRequestDTO
-    ): ResponseEntity<out Any> = signQuote(quoteId, request, false)
-
-    private fun signQuote(quoteId: UUID, request: SignRequestDTO, isForced: Boolean): ResponseEntity<*> {
+    ): ResponseEntity<out Any> {
         if (request.startsAt == null && request.currentInsuranceCompanyId == null) {
             return ResponseEntity.badRequest().body("currentInsuranceCompanyId is required when startsAt is null")
         }
         return logRequestId(request.requestId) {
 
-            val response = quoteService.signQuote(quoteId, request, isForced)
+            val response = quoteService.signQuote(quoteId, request)
 
             return@logRequestId response.bimap(
                 { left -> ResponseEntity.status(500).body(ExternalErrorResponseDTO(left)) },

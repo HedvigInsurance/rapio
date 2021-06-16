@@ -25,6 +25,8 @@ class TestHttpClient(
         template.restTemplate.requestFactory = GetRequestWithBodyAllowingRequestFactory()
     }
 
+    fun withUser(user: String) = TestHttpClient(mapper, template.withBasicAuth(user, ""))
+
     fun get(uri: String, headers: Map<String, String> = emptyMap(), body: Any? = null): Response {
         return exchange(HttpMethod.GET, uri, body, headers)
     }
@@ -46,7 +48,11 @@ class TestHttpClient(
                 }
             }
         )
-        val entity = template.exchange(uri, method, httpEntity, Any::class.java)
+        val entity = try {
+            template.exchange(uri, method, httpEntity, Any::class.java)
+        } catch (e: Exception) {
+            template.exchange(uri, method, httpEntity, String::class.java)
+        }
         return Response(mapper, entity)
     }
 
@@ -56,7 +62,9 @@ class TestHttpClient(
     ) {
 
         fun assert2xx(): Response {
-            assertThat(entity.statusCode).isBetween(HttpStatus.OK, HttpStatus.IM_USED)
+            assertThat(entity.statusCode.series())
+                .describedAs("${entity.statusCode}, ${entity.body}")
+                .isEqualTo(HttpStatus.Series.SUCCESSFUL)
             return this
         }
 

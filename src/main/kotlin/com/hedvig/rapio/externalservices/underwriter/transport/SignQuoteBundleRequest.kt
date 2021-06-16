@@ -11,7 +11,8 @@ data class SignQuoteBundleRequest(
     val startDate: LocalDate,
     @Masked val email: String,
     val price: String?, // Used for bundle price verification
-    val currency: String? // Used for bundle price verification
+    val currency: String?, // Used for bundle price verification,
+    val memberId: String?
 ) {
     data class Name(
         @Masked val firstName: String,

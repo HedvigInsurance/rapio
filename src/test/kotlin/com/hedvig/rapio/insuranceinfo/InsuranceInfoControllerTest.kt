@@ -1,6 +1,5 @@
 package com.hedvig.rapio.insuranceinfo
 
-import com.hedvig.memberservice.helpers.IntegrationTest
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.external.ExternalMemberRepository
@@ -12,6 +11,7 @@ import com.hedvig.rapio.externalservices.productPricing.transport.Contract
 import com.hedvig.rapio.externalservices.productPricing.transport.ContractStatus
 import com.hedvig.rapio.externalservices.productPricing.transport.GenericAgreement
 import com.hedvig.rapio.externalservices.productPricing.transport.TrialDto
+import com.hedvig.rapio.helpers.IntegrationTest
 import io.mockk.every
 import java.math.BigDecimal
 import java.time.Instant

@@ -3,6 +3,7 @@ package com.hedvig.rapio.quotes.web.dto
 import com.hedvig.libs.logging.masking.Masked
 import java.time.LocalDate
 import java.time.ZoneId
+import java.util.*
 import javax.validation.Valid
 import javax.validation.constraints.Email
 import javax.validation.constraints.FutureOrPresent
@@ -18,8 +19,11 @@ data class SignRequestDTO(
     @get:NotBlank @Masked val firstName: String,
     @get:NotBlank @Masked val lastName: String,
 
-    @Masked val personalNumber: String?
+    @Masked val personalNumber: String?,
+
+    val externalMemberId: UUID?
 ) {
+
     data class Date(
         @FutureOrPresent val date: LocalDate,
         val timezone: ZoneId

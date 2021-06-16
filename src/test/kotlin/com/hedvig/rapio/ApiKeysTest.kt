@@ -119,7 +119,7 @@ class ApiKeysTest {
 
     @Test
     fun `succeed to access signing quotes if the role is ROLE_COMPARISON`() {
-        every { quoteService.signQuote(any(), any(), any()) } returns Right(makeSignResponse())
+        every { quoteService.signQuote(any(), any()) } returns Right(makeSignResponse())
 
         mvc
             .perform(
@@ -134,7 +134,7 @@ class ApiKeysTest {
 
     @Test
     fun `succeed to access signing quotes if the role is ROLE_DISTRIBUTION`() {
-        every { quoteService.signQuote(any(), any(), any()) } returns Right(makeSignResponse())
+        every { quoteService.signQuote(any(), any()) } returns Right(makeSignResponse())
 
         mvc
             .perform(

@@ -18,7 +18,8 @@ data class SignBundleRequestDTO(
     @get:NotBlank @Masked val firstName: String,
     @get:NotBlank @Masked val lastName: String,
     @Masked val personalNumber: String?,
-    val monthlyPremium: Amount
+    val monthlyPremium: Amount,
+    val externalMemberId: UUID?
 ) {
     data class Date(
         @FutureOrPresent val date: LocalDate,

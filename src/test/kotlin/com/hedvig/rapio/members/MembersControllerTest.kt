@@ -1,6 +1,5 @@
 package com.hedvig.rapio.members
 
-import com.hedvig.memberservice.helpers.IntegrationTest
 import com.hedvig.rapio.helpers.TestHttpClient
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.apikeys.Role
@@ -9,6 +8,7 @@ import com.hedvig.rapio.externalservices.memberService.dto.CreateMemberResponse
 import com.hedvig.rapio.externalservices.memberService.dto.CreateTrialResponse
 import com.hedvig.rapio.externalservices.memberService.dto.CreateUserResponse
 import com.hedvig.rapio.externalservices.memberService.dto.IsMemberRequest
+import com.hedvig.rapio.helpers.IntegrationTest
 import io.mockk.every
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
