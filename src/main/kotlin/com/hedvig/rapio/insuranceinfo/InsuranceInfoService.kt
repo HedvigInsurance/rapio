@@ -1,25 +1,29 @@
 package com.hedvig.rapio.insuranceinfo
 
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
+import com.hedvig.rapio.externalservices.memberService.MemberService
 import com.hedvig.rapio.externalservices.paymentService.PaymentService
 import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatus
 import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
 import com.hedvig.rapio.externalservices.productPricing.ProductPricingService
+import com.hedvig.rapio.externalservices.productPricing.TypeOfContract
 import com.hedvig.rapio.externalservices.productPricing.transport.Contract
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceAddress
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
+import com.hedvig.rapio.util.let2
+import com.hedvig.rapio.util.let3
 import java.math.BigDecimal
+import java.util.Locale
 import org.javamoney.moneta.Money
 import org.springframework.stereotype.Service
-
-const val dummyTermsAndConditions = "https://cdn.hedvig.com/info/se/sv/forsakringsvillkor-bostadsratt-2020-08.pdf" // TODO replace with real terms
 
 @Service
 class InsuranceInfoService(
     val productPricingService: ProductPricingService,
     val paymentService: PaymentService,
-    val apiGateway: ApiGateway
+    val apiGateway: ApiGateway,
+    val memberService: MemberService
 ) {
     private fun getCurrentContract(memberId: String): Contract? {
         val contracts: List<Contract> = productPricingService.getContractsByMemberId(memberId)
@@ -70,49 +74,71 @@ class InsuranceInfoService(
     }
 
     private fun getExtendedInsuranceInfoFromTrial(memberId: String): ExtendedInsuranceInfo? {
+        val member = memberService.getMember(memberId)
         val trial = productPricingService.getTrialForMemberId(memberId)
         val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
-        return trial?.let {
+        return (member to trial).let2 { m, t ->
+            val termsAndConditions =
+                Triple(getContractType(t.type.name), m.acceptLanguage, m.country)
+                    .let3 { type, lang, country ->
+                        productPricingService.getTermsAndConditions(type, Locale(lang, country), t.fromDate)
+                    }
+
             ExtendedInsuranceInfo(
                 isTrial = true,
                 insuranceStatus = InsuranceStatus.ACTIVE,
                 insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
-                inceptionDate = trial.fromDate,
+                inceptionDate = t.fromDate,
                 paymentConnected = directDebitStatus?.directDebitActivated ?: false,
-                terminationDate = trial.toDate,
+                terminationDate = t.toDate,
                 paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
                 certificateUrl = null,
                 numberCoInsured = null,
                 insuranceAddress = InsuranceAddress(
-                    trial.address.street,
-                    trial.address.zipCode
+                    t.address.street,
+                    t.address.zipCode
                 ),
-                squareMeters = trial.address.livingSpace?.toLong(),
-                termsAndConditions = dummyTermsAndConditions
+                squareMeters = t.address.livingSpace?.toLong(),
+                termsAndConditions = termsAndConditions?.url ?: ""
             )
         }
     }
 
-    fun getExtendedInsuranceInfoFromContract(memberId: String): ExtendedInsuranceInfo? {
-        val currentContract = getCurrentContract(memberId) ?: return null
-        val currentAgreement =
-            currentContract.genericAgreements.find { agreement -> agreement.id == currentContract.currentAgreementId }!!
-        val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
+    fun getContractType(type: String): TypeOfContract? = try {
+        TypeOfContract.valueOf(type)
+    } catch (e: IllegalArgumentException) {
+        null
+    }
 
-        return ExtendedInsuranceInfo(
-            isTrial = false,
-            insuranceStatus = InsuranceStatus.fromContractStatus(currentContract.status),
-            insurancePremium = currentAgreement.basePremium,
-            inceptionDate = currentContract.masterInception,
-            terminationDate = currentContract.terminationDate,
-            paymentConnected = directDebitStatus?.directDebitActivated ?: false,
-            paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
-            certificateUrl = currentAgreement.certificateUrl,
-            numberCoInsured = currentAgreement.numberCoInsured,
-            insuranceAddress = currentAgreement.address?.let { InsuranceAddress(it.street, it.postalCode) },
-            squareMeters = currentAgreement.squareMeters,
-            termsAndConditions = dummyTermsAndConditions
-        )
+    fun getExtendedInsuranceInfoFromContract(memberId: String): ExtendedInsuranceInfo? {
+        val member = memberService.getMember(memberId)
+        val contract = getCurrentContract(memberId)
+        return (member to contract).let2 { m, c ->
+            val currentAgreement =
+                c.genericAgreements.find { agreement -> agreement.id == c.currentAgreementId }!!
+            val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
+
+            val termsAndConditions =
+                Triple(m.acceptLanguage, m.country, currentAgreement.fromDate)
+                    .let3 { lang, country, date ->
+                        productPricingService.getTermsAndConditions(c.typeOfContract, Locale(lang, country), date)
+                    }
+
+            ExtendedInsuranceInfo(
+                isTrial = false,
+                insuranceStatus = InsuranceStatus.fromContractStatus(c.status),
+                insurancePremium = currentAgreement.basePremium,
+                inceptionDate = c.masterInception,
+                terminationDate = c.terminationDate,
+                paymentConnected = directDebitStatus?.directDebitActivated ?: false,
+                paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
+                certificateUrl = currentAgreement.certificateUrl,
+                numberCoInsured = currentAgreement.numberCoInsured,
+                insuranceAddress = currentAgreement.address?.let { InsuranceAddress(it.street, it.postalCode) },
+                squareMeters = currentAgreement.squareMeters,
+                termsAndConditions = termsAndConditions?.url ?: ""
+            )
+        }
     }
 
     fun getConnectDirectDebitUrl(memberId: String): String? {

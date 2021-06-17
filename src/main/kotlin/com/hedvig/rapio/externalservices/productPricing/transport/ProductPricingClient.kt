@@ -2,6 +2,10 @@ package com.hedvig.rapio.externalservices.productPricing.transport
 
 import com.hedvig.rapio.externalservices.memberService.dto.CreateTrialRequest
 import com.hedvig.rapio.externalservices.memberService.dto.CreateTrialResponse
+import com.hedvig.rapio.externalservices.productPricing.TermsAndConditions
+import com.hedvig.rapio.externalservices.productPricing.TypeOfContract
+import java.time.LocalDate
+import java.util.Locale
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -26,4 +30,11 @@ interface ProductPricingClient {
 
     @GetMapping("/_/trial")
     fun getTrialByMemberId(@RequestParam memberId: String) : ResponseEntity<List<TrialDto>>
+
+    @GetMapping("/_/terms/{contractType}/{locale}/{date}")
+    fun getTermsAndConditionsForContractType(
+        @PathVariable contractType: TypeOfContract,
+        @PathVariable locale: Locale,
+        @PathVariable date: LocalDate
+    ): ResponseEntity<TermsAndConditions>
 }

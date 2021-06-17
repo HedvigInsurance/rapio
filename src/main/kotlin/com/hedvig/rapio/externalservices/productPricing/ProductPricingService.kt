@@ -5,6 +5,8 @@ import com.hedvig.rapio.externalservices.productPricing.transport.ContractMarket
 import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
 import com.hedvig.rapio.externalservices.productPricing.transport.TrialDto
 import feign.FeignException
+import java.time.LocalDate
+import java.util.Locale
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 
@@ -28,6 +30,19 @@ class ProductPricingService(
         productPricingClient.getTrialByMemberId(memberId).body?.firstOrNull()
     } catch (e: FeignException) {
         logger.error(e) { "Unable to get Trial for member (memberId=$memberId)" }
+        null
+    }
+
+    fun getTermsAndConditions(
+        contractType: TypeOfContract,
+        locale: Locale,
+        date: LocalDate
+    ): TermsAndConditions? = try {
+        productPricingClient.getTermsAndConditionsForContractType(
+            contractType, locale, date
+        ).body
+    } catch (e: FeignException) {
+        logger.error(e) { "Failed to get terms for input { contractType: $contractType, locale: $locale, date: $date}" }
         null
     }
 
