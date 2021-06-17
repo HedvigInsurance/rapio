@@ -3,10 +3,13 @@ package com.hedvig.rapio.insuranceinfo
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.external.ExternalMemberRepository
+import com.hedvig.rapio.externalservices.memberService.model.Member
 import com.hedvig.rapio.externalservices.memberService.model.TrialType
 import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatus
 import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatusDTO
 import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
+import com.hedvig.rapio.externalservices.productPricing.TermsAndConditions
+import com.hedvig.rapio.externalservices.productPricing.TypeOfContract
 import com.hedvig.rapio.externalservices.productPricing.transport.Contract
 import com.hedvig.rapio.externalservices.productPricing.transport.ContractStatus
 import com.hedvig.rapio.externalservices.productPricing.transport.GenericAgreement
@@ -16,6 +19,7 @@ import io.mockk.every
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
+import java.util.Locale
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.javamoney.moneta.Money
@@ -70,7 +74,8 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
                             squareMeters = null
                         )
                     ),
-                    createdAt = Instant.now()
+                    createdAt = Instant.now(),
+                    typeOfContract = TypeOfContract.SE_APARTMENT_BRF
                 )
             )
         )
@@ -107,7 +112,8 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
                             squareMeters = null
                         )
                     ),
-                    createdAt = Instant.now()
+                    createdAt = Instant.now(),
+                    typeOfContract = TypeOfContract.SE_APARTMENT_BRF
                 )
             )
         )
@@ -158,7 +164,8 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
                             squareMeters = null
                         )
                     ),
-                    createdAt = Instant.now()
+                    createdAt = Instant.now(),
+                    typeOfContract = TypeOfContract.SE_APARTMENT_BRF
                 )
             )
         )
@@ -232,7 +239,12 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
             .body<Map<String, Any>>()
         assertThat(response["memberId"]).isEqualTo(memberId)
         assertThat(response["insuranceStatus"]).isEqualTo(InsuranceStatus.ACTIVE.name)
-        assertThat(response["insurancePremium"]).isEqualToComparingFieldByField(mapOf("amount" to "0.00", "currency" to "SEK"))
+        assertThat(response["insurancePremium"]).isEqualToComparingFieldByField(
+            mapOf(
+                "amount" to "0.00",
+                "currency" to "SEK"
+            )
+        )
         assertThat(response["inceptionDate"]).isEqualTo(LocalDate.now().toString())
         assertThat(response["paymentConnected"]).isEqualTo(true)
     }
@@ -242,6 +254,26 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
         val externalMemberId = UUID.randomUUID()
         val memberId = "123456"
         every { productPricingClient.getContractsByMemberId(memberId) } returns ResponseEntity.ok(emptyList())
+        every { memberServiceClient.getMember(memberId) } returns ResponseEntity.ok(
+            Member(
+                memberId = memberId.toLong(),
+                country = "SE",
+                acceptLanguage = "sv"
+            )
+        )
+        every {
+            productPricingClient.getTermsAndConditionsForContractType(
+                TypeOfContract.SE_APARTMENT_BRF,
+                Locale("sv", "SE"),
+                LocalDate.now()
+            )
+        } returns ResponseEntity.ok(
+            TermsAndConditions(
+                commencementDate = LocalDate.now(),
+                displayName = "Villkor",
+                url = "www.hedvig.com/sv_SE-terms.pdf"
+            )
+        )
         every { productPricingClient.getTrialByMemberId(memberId) } returns ResponseEntity.ok(
             listOf(
                 TrialDto(
@@ -286,5 +318,85 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
             )
         )
         assertThat(response["squareMeters"]).isEqualTo(45)
+        assertThat(response["termsAndConditions"]).isEqualTo("www.hedvig.com/sv_SE-terms.pdf")
     }
+
+    @Test
+    fun `can get extended insurance info for members with contract`() {
+        val externalMemberId = UUID.randomUUID()
+        val memberId = "123456"
+        val a1 = UUID.randomUUID()
+        every { productPricingClient.getContractsByMemberId(memberId) } returns ResponseEntity.ok(
+            listOf(
+                Contract(
+                    id = UUID.randomUUID(),
+                    holderMemberId = memberId,
+                    masterInception = LocalDate.now(),
+                    status = ContractStatus.PENDING,
+                    terminationDate = null,
+                    currentAgreementId = a1,
+                    typeOfContract = TypeOfContract.SE_APARTMENT_BRF,
+                    genericAgreements = listOf(
+                        GenericAgreement(
+                            id = a1,
+                            fromDate = LocalDate.now(),
+                            toDate = null,
+                            basePremium = Money.of(0, "SEK"),
+                            certificateUrl = "www.certificate.url",
+                            address = GenericAgreement.Address(street = "Teststreet 1", postalCode = "12345"),
+                            numberCoInsured = 2,
+                            squareMeters = 40
+                        )
+                    ),
+                    createdAt = Instant.now()
+                )
+            )
+        )
+        every { memberServiceClient.getMember(memberId) } returns ResponseEntity.ok(
+            Member(
+                memberId = memberId.toLong(),
+                country = "SE",
+                acceptLanguage = "sv"
+            )
+        )
+        every {
+            productPricingClient.getTermsAndConditionsForContractType(
+                TypeOfContract.SE_APARTMENT_BRF,
+                Locale("sv", "SE"),
+                LocalDate.now()
+            )
+        } returns ResponseEntity.ok(
+            TermsAndConditions(
+                commencementDate = LocalDate.now(),
+                displayName = "Villkor",
+                url = "www.hedvig.com/sv_SE-terms.pdf"
+            )
+        )
+        every { paymentServiceClient.getDirectDebitStatusByMemberId(memberId) } returns ResponseEntity.ok(
+            DirectDebitStatusDTO(memberId, true, DirectDebitStatus.ACTIVATED)
+        )
+        externalMemberRepository.save(ExternalMember(externalMemberId, memberId, Partner.HEDVIG))
+
+        val response = client.get("/v1/members/$externalMemberId/extended")
+            .assert2xx()
+            .body<Map<String, Any>>()
+        assertThat(response["isTrial"]).isEqualTo(false)
+        assertThat(response["insuranceStatus"]).isEqualTo(InsuranceStatus.PENDING.name)
+        assertThat(response["insurancePremium"]).isEqualTo(mapOf("amount" to "0.00", "currency" to "SEK"))
+        assertThat(response["inceptionDate"]).isEqualTo(LocalDate.now().toString())
+        assertThat(response["terminationDate"]).isEqualTo(null)
+        assertThat(response["paymentConnected"]).isEqualTo(true)
+        assertThat(response["paymentConnectionStatus"]).isEqualTo(DirectDebitStatus.ACTIVATED.toString())
+        assertThat(response["certificateUrl"]).isEqualTo("www.certificate.url")
+        assertThat(response["numberCoInsured"]).isEqualTo(2)
+        assertThat(response["insuranceAddress"]).isEqualToComparingFieldByField(
+            mapOf(
+                "street" to "Teststreet 1",
+                "postalCode" to "12345"
+            )
+        )
+        assertThat(response["squareMeters"]).isEqualTo(40)
+        assertThat(response["termsAndConditions"]).isEqualTo("www.hedvig.com/sv_SE-terms.pdf")
+    }
+
 }
