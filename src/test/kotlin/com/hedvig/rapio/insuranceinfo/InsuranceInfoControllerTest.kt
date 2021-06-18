@@ -71,7 +71,8 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
                             certificateUrl = null,
                             address = null,
                             numberCoInsured = null,
-                            squareMeters = null
+                            squareMeters = null,
+                            partner = null
                         )
                     ),
                     createdAt = Instant.now(),
@@ -109,7 +110,8 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
                             certificateUrl = null,
                             address = null,
                             numberCoInsured = null,
-                            squareMeters = null
+                            squareMeters = null,
+                            partner = null
                         )
                     ),
                     createdAt = Instant.now(),
@@ -161,7 +163,8 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
                             certificateUrl = null,
                             address = null,
                             numberCoInsured = null,
-                            squareMeters = null
+                            squareMeters = null,
+                            partner = null
                         )
                     ),
                     createdAt = Instant.now(),
@@ -262,10 +265,11 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
             )
         )
         every {
-            productPricingClient.getTermsAndConditionsForContractType(
+            productPricingClient.getTermsAndConditions(
                 TypeOfContract.SE_APARTMENT_BRF,
                 Locale("sv", "SE"),
-                LocalDate.now()
+                LocalDate.now(),
+                null
             )
         } returns ResponseEntity.ok(
             TermsAndConditions(
@@ -345,7 +349,8 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
                             certificateUrl = "www.certificate.url",
                             address = GenericAgreement.Address(street = "Teststreet 1", postalCode = "12345"),
                             numberCoInsured = 2,
-                            squareMeters = 40
+                            squareMeters = 40,
+                            partner = null
                         )
                     ),
                     createdAt = Instant.now()
@@ -360,10 +365,11 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
             )
         )
         every {
-            productPricingClient.getTermsAndConditionsForContractType(
-                TypeOfContract.SE_APARTMENT_BRF,
-                Locale("sv", "SE"),
-                LocalDate.now()
+            productPricingClient.getTermsAndConditions(
+                contractType = TypeOfContract.SE_APARTMENT_BRF,
+                locale = Locale("sv", "SE"),
+                date = LocalDate.now(),
+                partner = null
             )
         } returns ResponseEntity.ok(
             TermsAndConditions(

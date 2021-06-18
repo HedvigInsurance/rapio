@@ -36,13 +36,27 @@ class ProductPricingService(
     fun getTermsAndConditions(
         contractType: TypeOfContract,
         locale: Locale,
-        date: LocalDate
+        date: LocalDate,
+        partner: String?
     ): TermsAndConditions? = try {
-        productPricingClient.getTermsAndConditionsForContractType(
-            contractType, locale, date
+        productPricingClient.getTermsAndConditions(
+            contractType, locale, date, partner
         ).body
     } catch (e: FeignException) {
-        logger.error(e) { "Failed to get terms for input { contractType: $contractType, locale: $locale, date: $date}" }
+        logger.error(e) { "Failed to get terms for input { contractType: $contractType, locale: $locale, date: $date, partner: $partner}" }
+        null
+    }
+
+    fun getLatestTermsAndConditions(
+        contractType: TypeOfContract,
+        locale: Locale,
+        partner: String?
+    ): TermsAndConditions? = try {
+        productPricingClient.getLatestTermsAndConditions(
+            contractType, locale, partner
+        ).body
+    } catch (e: FeignException) {
+        logger.error(e) { "Failed to get terms for input { contractType: $contractType, locale: $locale, partner: $partner}" }
         null
     }
 

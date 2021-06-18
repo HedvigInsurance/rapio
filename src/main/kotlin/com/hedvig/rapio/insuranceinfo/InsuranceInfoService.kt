@@ -1,20 +1,19 @@
 package com.hedvig.rapio.insuranceinfo
 
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
-import com.hedvig.rapio.externalservices.memberService.MemberService
-import com.hedvig.rapio.externalservices.memberService.model.TrialType
+import com.hedvig.rapio.externalservices.memberService.model.toContractType
 import com.hedvig.rapio.externalservices.paymentService.PaymentService
 import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatus
 import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
 import com.hedvig.rapio.externalservices.productPricing.ProductPricingService
+import com.hedvig.rapio.externalservices.productPricing.TermsAndConditions
 import com.hedvig.rapio.externalservices.productPricing.TypeOfContract
 import com.hedvig.rapio.externalservices.productPricing.transport.Contract
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceAddress
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
-import com.hedvig.rapio.util.let2
-import com.hedvig.rapio.util.let3
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.util.Locale
 import org.javamoney.moneta.Money
 import org.springframework.stereotype.Service
@@ -23,8 +22,7 @@ import org.springframework.stereotype.Service
 class InsuranceInfoService(
     val productPricingService: ProductPricingService,
     val paymentService: PaymentService,
-    val apiGateway: ApiGateway,
-    val memberService: MemberService
+    val apiGateway: ApiGateway
 ) {
     private fun getCurrentContract(memberId: String): Contract? {
         val contracts: List<Contract> = productPricingService.getContractsByMemberId(memberId)
@@ -75,73 +73,67 @@ class InsuranceInfoService(
     }
 
     private fun getExtendedInsuranceInfoFromTrial(memberId: String): ExtendedInsuranceInfo? {
-        val member = memberService.getMember(memberId)
-        val trial = productPricingService.getTrialForMemberId(memberId)
+        val trial = productPricingService.getTrialForMemberId(memberId) ?: return null
         val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
-        return (member to trial).let2 { m, t ->
-            val termsAndConditions =
-                Triple(getAvyContractType(t.type), m.acceptLanguage, m.country)
-                    .let3 { type, lang, country ->
-                        productPricingService.getTermsAndConditions(type, Locale(lang, country), t.fromDate)
-                    }
 
-            ExtendedInsuranceInfo(
-                isTrial = true,
-                insuranceStatus = InsuranceStatus.ACTIVE,
-                insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
-                inceptionDate = t.fromDate,
-                paymentConnected = directDebitStatus?.directDebitActivated ?: false,
-                terminationDate = t.toDate,
-                paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
-                certificateUrl = null,
-                numberCoInsured = null,
-                insuranceAddress = InsuranceAddress(
-                    t.address.street,
-                    t.address.zipCode
-                ),
-                squareMeters = t.address.livingSpace?.toLong(),
-                termsAndConditions = termsAndConditions?.url ?: ""
-            )
-        }
-    }
+        val termsAndConditions = getTermsAndConditions(trial.type.toContractType(), null, trial.fromDate, trial.partner)
 
-    fun getAvyContractType(type: TrialType): TypeOfContract? = try {
-        if (type == TrialType.SE_APARTMENT_RENT)
-            TypeOfContract.valueOf("${type}_PARTNER_AVY")
-        else
-            TypeOfContract.valueOf(type.name)
-    } catch (e: IllegalArgumentException) {
-        null
+        return ExtendedInsuranceInfo(
+            isTrial = true,
+            insuranceStatus = InsuranceStatus.ACTIVE,
+            insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
+            inceptionDate = trial.fromDate,
+            paymentConnected = directDebitStatus?.directDebitActivated ?: false,
+            terminationDate = trial.toDate,
+            paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
+            certificateUrl = null,
+            numberCoInsured = null,
+            insuranceAddress = InsuranceAddress(
+                trial.address.street,
+                trial.address.zipCode
+            ),
+            squareMeters = trial.address.livingSpace?.toLong(),
+            termsAndConditions = termsAndConditions?.url ?: ""
+        )
     }
 
     fun getExtendedInsuranceInfoFromContract(memberId: String): ExtendedInsuranceInfo? {
-        val member = memberService.getMember(memberId)
-        val contract = getCurrentContract(memberId)
-        return (member to contract).let2 { m, c ->
-            val currentAgreement =
-                c.genericAgreements.find { agreement -> agreement.id == c.currentAgreementId }!!
-            val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
+        val contract = getCurrentContract(memberId) ?: return null
+        val agreement =
+            contract.genericAgreements.find { agreement -> agreement.id == contract.currentAgreementId }!!
+        val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
 
-            val termsAndConditions =
-                Triple(m.acceptLanguage, m.country, currentAgreement.fromDate)
-                    .let3 { lang, country, date ->
-                        productPricingService.getTermsAndConditions(c.typeOfContract, Locale(lang, country), date)
-                    }
+        val termsAndConditions =
+            getTermsAndConditions(contract.typeOfContract, null, agreement.fromDate, agreement.partner)
 
-            ExtendedInsuranceInfo(
-                isTrial = false,
-                insuranceStatus = InsuranceStatus.fromContractStatus(c.status),
-                insurancePremium = currentAgreement.basePremium,
-                inceptionDate = c.masterInception,
-                terminationDate = c.terminationDate,
-                paymentConnected = directDebitStatus?.directDebitActivated ?: false,
-                paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
-                certificateUrl = currentAgreement.certificateUrl,
-                numberCoInsured = currentAgreement.numberCoInsured,
-                insuranceAddress = currentAgreement.address?.let { InsuranceAddress(it.street, it.postalCode) },
-                squareMeters = currentAgreement.squareMeters,
-                termsAndConditions = termsAndConditions?.url ?: ""
-            )
+        return ExtendedInsuranceInfo(
+            isTrial = false,
+            insuranceStatus = InsuranceStatus.fromContractStatus(contract.status),
+            insurancePremium = agreement.basePremium,
+            inceptionDate = contract.masterInception,
+            terminationDate = contract.terminationDate,
+            paymentConnected = directDebitStatus?.directDebitActivated ?: false,
+            paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
+            certificateUrl = agreement.certificateUrl,
+            numberCoInsured = agreement.numberCoInsured,
+            insuranceAddress = agreement.address?.let { InsuranceAddress(it.street, it.postalCode) },
+            squareMeters = agreement.squareMeters,
+            termsAndConditions = termsAndConditions?.url ?: ""
+        )
+    }
+
+    private fun getTermsAndConditions(
+        type: TypeOfContract,
+        language: String?,
+        date: LocalDate?,
+        partner: String?
+    ): TermsAndConditions? {
+        val countryCode = type.name.split("_").first()
+        val locale = Locale(language ?: "en", countryCode)
+        return if (date != null) {
+            productPricingService.getTermsAndConditions(type, locale, date, partner)
+        } else {
+            productPricingService.getLatestTermsAndConditions(type, locale, partner)
         }
     }
 

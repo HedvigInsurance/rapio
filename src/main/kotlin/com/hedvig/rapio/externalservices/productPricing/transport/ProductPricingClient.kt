@@ -32,9 +32,17 @@ interface ProductPricingClient {
     fun getTrialByMemberId(@RequestParam memberId: String) : ResponseEntity<List<TrialDto>>
 
     @GetMapping("/_/terms/{contractType}/{locale}/{date}")
-    fun getTermsAndConditionsForContractType(
+    fun getTermsAndConditions(
         @PathVariable contractType: TypeOfContract,
         @PathVariable locale: Locale,
-        @PathVariable date: LocalDate
+        @PathVariable date: LocalDate,
+        @RequestParam partner:String?
+    ): ResponseEntity<TermsAndConditions>
+
+    @GetMapping("/_/terms/{contractType}/{locale}/{date}")
+    fun getLatestTermsAndConditions(
+        @PathVariable contractType: TypeOfContract,
+        @PathVariable locale: Locale,
+        @RequestParam partner: String?
     ): ResponseEntity<TermsAndConditions>
 }
