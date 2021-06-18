@@ -266,10 +266,10 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
         )
         every {
             productPricingClient.getTermsAndConditions(
-                TypeOfContract.SE_APARTMENT_BRF,
-                Locale("sv", "SE"),
-                LocalDate.now(),
-                null
+                contractType = TypeOfContract.SE_APARTMENT_BRF,
+                locale = Locale("sv", "SE"),
+                date = LocalDate.now(),
+                partner = "HEDVIG"
             )
         } returns ResponseEntity.ok(
             TermsAndConditions(
@@ -303,7 +303,10 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
         )
         externalMemberRepository.save(ExternalMember(externalMemberId, memberId, Partner.HEDVIG))
 
-        val response = client.get("/v1/members/$externalMemberId/extended")
+        val response = client.get(
+            "/v1/members/$externalMemberId/extended",
+            headers = mapOf("Accept-Language" to "sv")
+        )
             .assert2xx()
             .body<Map<String, Any>>()
         assertThat(response["isTrial"]).isEqualTo(true)
@@ -383,7 +386,10 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
         )
         externalMemberRepository.save(ExternalMember(externalMemberId, memberId, Partner.HEDVIG))
 
-        val response = client.get("/v1/members/$externalMemberId/extended")
+        val response = client.get(
+            "/v1/members/$externalMemberId/extended",
+            headers = mapOf("Accept-Language" to "sv")
+        )
             .assert2xx()
             .body<Map<String, Any>>()
         assertThat(response["isTrial"]).isEqualTo(false)

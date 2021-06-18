@@ -67,16 +67,16 @@ class InsuranceInfoService(
         )
     }
 
-    fun getExtendedInsuranceInfo(memberId: String): ExtendedInsuranceInfo? {
-        return getExtendedInsuranceInfoFromContract(memberId)
-            ?: getExtendedInsuranceInfoFromTrial(memberId)
+    fun getExtendedInsuranceInfo(memberId: String, language: String?): ExtendedInsuranceInfo? {
+        return getExtendedInsuranceInfoFromContract(memberId, language)
+            ?: getExtendedInsuranceInfoFromTrial(memberId, language)
     }
 
-    private fun getExtendedInsuranceInfoFromTrial(memberId: String): ExtendedInsuranceInfo? {
+    private fun getExtendedInsuranceInfoFromTrial(memberId: String, language: String?): ExtendedInsuranceInfo? {
         val trial = productPricingService.getTrialForMemberId(memberId) ?: return null
         val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
 
-        val termsAndConditions = getTermsAndConditions(trial.type.toContractType(), null, trial.fromDate, trial.partner)
+        val termsAndConditions = getTermsAndConditions(trial.type.toContractType(), language, trial.fromDate, trial.partner)
 
         return ExtendedInsuranceInfo(
             isTrial = true,
@@ -97,14 +97,14 @@ class InsuranceInfoService(
         )
     }
 
-    fun getExtendedInsuranceInfoFromContract(memberId: String): ExtendedInsuranceInfo? {
+    fun getExtendedInsuranceInfoFromContract(memberId: String, language: String?): ExtendedInsuranceInfo? {
         val contract = getCurrentContract(memberId) ?: return null
         val agreement =
             contract.genericAgreements.find { agreement -> agreement.id == contract.currentAgreementId }!!
         val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
 
         val termsAndConditions =
-            getTermsAndConditions(contract.typeOfContract, null, agreement.fromDate, agreement.partner)
+            getTermsAndConditions(contract.typeOfContract, language, agreement.fromDate, agreement.partner)
 
         return ExtendedInsuranceInfo(
             isTrial = false,
