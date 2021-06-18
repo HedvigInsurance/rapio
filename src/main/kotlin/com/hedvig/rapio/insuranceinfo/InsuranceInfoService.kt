@@ -79,7 +79,7 @@ class InsuranceInfoService(
         val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
         return (member to trial).let2 { m, t ->
             val termsAndConditions =
-                Triple(getContractType(t.type.name), m.acceptLanguage, m.country)
+                Triple(getContractType("${t.type.name}_PARTNER_AVY"), m.acceptLanguage, m.country)
                     .let3 { type, lang, country ->
                         productPricingService.getTermsAndConditions(type, Locale(lang, country), t.fromDate)
                     }
