@@ -9,6 +9,7 @@ import com.hedvig.rapio.externalservices.memberService.dto.SimpleSignConnectionD
 import com.hedvig.rapio.externalservices.memberService.dto.UpdateMemberRequest
 import com.hedvig.rapio.externalservices.memberService.model.NewMemberInfo
 import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
+import com.hedvig.rapio.util.forbidden
 import com.hedvig.rapio.util.internalServerError
 import com.neovisionaries.i18n.CountryCode
 import java.time.LocalDate
@@ -49,6 +50,12 @@ class MemberService(
         fromDate: LocalDate,
         newMemberInfo: NewMemberInfo
     ): Long {
+        val personalNumberIsTaken = memberServiceClient.getIsMember(
+            IsMemberRequest(ssn = newMemberInfo.personalNumber)
+        ).bodyOrNull() ?: throw internalServerError()
+        if (personalNumberIsTaken) {
+            throw forbidden()
+        }
         val memberId = memberServiceClient.createMember(
             CreateMemberRequest(language, partner.toString())
         ).bodyOrNull()?.memberId ?: throw internalServerError()
