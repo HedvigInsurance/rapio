@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ContextConfiguration
 
@@ -34,6 +35,7 @@ class MembersControllerTest : IntegrationTest() {
     fun `Can create trial insurance`() {
         val memberId = 1337L
 
+        every { memberServiceClient.getIsMember(IsMemberRequest(ssn = "191212121212")) } returns ResponseEntity.ok(false)
         every { memberServiceClient.createMember(any()) } returns ResponseEntity.ok(
             CreateMemberResponse(memberId = memberId)
         )
@@ -68,12 +70,42 @@ class MembersControllerTest : IntegrationTest() {
                 "birthDate" to "1900-01-01"
             ),
             headers = mapOf(
-                "Content-Type" to "Application/json",
                 "Accept-Language" to "en"
             )
         ).assert2xx()
 
         assertThat(result.body<Map<String, Any>>()["memberId"]).isNotNull
+    }
+
+    @Test
+    fun `Cannot create trial insurance if member service says the SSN is taken`() {
+        every { memberServiceClient.getIsMember(IsMemberRequest(ssn = "191212121212")) } returns ResponseEntity.ok(true)
+
+        client.post(
+            uri = "/v1/members/trial",
+            body = mapOf(
+                "personalNumber" to "191212121212",
+                "firstName" to "Testy",
+                "lastName" to "Tester",
+                "email" to "test@example.com",
+                "countryCode" to "SE",
+                "phoneNumber" to "08-8888",
+                "address" to mapOf(
+                    "street" to "testgatan",
+                    "zipCode" to "12345",
+                    "city" to "Stockholm",
+                    "livingSpace" to 40,
+                    "apartmentNo" to "1",
+                    "floor" to 2
+                ),
+                "fromDate" to "2021-04-04",
+                "type" to "SE_APARTMENT_BRF",
+                "birthDate" to "1900-01-01"
+            ),
+            headers = mapOf(
+                "Accept-Language" to "en"
+            )
+        ).assertStatus(HttpStatus.FORBIDDEN)
     }
 
     @Test
