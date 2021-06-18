@@ -2,6 +2,7 @@ package com.hedvig.rapio.insuranceinfo
 
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
 import com.hedvig.rapio.externalservices.memberService.MemberService
+import com.hedvig.rapio.externalservices.memberService.model.TrialType
 import com.hedvig.rapio.externalservices.paymentService.PaymentService
 import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatus
 import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
@@ -79,7 +80,7 @@ class InsuranceInfoService(
         val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
         return (member to trial).let2 { m, t ->
             val termsAndConditions =
-                Triple(getContractType("${t.type.name}_PARTNER_AVY"), m.acceptLanguage, m.country)
+                Triple(getAvyContractType(t.type), m.acceptLanguage, m.country)
                     .let3 { type, lang, country ->
                         productPricingService.getTermsAndConditions(type, Locale(lang, country), t.fromDate)
                     }
@@ -104,8 +105,11 @@ class InsuranceInfoService(
         }
     }
 
-    fun getContractType(type: String): TypeOfContract? = try {
-        TypeOfContract.valueOf(type)
+    fun getAvyContractType(type: TrialType): TypeOfContract? = try {
+        if (type == TrialType.SE_APARTMENT_RENT)
+            TypeOfContract.valueOf("${type}_PARTNER_AVY")
+        else
+            TypeOfContract.valueOf(type.name)
     } catch (e: IllegalArgumentException) {
         null
     }
