@@ -36,7 +36,7 @@ interface ProductPricingClient {
         @PathVariable contractType: TypeOfContract,
         @PathVariable locale: Locale,
         @PathVariable date: LocalDate,
-        @RequestParam partner:String?
+        @RequestParam partner: String?
     ): ResponseEntity<TermsAndConditions>
 
     @GetMapping("/_/terms/{contractType}/{locale}/{date}")
