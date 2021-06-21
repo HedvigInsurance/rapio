@@ -13,11 +13,11 @@ import com.hedvig.rapio.externalservices.productPricing.transport.toInsuranceSta
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceAddress
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
+import org.javamoney.moneta.Money
+import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.Locale
-import org.javamoney.moneta.Money
-import org.springframework.stereotype.Service
 
 @Service
 class InsuranceInfoService(
@@ -90,8 +90,8 @@ class InsuranceInfoService(
             certificateUrl = trial.certificateUrl,
             numberCoInsured = null,
             insuranceAddress = InsuranceAddress(
-                street =trial.address.street,
-                postalCode =trial.address.zipCode
+                street = trial.address.street,
+                postalCode = trial.address.zipCode
             ),
             squareMeters = trial.address.livingSpace?.toLong(),
             termsAndConditions = termsAndConditions?.url ?: ""
