@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
+import java.util.Locale
 import java.util.UUID
 
 internal class InsuranceInfoControllerTest : IntegrationTest() {
@@ -297,7 +298,7 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
                         apartmentNo = null,
                         floor = null
                     ),
-                    partner = Partner.AVY.name,
+                    partner = Partner.HEDVIG.name,
                     certificateUrl = "url",
                     status = TrialStatus.TERMINATED_IN_FUTURE,
                     createdAt = Instant.now()
@@ -421,5 +422,4 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
         assertThat(response["squareMeters"]).isEqualTo(40)
         assertThat(response["termsAndConditions"]).isEqualTo("www.hedvig.com/sv_SE-terms.pdf")
     }
-
 }
