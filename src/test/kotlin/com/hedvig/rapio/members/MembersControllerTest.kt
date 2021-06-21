@@ -1,6 +1,5 @@
 package com.hedvig.rapio.members
 
-import com.hedvig.rapio.helpers.TestHttpClient
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.apikeys.Role
 import com.hedvig.rapio.external.ExternalMember
@@ -10,16 +9,15 @@ import com.hedvig.rapio.externalservices.memberService.dto.CreateUserResponse
 import com.hedvig.rapio.externalservices.memberService.dto.IsMemberRequest
 import com.hedvig.rapio.helpers.IntegrationTest
 import io.mockk.every
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ContextConfiguration
+import java.util.UUID
 
 @ContextConfiguration(classes = [MemberControllerTestUserConfiguration::class])
 class MembersControllerTest : IntegrationTest() {
@@ -134,7 +132,7 @@ class MembersControllerTest : IntegrationTest() {
 }
 
 @TestConfiguration
-private class MemberControllerTestUserConfiguration {
+class MemberControllerTestUserConfiguration {
 
     @Bean("insecureUserName")
     fun userName(): Partner = Partner.AVY

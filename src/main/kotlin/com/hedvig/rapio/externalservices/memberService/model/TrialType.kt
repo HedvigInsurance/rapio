@@ -11,7 +11,7 @@ enum class TrialType {
     SE_APARTMENT_RENT,
 
     @JsonProperty("SE_APARTMENT_BRF")
-    SE_APARTMENT_BRF
+    SE_APARTMENT_BRF,
 }
 
 fun TrialType.toContractType() = TypeOfContract.valueOf(name)

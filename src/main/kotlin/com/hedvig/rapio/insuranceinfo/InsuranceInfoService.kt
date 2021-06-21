@@ -9,6 +9,7 @@ import com.hedvig.rapio.externalservices.productPricing.ProductPricingService
 import com.hedvig.rapio.externalservices.productPricing.TermsAndConditions
 import com.hedvig.rapio.externalservices.productPricing.TypeOfContract
 import com.hedvig.rapio.externalservices.productPricing.transport.Contract
+import com.hedvig.rapio.externalservices.productPricing.transport.toInsuranceStatus
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceAddress
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
@@ -80,17 +81,17 @@ class InsuranceInfoService(
 
         return ExtendedInsuranceInfo(
             isTrial = true,
-            insuranceStatus = InsuranceStatus.ACTIVE,
+            insuranceStatus = trial.status.toInsuranceStatus(),
             insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
             inceptionDate = trial.fromDate,
             paymentConnected = directDebitStatus?.directDebitActivated ?: false,
             terminationDate = trial.toDate,
             paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
-            certificateUrl = null,
+            certificateUrl = trial.certificateUrl,
             numberCoInsured = null,
             insuranceAddress = InsuranceAddress(
-                trial.address.street,
-                trial.address.zipCode
+                street =trial.address.street,
+                postalCode =trial.address.zipCode
             ),
             squareMeters = trial.address.livingSpace?.toLong(),
             termsAndConditions = termsAndConditions?.url ?: ""

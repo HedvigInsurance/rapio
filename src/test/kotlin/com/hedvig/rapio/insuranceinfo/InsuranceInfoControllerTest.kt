@@ -14,13 +14,9 @@ import com.hedvig.rapio.externalservices.productPricing.transport.Contract
 import com.hedvig.rapio.externalservices.productPricing.transport.ContractStatus
 import com.hedvig.rapio.externalservices.productPricing.transport.GenericAgreement
 import com.hedvig.rapio.externalservices.productPricing.transport.TrialDto
+import com.hedvig.rapio.externalservices.productPricing.transport.TrialDto.TrialStatus
 import com.hedvig.rapio.helpers.IntegrationTest
 import io.mockk.every
-import java.math.BigDecimal
-import java.time.Instant
-import java.time.LocalDate
-import java.util.Locale
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.javamoney.moneta.Money
 import org.junit.jupiter.api.AfterEach
@@ -28,6 +24,10 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import java.math.BigDecimal
+import java.time.Instant
+import java.time.LocalDate
+import java.util.UUID
 
 internal class InsuranceInfoControllerTest : IntegrationTest() {
 
@@ -128,7 +128,7 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
             ExternalMember(
                 id = externalMemberId,
                 memberId = memberId,
-                partner = Partner.HEDVIG
+                partner = Partner.AVY
             )
         )
 
@@ -199,7 +199,7 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
 
         every { productPricingClient.getContractsByMemberId(memberId) } returns ResponseEntity.ok(emptyList())
         every { productPricingClient.getTrialByMemberId(memberId) } returns ResponseEntity.ok(emptyList())
-        externalMemberRepository.save(ExternalMember(externalMemberId, memberId, Partner.HEDVIG))
+        externalMemberRepository.save(ExternalMember(externalMemberId, memberId, Partner.AVY))
 
         val response = client.post("/v1/members/$memberId/to-external-member-id")
             .assert2xx()
@@ -228,14 +228,17 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
                         apartmentNo = null,
                         floor = null
                     ),
-                    partner = Partner.HEDVIG.name
+                    partner = Partner.AVY.name,
+                    certificateUrl = "url",
+                    status = TrialStatus.TERMINATED_IN_FUTURE,
+                    createdAt = Instant.now()
                 )
             )
         )
         every { paymentServiceClient.getDirectDebitStatusByMemberId(memberId) } returns ResponseEntity.ok(
             DirectDebitStatusDTO(memberId, true, DirectDebitStatus.ACTIVATED)
         )
-        externalMemberRepository.save(ExternalMember(externalMemberId, memberId, Partner.HEDVIG))
+        externalMemberRepository.save(ExternalMember(externalMemberId, memberId, Partner.AVY))
 
         val response = client.get("/v1/members/$externalMemberId")
             .assert2xx()
@@ -294,14 +297,17 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
                         apartmentNo = null,
                         floor = null
                     ),
-                    partner = Partner.HEDVIG.name
+                    partner = Partner.AVY.name,
+                    certificateUrl = "url",
+                    status = TrialStatus.TERMINATED_IN_FUTURE,
+                    createdAt = Instant.now()
                 )
             )
         )
         every { paymentServiceClient.getDirectDebitStatusByMemberId(memberId) } returns ResponseEntity.ok(
             DirectDebitStatusDTO(memberId, true, DirectDebitStatus.ACTIVATED)
         )
-        externalMemberRepository.save(ExternalMember(externalMemberId, memberId, Partner.HEDVIG))
+        externalMemberRepository.save(ExternalMember(externalMemberId, memberId, Partner.AVY))
 
         val response = client.get(
             "/v1/members/$externalMemberId/extended",
@@ -311,12 +317,17 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
             .body<Map<String, Any>>()
         assertThat(response["isTrial"]).isEqualTo(true)
         assertThat(response["insuranceStatus"]).isEqualTo(InsuranceStatus.ACTIVE.name)
-        assertThat(response["insurancePremium"]).isEqualTo(mapOf("amount" to "0.00", "currency" to "SEK"))
+        assertThat(response["insurancePremium"]).isEqualTo(
+            mapOf(
+                "amount" to "0.00",
+                "currency" to "SEK"
+            )
+        )
         assertThat(response["inceptionDate"]).isEqualTo(LocalDate.now().toString())
         assertThat(response["terminationDate"]).isEqualTo(LocalDate.now().plusDays(30).toString())
         assertThat(response["paymentConnected"]).isEqualTo(true)
         assertThat(response["paymentConnectionStatus"]).isEqualTo(DirectDebitStatus.ACTIVATED.toString())
-        assertThat(response["certificateUrl"]).isEqualTo(null)
+        assertThat(response["certificateUrl"]).isEqualTo("url")
         assertThat(response["numberCoInsured"]).isEqualTo(null)
         assertThat(response["insuranceAddress"]).isEqualToComparingFieldByField(
             mapOf(

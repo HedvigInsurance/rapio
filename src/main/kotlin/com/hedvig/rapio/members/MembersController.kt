@@ -10,10 +10,10 @@ import com.hedvig.rapio.insuranceinfo.dto.IsMemberResponse
 import com.hedvig.rapio.members.dto.CreateTrialMemberRequest
 import com.hedvig.rapio.members.dto.CreateTrialMemberResponse
 import com.hedvig.rapio.util.forbidden
+import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -32,12 +32,11 @@ class MembersController(
     @PostMapping("/trial")
     @Secured("ROLE_DISTRIBUTION")
     @LogCall
-    fun createMember(
+    fun createMemberTrial(
         @RequestHeader(value = "Accept-Language", required = true) acceptLanguage: String,
         @RequestBody body: CreateTrialMemberRequest
     ): ResponseEntity<CreateTrialMemberResponse> {
-        val currentUserName = SecurityContextHolder.getContext().authentication.name
-        val partner = Partner.valueOf(currentUserName)
+        val partner = getCurrentlyAuthenticatedPartner()
 
         if (partner != Partner.AVY) {
             throw forbidden()
