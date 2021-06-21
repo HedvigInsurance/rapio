@@ -7,17 +7,15 @@ import com.hedvig.rapio.externalservices.memberService.dto.CreateUserRequest
 import com.hedvig.rapio.externalservices.memberService.dto.IsMemberRequest
 import com.hedvig.rapio.externalservices.memberService.dto.SimpleSignConnectionDto
 import com.hedvig.rapio.externalservices.memberService.dto.UpdateMemberRequest
-import com.hedvig.rapio.externalservices.memberService.model.Member
 import com.hedvig.rapio.externalservices.memberService.model.NewMemberInfo
 import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
 import com.hedvig.rapio.util.forbidden
 import com.hedvig.rapio.util.internalServerError
 import com.neovisionaries.i18n.CountryCode
-import feign.FeignException
-import java.time.LocalDate
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class MemberService(
@@ -34,12 +32,13 @@ class MemberService(
         } catch (ex: Exception) {
             logger.error(
                 "Error from member service when checking member status for ${
-                    IsMemberRequest(
-                        memberId,
-                        ssn,
-                        email
-                    )
-                }.", ex
+                IsMemberRequest(
+                    memberId,
+                    ssn,
+                    email
+                )
+                }.",
+                ex
             )
         }
         return false
@@ -81,13 +80,6 @@ class MemberService(
         ).bodyOrNull() ?: throw internalServerError()
 
         return memberId
-    }
-
-    fun getMember(memberId: String): Member? = try {
-        memberServiceClient.getMember(memberId).body
-    } catch (e: FeignException) {
-        logger.error("Failed to get member with id: $memberId", e)
-        null
     }
 
     private fun NewMemberInfo.toTrialRequest(
