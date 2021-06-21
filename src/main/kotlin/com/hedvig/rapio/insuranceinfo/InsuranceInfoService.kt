@@ -6,14 +6,16 @@ import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitSta
 import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
 import com.hedvig.rapio.externalservices.productPricing.ProductPricingService
 import com.hedvig.rapio.externalservices.productPricing.transport.Contract
+import com.hedvig.rapio.externalservices.productPricing.transport.toInsuranceStatus
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceAddress
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
-import java.math.BigDecimal
 import org.javamoney.moneta.Money
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 
-const val dummyTermsAndConditions = "https://cdn.hedvig.com/info/se/sv/forsakringsvillkor-bostadsratt-2020-08.pdf" // TODO replace with real terms
+const val dummyTermsAndConditions =
+    "https://cdn.hedvig.com/info/se/sv/forsakringsvillkor-bostadsratt-2020-08.pdf" // TODO replace with real terms
 
 @Service
 class InsuranceInfoService(
@@ -75,17 +77,17 @@ class InsuranceInfoService(
         return trial?.let {
             ExtendedInsuranceInfo(
                 isTrial = true,
-                insuranceStatus = InsuranceStatus.ACTIVE,
+                insuranceStatus = trial.status.toInsuranceStatus(),
                 insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
                 inceptionDate = trial.fromDate,
                 paymentConnected = directDebitStatus?.directDebitActivated ?: false,
                 terminationDate = trial.toDate,
                 paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
-                certificateUrl = null,
+                certificateUrl = trial.certificateUrl,
                 numberCoInsured = null,
                 insuranceAddress = InsuranceAddress(
-                    trial.address.street,
-                    trial.address.zipCode
+                    street = trial.address.street,
+                    postalCode = trial.address.zipCode
                 ),
                 squareMeters = trial.address.livingSpace?.toLong(),
                 termsAndConditions = dummyTermsAndConditions

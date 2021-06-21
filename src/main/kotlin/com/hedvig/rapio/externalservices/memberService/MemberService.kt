@@ -86,12 +86,11 @@ class MemberService(
         fromDate: LocalDate,
         partner: Partner
     ) = CreateTrialRequest(
-        memberId.toString(),
-        fromDate,
-        fromDate.plusDays(30),
-        type,
-        partner,
-        CreateTrialRequest.Address(
+        memberId = memberId.toString(),
+        fromDate = fromDate,
+        type = type,
+        partner = partner,
+        address = CreateTrialRequest.Address(
             street = address.street,
             city = address.city,
             zipCode = address.zipCode,

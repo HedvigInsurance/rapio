@@ -7,7 +7,6 @@ import java.time.LocalDate
 data class CreateTrialRequest(
     val memberId: String,
     val fromDate: LocalDate,
-    val toDate: LocalDate,
     val type: TrialType,
     val partner: Partner,
     val address: Address
