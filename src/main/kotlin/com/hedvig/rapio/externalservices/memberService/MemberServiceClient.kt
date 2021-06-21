@@ -6,8 +6,10 @@ import com.hedvig.rapio.externalservices.memberService.dto.CreateUserRequest
 import com.hedvig.rapio.externalservices.memberService.dto.CreateUserResponse
 import com.hedvig.rapio.externalservices.memberService.dto.IsMemberRequest
 import com.hedvig.rapio.externalservices.memberService.dto.UpdateMemberRequest
+import com.hedvig.rapio.externalservices.memberService.model.Member
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -30,5 +32,8 @@ interface MemberServiceClient {
 
     @PostMapping("/_/user")
     fun createUser(@RequestBody user: CreateUserRequest): ResponseEntity<CreateUserResponse>
+
+    @GetMapping("/_/member/{memberId}")
+    fun getMember(@PathVariable memberId: String) : ResponseEntity<Member>
 
 }

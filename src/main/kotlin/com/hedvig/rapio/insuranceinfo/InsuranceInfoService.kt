@@ -1,10 +1,13 @@
 package com.hedvig.rapio.insuranceinfo
 
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
+import com.hedvig.rapio.externalservices.memberService.model.toContractType
 import com.hedvig.rapio.externalservices.paymentService.PaymentService
 import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatus
 import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
 import com.hedvig.rapio.externalservices.productPricing.ProductPricingService
+import com.hedvig.rapio.externalservices.productPricing.TermsAndConditions
+import com.hedvig.rapio.externalservices.productPricing.TypeOfContract
 import com.hedvig.rapio.externalservices.productPricing.transport.Contract
 import com.hedvig.rapio.externalservices.productPricing.transport.toInsuranceStatus
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
@@ -13,9 +16,8 @@ import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
 import org.javamoney.moneta.Money
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
-
-const val dummyTermsAndConditions =
-    "https://cdn.hedvig.com/info/se/sv/forsakringsvillkor-bostadsratt-2020-08.pdf" // TODO replace with real terms
+import java.time.LocalDate
+import java.util.Locale
 
 @Service
 class InsuranceInfoService(
@@ -66,55 +68,74 @@ class InsuranceInfoService(
         )
     }
 
-    fun getExtendedInsuranceInfo(memberId: String): ExtendedInsuranceInfo? {
-        return getExtendedInsuranceInfoFromContract(memberId)
-            ?: getExtendedInsuranceInfoFromTrial(memberId)
+    fun getExtendedInsuranceInfo(memberId: String, language: String?): ExtendedInsuranceInfo? {
+        return getExtendedInsuranceInfoFromContract(memberId, language)
+            ?: getExtendedInsuranceInfoFromTrial(memberId, language)
     }
 
-    private fun getExtendedInsuranceInfoFromTrial(memberId: String): ExtendedInsuranceInfo? {
-        val trial = productPricingService.getTrialForMemberId(memberId)
+    private fun getExtendedInsuranceInfoFromTrial(memberId: String, language: String?): ExtendedInsuranceInfo? {
+        val trial = productPricingService.getTrialForMemberId(memberId) ?: return null
         val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
-        return trial?.let {
-            ExtendedInsuranceInfo(
-                isTrial = true,
-                insuranceStatus = trial.status.toInsuranceStatus(),
-                insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
-                inceptionDate = trial.fromDate,
-                paymentConnected = directDebitStatus?.directDebitActivated ?: false,
-                terminationDate = trial.toDate,
-                paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
-                certificateUrl = trial.certificateUrl,
-                numberCoInsured = null,
-                insuranceAddress = InsuranceAddress(
-                    street = trial.address.street,
-                    postalCode = trial.address.zipCode
-                ),
-                squareMeters = trial.address.livingSpace?.toLong(),
-                termsAndConditions = dummyTermsAndConditions
-            )
-        }
+
+        val termsAndConditions = getTermsAndConditions(trial.type.toContractType(), language, trial.fromDate, trial.partner)
+
+        return ExtendedInsuranceInfo(
+            isTrial = true,
+            insuranceStatus = trial.status.toInsuranceStatus(),
+            insurancePremium = Money.of(BigDecimal.ZERO, "SEK"),
+            inceptionDate = trial.fromDate,
+            paymentConnected = directDebitStatus?.directDebitActivated ?: false,
+            terminationDate = trial.toDate,
+            paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
+            certificateUrl = trial.certificateUrl,
+            numberCoInsured = null,
+            insuranceAddress = InsuranceAddress(
+                street = trial.address.street,
+                postalCode = trial.address.zipCode
+            ),
+            squareMeters = trial.address.livingSpace?.toLong(),
+            termsAndConditions = termsAndConditions?.url ?: ""
+        )
     }
 
-    fun getExtendedInsuranceInfoFromContract(memberId: String): ExtendedInsuranceInfo? {
-        val currentContract = getCurrentContract(memberId) ?: return null
-        val currentAgreement =
-            currentContract.genericAgreements.find { agreement -> agreement.id == currentContract.currentAgreementId }!!
+    fun getExtendedInsuranceInfoFromContract(memberId: String, language: String?): ExtendedInsuranceInfo? {
+        val contract = getCurrentContract(memberId) ?: return null
+        val agreement =
+            contract.genericAgreements.find { agreement -> agreement.id == contract.currentAgreementId }!!
         val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
+
+        val termsAndConditions =
+            getTermsAndConditions(contract.typeOfContract, language, agreement.fromDate, agreement.partner)
 
         return ExtendedInsuranceInfo(
             isTrial = false,
-            insuranceStatus = InsuranceStatus.fromContractStatus(currentContract.status),
-            insurancePremium = currentAgreement.basePremium,
-            inceptionDate = currentContract.masterInception,
-            terminationDate = currentContract.terminationDate,
+            insuranceStatus = InsuranceStatus.fromContractStatus(contract.status),
+            insurancePremium = agreement.basePremium,
+            inceptionDate = contract.masterInception,
+            terminationDate = contract.terminationDate,
             paymentConnected = directDebitStatus?.directDebitActivated ?: false,
             paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
-            certificateUrl = currentAgreement.certificateUrl,
-            numberCoInsured = currentAgreement.numberCoInsured,
-            insuranceAddress = currentAgreement.address?.let { InsuranceAddress(it.street, it.postalCode) },
-            squareMeters = currentAgreement.squareMeters,
-            termsAndConditions = dummyTermsAndConditions
+            certificateUrl = agreement.certificateUrl,
+            numberCoInsured = agreement.numberCoInsured,
+            insuranceAddress = agreement.address?.let { InsuranceAddress(it.street, it.postalCode) },
+            squareMeters = agreement.squareMeters,
+            termsAndConditions = termsAndConditions?.url ?: ""
         )
+    }
+
+    private fun getTermsAndConditions(
+        type: TypeOfContract,
+        language: String?,
+        date: LocalDate?,
+        partner: String?
+    ): TermsAndConditions? {
+        val countryCode = type.name.split("_").first()
+        val locale = Locale(language ?: "en", countryCode)
+        return if (date != null) {
+            productPricingService.getTermsAndConditions(type, locale, date, partner)
+        } else {
+            productPricingService.getLatestTermsAndConditions(type, locale, partner)
+        }
     }
 
     fun getConnectDirectDebitUrl(memberId: String): String? {
