@@ -13,6 +13,8 @@ import com.hedvig.rapio.externalservices.productPricing.transport.toInsuranceSta
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceAddress
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
+import com.hedvig.rapio.util.internalServerError
+import mu.KotlinLogging
 import org.javamoney.moneta.Money
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -77,7 +79,12 @@ class InsuranceInfoService(
         val trial = productPricingService.getTrialForMemberId(memberId) ?: return null
         val directDebitStatus = paymentService.getDirectDebitStatus(memberId)
 
-        val termsAndConditions = getTermsAndConditions(trial.type.toContractType(), language, trial.fromDate, trial.partner)
+        val termsAndConditions =
+            getTermsAndConditions(trial.type.toContractType(), language, trial.fromDate, trial.partner)
+                ?: run {
+                    logger.error { "No terms found for input { type: ${trial.type.toContractType()}, language: $language, partner: ${trial.partner}}" }
+                    throw internalServerError()
+                }
 
         return ExtendedInsuranceInfo(
             isTrial = true,
@@ -94,7 +101,7 @@ class InsuranceInfoService(
                 postalCode = trial.address.zipCode
             ),
             squareMeters = trial.address.livingSpace?.toLong(),
-            termsAndConditions = termsAndConditions?.url ?: ""
+            termsAndConditions = termsAndConditions.url
         )
     }
 
@@ -106,6 +113,10 @@ class InsuranceInfoService(
 
         val termsAndConditions =
             getTermsAndConditions(contract.typeOfContract, language, agreement.fromDate, agreement.partner)
+                ?: run {
+                    logger.error { "No terms found for input { type: ${contract.typeOfContract}, language: $language, partner: ${agreement.partner}}" }
+                    throw internalServerError()
+                }
 
         return ExtendedInsuranceInfo(
             isTrial = false,
@@ -119,7 +130,7 @@ class InsuranceInfoService(
             numberCoInsured = agreement.numberCoInsured,
             insuranceAddress = agreement.address?.let { InsuranceAddress(it.street, it.postalCode) },
             squareMeters = agreement.squareMeters,
-            termsAndConditions = termsAndConditions?.url ?: ""
+            termsAndConditions = termsAndConditions.url
         )
     }
 
@@ -141,5 +152,9 @@ class InsuranceInfoService(
     fun getConnectDirectDebitUrl(memberId: String): String? {
         val contractMarket = productPricingService.getContractMarketInfo(memberId)?.market ?: return null
         return apiGateway.setupPaymentLink(memberId, contractMarket)
+    }
+
+    companion object {
+        private val logger = KotlinLogging.logger {}
     }
 }
