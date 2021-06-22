@@ -55,7 +55,7 @@ class MemberService(
             IsMemberRequest(ssn = newMemberInfo.personalNumber)
         ).bodyOrNull() ?: throw internalServerError()
         if (personalNumberIsTaken) {
-            throw forbidden()
+            throw forbidden("This personalNumber is occupied by another member.")
         }
         val memberId = memberServiceClient.createMember(
             CreateMemberRequest(language, partner.toString())

@@ -9,8 +9,8 @@ import com.hedvig.rapio.insuranceinfo.dto.IsMemberRequest
 import com.hedvig.rapio.insuranceinfo.dto.IsMemberResponse
 import com.hedvig.rapio.members.dto.CreateTrialMemberRequest
 import com.hedvig.rapio.members.dto.CreateTrialMemberResponse
-import com.hedvig.rapio.util.forbidden
 import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
+import com.hedvig.rapio.util.unauthorized
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
@@ -39,7 +39,7 @@ class MembersController(
         val partner = getCurrentlyAuthenticatedPartner()
 
         if (partner != Partner.AVY) {
-            throw forbidden()
+            throw unauthorized("This endpoint is restricted.")
         }
 
         val memberId = memberService.createMemberWithTrialInsurance(

@@ -87,11 +87,11 @@ class RestExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler
     fun handle(e: HttpServerErrorException): ResponseEntity<ExternalErrorResponseDTO> {
-        return ResponseEntity.status(e.statusCode).body(ExternalErrorResponseDTO(e.message ?: ""))
+        return ResponseEntity.status(e.statusCode).body(ExternalErrorResponseDTO(e.responseBodyAsString))
     }
 
     @ExceptionHandler(MissingRequestHeaderException::class)
     fun handle(e: MissingRequestHeaderException): ResponseEntity<ExternalErrorResponseDTO> {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExternalErrorResponseDTO(e.message ?: ""))
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExternalErrorResponseDTO(e.message))
     }
 }
