@@ -2,12 +2,13 @@ package com.hedvig.rapio.insuranceinfo
 
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
 import com.hedvig.rapio.externalservices.paymentService.PaymentService
-import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatus
+import com.hedvig.rapio.externalservices.paymentService.transport.toInfo
 import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
 import com.hedvig.rapio.externalservices.productPricing.ProductPricingService
 import com.hedvig.rapio.externalservices.productPricing.transport.Contract
 import com.hedvig.rapio.externalservices.productPricing.transport.toInsuranceStatus
 import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
+import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo.DirectDebitStatusInfo
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceAddress
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
 import org.javamoney.moneta.Money
@@ -82,7 +83,8 @@ class InsuranceInfoService(
                 inceptionDate = trial.fromDate,
                 paymentConnected = directDebitStatus?.directDebitActivated ?: false,
                 terminationDate = trial.toDate,
-                paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
+                paymentConnectionStatus = directDebitStatus?.directDebitStatus?.toInfo()
+                    ?: DirectDebitStatusInfo.NEEDS_SETUP,
                 certificateUrl = trial.certificateUrl,
                 numberCoInsured = null,
                 insuranceAddress = InsuranceAddress(
@@ -108,7 +110,8 @@ class InsuranceInfoService(
             inceptionDate = currentContract.masterInception,
             terminationDate = currentContract.terminationDate,
             paymentConnected = directDebitStatus?.directDebitActivated ?: false,
-            paymentConnectionStatus = directDebitStatus?.directDebitStatus ?: DirectDebitStatus.NEEDS_SETUP,
+            paymentConnectionStatus = directDebitStatus?.directDebitStatus?.toInfo()
+                ?: DirectDebitStatusInfo.NEEDS_SETUP,
             certificateUrl = currentAgreement.certificateUrl,
             numberCoInsured = currentAgreement.numberCoInsured,
             insuranceAddress = currentAgreement.address?.let { InsuranceAddress(it.street, it.postalCode) },

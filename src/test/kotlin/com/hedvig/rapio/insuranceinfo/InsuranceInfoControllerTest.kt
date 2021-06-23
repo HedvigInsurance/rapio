@@ -6,7 +6,6 @@ import com.hedvig.rapio.external.ExternalMemberRepository
 import com.hedvig.rapio.externalservices.memberService.model.TrialType
 import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatus
 import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatusDTO
-import com.hedvig.rapio.externalservices.productPricing.InsuranceStatus
 import com.hedvig.rapio.externalservices.productPricing.transport.Contract
 import com.hedvig.rapio.externalservices.productPricing.transport.ContractStatus
 import com.hedvig.rapio.externalservices.productPricing.transport.GenericAgreement
@@ -76,7 +75,7 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
             )
         )
         every { paymentServiceClient.getDirectDebitStatusByMemberId(memberId) } returns ResponseEntity.ok(
-            DirectDebitStatusDTO(memberId, true, DirectDebitStatus.ACTIVATED)
+            DirectDebitStatusDTO(memberId, true, DirectDebitStatus.ACTIVE)
         )
         val response = client.get("/v1/members/$memberId").assert2xx().body<Map<String, Any>>()
         assertThat(response["memberId"]).isEqualTo(memberId)
@@ -114,7 +113,7 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
         )
 
         every { paymentServiceClient.getDirectDebitStatusByMemberId(memberId) } returns ResponseEntity.ok(
-            DirectDebitStatusDTO(memberId, true, DirectDebitStatus.ACTIVATED)
+            DirectDebitStatusDTO(memberId, true, DirectDebitStatus.ACTIVE)
         )
 
         externalMemberRepository.save(
@@ -165,7 +164,7 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
         )
 
         every { paymentServiceClient.getDirectDebitStatusByMemberId(memberId) } returns ResponseEntity.ok(
-            DirectDebitStatusDTO(memberId, true, DirectDebitStatus.ACTIVATED)
+            DirectDebitStatusDTO(memberId, true, DirectDebitStatus.ACTIVE)
         )
 
         val response = client.post("/v1/members/$memberId/to-external-member-id")
@@ -227,7 +226,7 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
             )
         )
         every { paymentServiceClient.getDirectDebitStatusByMemberId(memberId) } returns ResponseEntity.ok(
-            DirectDebitStatusDTO(memberId, true, DirectDebitStatus.ACTIVATED)
+            DirectDebitStatusDTO(memberId, true, DirectDebitStatus.ACTIVE)
         )
         externalMemberRepository.save(ExternalMember(externalMemberId, memberId, Partner.AVY))
 
@@ -235,7 +234,7 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
             .assert2xx()
             .body<Map<String, Any>>()
         assertThat(response["memberId"]).isEqualTo(memberId)
-        assertThat(response["insuranceStatus"]).isEqualTo(InsuranceStatus.ACTIVE.name)
+        assertThat(response["insuranceStatus"]).isEqualTo("ACTIVE")
         assertThat(response["insurancePremium"]).isEqualToComparingFieldByField(
             mapOf(
                 "amount" to "0.00",
@@ -275,7 +274,7 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
             )
         )
         every { paymentServiceClient.getDirectDebitStatusByMemberId(memberId) } returns ResponseEntity.ok(
-            DirectDebitStatusDTO(memberId, true, DirectDebitStatus.ACTIVATED)
+            DirectDebitStatusDTO(memberId, true, DirectDebitStatus.ACTIVE)
         )
         externalMemberRepository.save(ExternalMember(externalMemberId, memberId, Partner.AVY))
 
@@ -283,7 +282,7 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
             .assert2xx()
             .body<Map<String, Any>>()
         assertThat(response["isTrial"]).isEqualTo(true)
-        assertThat(response["insuranceStatus"]).isEqualTo(InsuranceStatus.ACTIVE.name)
+        assertThat(response["insuranceStatus"]).isEqualTo("ACTIVE")
         assertThat(response["insurancePremium"]).isEqualTo(
             mapOf(
                 "amount" to "0.00",
@@ -293,7 +292,7 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
         assertThat(response["inceptionDate"]).isEqualTo(LocalDate.now().toString())
         assertThat(response["terminationDate"]).isEqualTo(LocalDate.now().plusDays(30).toString())
         assertThat(response["paymentConnected"]).isEqualTo(true)
-        assertThat(response["paymentConnectionStatus"]).isEqualTo(DirectDebitStatus.ACTIVATED.toString())
+        assertThat(response["paymentConnectionStatus"]).isEqualTo("ACTIVATED")
         assertThat(response["certificateUrl"]).isEqualTo("url")
         assertThat(response["numberCoInsured"]).isEqualTo(null)
         assertThat(response["insuranceAddress"]).isEqualToComparingFieldByField(
