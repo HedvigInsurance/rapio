@@ -8,14 +8,15 @@ import com.hedvig.rapio.insuranceinfo.dto.ExtendedInsuranceInfo
 import com.hedvig.rapio.insuranceinfo.dto.ExternalMemberId
 import com.hedvig.rapio.insuranceinfo.dto.InsuranceInfo
 import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
+import java.util.UUID
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping("v1/members")
@@ -46,11 +47,12 @@ class InsuranceInfoController(
     @Secured("ROLE_DISTRIBUTION")
     @LogCall
     fun getExtendedInsuranceInfo(
+        @RequestHeader(value = "Accept-Language", required = false) acceptLanguage: String?,
         @PathVariable externalMemberId: UUID
     ): ResponseEntity<ExtendedInsuranceInfo> {
         val memberId = externalMemberService.getMemberIdByExternalMemberId(externalMemberId)
             ?: return ResponseEntity.notFound().build()
-        return when (val insuranceInfo = insuranceInfoService.getExtendedInsuranceInfo(memberId)) {
+        return when (val insuranceInfo = insuranceInfoService.getExtendedInsuranceInfo(memberId, acceptLanguage)) {
             null -> ResponseEntity.notFound().build()
             else -> ResponseEntity.ok(insuranceInfo)
         }

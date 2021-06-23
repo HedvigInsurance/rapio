@@ -12,7 +12,8 @@ data class GenericAgreement(
     val certificateUrl: String?,
     val address: Address?,
     val numberCoInsured: Int?,
-    val squareMeters: Long?
+    val squareMeters: Long?,
+    val partner: String?
 ) {
     data class Address(
         val street: String,
