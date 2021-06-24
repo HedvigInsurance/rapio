@@ -2,6 +2,7 @@ package com.hedvig.rapio.externalservices.apigateway
 
 import com.hedvig.rapio.externalservices.apigateway.transport.ApiGatewayClient
 import com.hedvig.rapio.externalservices.apigateway.transport.CreateSetupPaymentLinkRequestDto
+import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
 import com.neovisionaries.i18n.CountryCode
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -23,9 +24,12 @@ class ApiGateway(
                     throw RuntimeException("Unknown market: $market")
             }
 
+            val partner = getCurrentlyAuthenticatedPartner()
+
             val response = apiGatewayClient.setupPaymentLink(
-                token,
-                CreateSetupPaymentLinkRequestDto(memberId, countryCode)
+                token = token,
+                dto = CreateSetupPaymentLinkRequestDto(memberId, countryCode),
+                variation = partner.setupPaymentLinkVariation
             )
             response.body!!.url
         } catch (e: Exception) {
