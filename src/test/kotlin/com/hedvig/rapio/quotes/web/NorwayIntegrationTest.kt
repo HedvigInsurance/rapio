@@ -207,7 +207,8 @@ class NorwayIntegrationTest {
         every {
             apiGatewayClient.setupPaymentLink(
                 capture(agSetupPaymentLinkRequest1),
-                capture(agSetupPaymentLinkRequest2)
+                capture(agSetupPaymentLinkRequest2),
+                null
             )
         } returns ResponseEntity.ok(CreateSetupPaymentLinkResponseDto("payment-link"))
 
