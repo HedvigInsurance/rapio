@@ -1,6 +1,6 @@
 package com.hedvig.rapio.apikeys
 
-enum class Partner(val role: Role) {
+enum class Partner(val role: Role, val setupPaymentLinkVariation: String? = null) {
     INSPLANET(role = Role.COMPARISON),
     COMPRICER(role = Role.COMPARISON),
     HEDVIG(role = Role.COMPARISON),
@@ -8,7 +8,7 @@ enum class Partner(val role: Role) {
     KEYSOLUTIONS(role = Role.COMPARISON),
     SPIFF(role = Role.COMPARISON),
     TJENSTETORGET(role = Role.COMPARISON),
-    AVY(role = Role.DISTRIBUTION),
+    AVY(role = Role.DISTRIBUTION, setupPaymentLinkVariation = "avy"),
     FORSIKRINGSPORTALEN(role = Role.COMPARISON),
     SAMLINO(role = Role.COMPARISON),
     FINDFORSIKRING(role = Role.COMPARISON),
