@@ -48,7 +48,8 @@ internal class InsuranceCompaniesControllerTest {
         )
 
         result.andExpect(
-            status().is2xxSuccessful)
+            status().is2xxSuccessful
+        )
             .andExpect(jsonPath("$[0].id", Matchers.`is`("if")))
             .andExpect(jsonPath("$[1].id", Matchers.`is`("trygg-hansa")))
     }
