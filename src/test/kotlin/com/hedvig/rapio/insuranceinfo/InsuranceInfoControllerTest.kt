@@ -3,7 +3,6 @@ package com.hedvig.rapio.insuranceinfo
 import com.hedvig.rapio.apikeys.Partner
 import com.hedvig.rapio.external.ExternalMember
 import com.hedvig.rapio.external.ExternalMemberRepository
-import com.hedvig.rapio.externalservices.memberService.model.Member
 import com.hedvig.rapio.externalservices.memberService.model.TrialType
 import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatus
 import com.hedvig.rapio.externalservices.paymentService.transport.DirectDebitStatusDTO
@@ -261,13 +260,6 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
         val externalMemberId = UUID.randomUUID()
         val memberId = "123456"
         every { productPricingClient.getContractsByMemberId(memberId) } returns ResponseEntity.ok(emptyList())
-        every { memberServiceClient.getMember(memberId) } returns ResponseEntity.ok(
-            Member(
-                memberId = memberId.toLong(),
-                country = "SE",
-                acceptLanguage = "sv"
-            )
-        )
         every {
             productPricingClient.getTermsAndConditions(
                 contractType = TypeOfContract.SE_APARTMENT_BRF,
@@ -370,13 +362,6 @@ internal class InsuranceInfoControllerTest : IntegrationTest() {
                     ),
                     createdAt = Instant.now()
                 )
-            )
-        )
-        every { memberServiceClient.getMember(memberId) } returns ResponseEntity.ok(
-            Member(
-                memberId = memberId.toLong(),
-                country = "SE",
-                acceptLanguage = "sv"
             )
         )
         every {
