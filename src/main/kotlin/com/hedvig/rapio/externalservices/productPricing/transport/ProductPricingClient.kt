@@ -5,6 +5,7 @@ import com.hedvig.rapio.externalservices.memberService.dto.CreateTrialResponse
 import com.hedvig.rapio.externalservices.productPricing.TermsAndConditions
 import com.hedvig.rapio.externalservices.productPricing.TypeOfContract
 import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -35,7 +36,7 @@ interface ProductPricingClient {
     fun getTermsAndConditions(
         @PathVariable contractType: TypeOfContract,
         @PathVariable locale: Locale,
-        @PathVariable date: LocalDate,
+        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate,
         @RequestParam partner: String?
     ): ResponseEntity<TermsAndConditions>
 
