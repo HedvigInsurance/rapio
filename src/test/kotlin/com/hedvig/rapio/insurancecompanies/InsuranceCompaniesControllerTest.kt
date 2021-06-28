@@ -17,7 +17,8 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(controllers = [InsuranceCompaniesController::class], secure = false)
 internal class InsuranceCompaniesControllerTest {
@@ -46,7 +47,8 @@ internal class InsuranceCompaniesControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
         )
 
-        result.andExpect(status().is2xxSuccessful)
+        result.andExpect(
+            status().is2xxSuccessful)
             .andExpect(jsonPath("$[0].id", Matchers.`is`("if")))
             .andExpect(jsonPath("$[1].id", Matchers.`is`("trygg-hansa")))
     }
