@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.hedvig.rapio.externalservices.apigateway.ApiGateway
 import com.hedvig.rapio.externalservices.memberService.MemberServiceClient
 import com.hedvig.rapio.externalservices.paymentService.PaymentService
-import com.hedvig.rapio.externalservices.paymentService.transport.PaymentServiceClient
 import com.hedvig.rapio.externalservices.productPricing.ProductPricingService
 import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
 import com.hedvig.rapio.externalservices.underwriter.transport.QuoteBundleRequestDto

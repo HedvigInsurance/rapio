@@ -30,5 +30,4 @@ interface MemberServiceClient {
 
     @PostMapping("/_/user")
     fun createUser(@RequestBody user: CreateUserRequest): ResponseEntity<CreateUserResponse>
-
 }

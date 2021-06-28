@@ -20,9 +20,9 @@ class QualityAssuranceController(
     ): ResponseEntity<Void> {
         val success = qualityAssuranceService.unsignMember(personalNumber = request.personalNumber)
         if (success) {
-          return ResponseEntity.noContent().build()
+            return ResponseEntity.noContent().build()
         } else {
-          return ResponseEntity.notFound().build()
+            return ResponseEntity.notFound().build()
         }
     }
 }

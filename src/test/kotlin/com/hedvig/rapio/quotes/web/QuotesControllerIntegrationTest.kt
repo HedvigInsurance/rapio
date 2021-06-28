@@ -6,7 +6,6 @@ import com.hedvig.rapio.external.ExternalMemberRepository
 import com.hedvig.rapio.externalservices.underwriter.transport.SignQuoteRequest
 import com.hedvig.rapio.externalservices.underwriter.transport.SignedQuoteResponseDto
 import com.hedvig.rapio.helpers.IntegrationTest
-import com.hedvig.rapio.helpers.TestHttpClient
 import io.mockk.CapturingSlot
 import io.mockk.every
 import io.mockk.slot

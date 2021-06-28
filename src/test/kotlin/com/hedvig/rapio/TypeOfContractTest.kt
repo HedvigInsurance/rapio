@@ -1,9 +1,9 @@
 package com.hedvig.rapio
 
 import com.hedvig.rapio.externalservices.productPricing.TypeOfContract
-import java.util.Locale
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.util.Locale
 
 class TypeOfContractTest {
 

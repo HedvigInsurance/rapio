@@ -2,7 +2,6 @@ package com.hedvig.rapio.externalservices.underwriter.transport
 
 import com.hedvig.libs.logging.masking.Masked
 import java.time.LocalDate
-import java.time.ZoneId
 
 data class SignQuoteRequest(
     val name: Name?,
