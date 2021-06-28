@@ -7,12 +7,12 @@ import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricing
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import java.io.IOException
-import org.junit.jupiter.api.BeforeEach
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.http.ResponseEntity
+import java.io.IOException
 
 @ExtendWith(MockKExtension::class)
 class MemberServiceTest {

@@ -5,10 +5,10 @@ import com.hedvig.rapio.externalservices.productPricing.transport.ContractMarket
 import com.hedvig.rapio.externalservices.productPricing.transport.ProductPricingClient
 import com.hedvig.rapio.externalservices.productPricing.transport.TrialDto
 import feign.FeignException
-import java.time.LocalDate
-import java.util.Locale
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
+import java.time.LocalDate
+import java.util.Locale
 
 @Service
 class ProductPricingService(

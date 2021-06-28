@@ -6,7 +6,6 @@ import com.hedvig.rapio.external.ExternalMemberRepository
 import com.hedvig.rapio.externalservices.underwriter.transport.SignQuoteRequest
 import com.hedvig.rapio.externalservices.underwriter.transport.SignedQuoteResponseDto
 import com.hedvig.rapio.helpers.IntegrationTest
-import com.hedvig.rapio.helpers.TestHttpClient
 import io.mockk.CapturingSlot
 import io.mockk.every
 import io.mockk.slot
@@ -17,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 class QuotesControllerIntegrationTest : IntegrationTest() {
 

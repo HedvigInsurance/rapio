@@ -2,7 +2,6 @@ package com.hedvig.rapio.helpers
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import java.net.URI
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
 import org.apache.http.client.methods.HttpUriRequest
 import org.assertj.core.api.Assertions.assertThat
@@ -14,6 +13,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.stereotype.Component
+import java.net.URI
 
 @Component
 class TestHttpClient(
@@ -99,5 +99,4 @@ private class HttpGetRequestWithEntity(uri: URI) : HttpEntityEnclosingRequestBas
     }
 
     override fun getMethod(): String = HttpMethod.GET.name
-
 }

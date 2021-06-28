@@ -26,6 +26,3 @@ data class CreateTrialMemberRequest(
         val floor: Int?
     )
 }
-
-
-

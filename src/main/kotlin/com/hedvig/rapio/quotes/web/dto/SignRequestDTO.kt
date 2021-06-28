@@ -3,7 +3,7 @@ package com.hedvig.rapio.quotes.web.dto
 import com.hedvig.libs.logging.masking.Masked
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.*
+import java.util.UUID
 import javax.validation.Valid
 import javax.validation.constraints.Email
 import javax.validation.constraints.FutureOrPresent

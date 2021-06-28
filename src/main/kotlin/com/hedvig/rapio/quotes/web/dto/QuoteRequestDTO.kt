@@ -6,7 +6,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.libs.logging.masking.Masked
 import com.hedvig.rapio.externalservices.underwriter.transport.ExtraBuildingRequestDto
 import javax.validation.Valid
-import javax.validation.constraints.*
+import javax.validation.constraints.Max
+import javax.validation.constraints.Min
+import javax.validation.constraints.NotBlank
+import javax.validation.constraints.Pattern
 
 @optics
 data class QuoteRequestDTO(

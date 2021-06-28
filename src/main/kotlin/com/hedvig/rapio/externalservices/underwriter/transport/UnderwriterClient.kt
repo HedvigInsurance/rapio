@@ -24,5 +24,5 @@ interface UnderwriterClient {
     fun signQuoteBundle(@RequestBody body: SignQuoteBundleRequest): ResponseEntity<SignedQuoteBundleResponseDto>
 
     @GetMapping("/insurance-companies")
-    fun getInsuranceCompanies(@RequestParam countryCode: CountryCode) : ResponseEntity<List<InsuranceCompanyDto>>
+    fun getInsuranceCompanies(@RequestParam countryCode: CountryCode): ResponseEntity<List<InsuranceCompanyDto>>
 }
