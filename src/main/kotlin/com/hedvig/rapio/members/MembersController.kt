@@ -11,7 +11,6 @@ import com.hedvig.rapio.members.dto.CreateTrialMemberRequest
 import com.hedvig.rapio.members.dto.CreateTrialMemberResponse
 import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
 import com.hedvig.rapio.util.unauthorized
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.GetMapping
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("v1/members")
-@ConditionalOnProperty("hedvig.new-avy-api.enabled", havingValue = "true")
 class MembersController(
     val externalMemberService: ExternalMemberService,
     val memberService: MemberService
