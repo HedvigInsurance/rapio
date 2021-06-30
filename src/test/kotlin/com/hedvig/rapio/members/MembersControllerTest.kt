@@ -64,7 +64,7 @@ class MembersControllerTest : IntegrationTest() {
                     "apartmentNo" to "1",
                     "floor" to 2
                 ),
-                "fromDate" to LocalDate.now().toString(),
+                "fromDate" to LocalDate.now(),
                 "type" to "SE_APARTMENT_BRF",
                 "birthDate" to "1900-01-01"
             ),
@@ -97,7 +97,7 @@ class MembersControllerTest : IntegrationTest() {
                     "apartmentNo" to "1",
                     "floor" to 2
                 ),
-                "fromDate" to LocalDate.now().toString(),
+                "fromDate" to LocalDate.now(),
                 "type" to "SE_APARTMENT_BRF",
                 "birthDate" to "1900-01-01"
             ),
@@ -128,7 +128,7 @@ class MembersControllerTest : IntegrationTest() {
                     "apartmentNo" to "1",
                     "floor" to 2
                 ),
-                "fromDate" to LocalDate.now().minusYears(1).toString(),
+                "fromDate" to LocalDate.now().minusYears(1),
                 "type" to "SE_APARTMENT_BRF",
                 "birthDate" to "1900-01-01"
             ),
