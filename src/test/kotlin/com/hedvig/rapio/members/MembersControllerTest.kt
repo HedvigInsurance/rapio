@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ContextConfiguration
+import java.time.LocalDate
 import java.util.UUID
 
 @ContextConfiguration(classes = [MemberControllerTestUserConfiguration::class])
@@ -63,7 +64,7 @@ class MembersControllerTest : IntegrationTest() {
                     "apartmentNo" to "1",
                     "floor" to 2
                 ),
-                "fromDate" to "2021-04-04",
+                "fromDate" to LocalDate.now(),
                 "type" to "SE_APARTMENT_BRF",
                 "birthDate" to "1900-01-01"
             ),
@@ -96,7 +97,7 @@ class MembersControllerTest : IntegrationTest() {
                     "apartmentNo" to "1",
                     "floor" to 2
                 ),
-                "fromDate" to "2021-04-04",
+                "fromDate" to LocalDate.now(),
                 "type" to "SE_APARTMENT_BRF",
                 "birthDate" to "1900-01-01"
             ),
@@ -104,6 +105,37 @@ class MembersControllerTest : IntegrationTest() {
                 "Accept-Language" to "en"
             )
         ).assertStatus(HttpStatus.FORBIDDEN)
+    }
+
+    @Test
+    fun `Cannot create trial insurance if from date is in the past`() {
+        every { memberServiceClient.getIsMember(IsMemberRequest(ssn = "191212121212")) } returns ResponseEntity.ok(false)
+
+        client.post(
+            uri = "/v1/members/trial",
+            body = mapOf(
+                "personalNumber" to "191212121212",
+                "firstName" to "Testy",
+                "lastName" to "Tester",
+                "email" to "test@example.com",
+                "countryCode" to "SE",
+                "phoneNumber" to "08-8888",
+                "address" to mapOf(
+                    "street" to "testgatan",
+                    "zipCode" to "12345",
+                    "city" to "Stockholm",
+                    "livingSpace" to 40,
+                    "apartmentNo" to "1",
+                    "floor" to 2
+                ),
+                "fromDate" to LocalDate.now().minusYears(1),
+                "type" to "SE_APARTMENT_BRF",
+                "birthDate" to "1900-01-01"
+            ),
+            headers = mapOf(
+                "Accept-Language" to "en"
+            )
+        ).assertStatus(HttpStatus.BAD_REQUEST)
     }
 
     @Test
