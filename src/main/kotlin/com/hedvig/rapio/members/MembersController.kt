@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 
 @RestController
 @RequestMapping("v1/members")
@@ -34,6 +35,12 @@ class MembersController(
         @RequestHeader(value = "Accept-Language", required = true) acceptLanguage: String,
         @RequestBody body: CreateTrialMemberRequest
     ): ResponseEntity<CreateTrialMemberResponse> {
+        val trialEndDate = body.fromDate.plusDays(30)
+        val today = LocalDate.now()
+        require(!trialEndDate.isBefore(today)) {
+            return ResponseEntity.badRequest().build()
+        }
+
         val partner = getCurrentlyAuthenticatedPartner()
 
         if (partner != Partner.AVY) {
