@@ -23,3 +23,10 @@ fun unauthorized(message: String? = null) = HttpServerErrorException(
     message?.toByteArray(Charsets.UTF_8),
     Charsets.UTF_8
 )
+
+fun badRequest(message: String? = null) = HttpServerErrorException(
+    HttpStatus.BAD_REQUEST,
+    HttpStatus.BAD_REQUEST.reasonPhrase,
+    message?.toByteArray(Charsets.UTF_8),
+    Charsets.UTF_8
+)

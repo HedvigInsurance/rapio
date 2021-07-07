@@ -9,6 +9,7 @@ import com.hedvig.rapio.insuranceinfo.dto.IsMemberRequest
 import com.hedvig.rapio.insuranceinfo.dto.IsMemberResponse
 import com.hedvig.rapio.members.dto.CreateTrialMemberRequest
 import com.hedvig.rapio.members.dto.CreateTrialMemberResponse
+import com.hedvig.rapio.util.badRequest
 import com.hedvig.rapio.util.getCurrentlyAuthenticatedPartner
 import com.hedvig.rapio.util.unauthorized
 import org.springframework.http.ResponseEntity
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
+import org.springframework.web.client.HttpClientErrorException
 
 @RestController
 @RequestMapping("v1/members")
@@ -38,7 +40,7 @@ class MembersController(
         val trialEndDate = body.fromDate.plusDays(30)
         val today = LocalDate.now()
         require(!trialEndDate.isBefore(today)) {
-            return ResponseEntity.badRequest().build()
+            throw badRequest("Invalid fromDate: must not be more than 30 days ago")
         }
 
         val partner = getCurrentlyAuthenticatedPartner()
