@@ -2,6 +2,8 @@ package com.hedvig.rapio.exceptionhandler
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.rapio.comparison.web.dto.ExternalErrorResponseDTO
 import feign.FeignException
 import org.springframework.http.HttpHeaders
@@ -88,9 +90,11 @@ class RestExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler
     fun handle(e: FeignException): ResponseEntity<Any> {
+        val jsonContent = jacksonObjectMapper().readValue<MutableMap<String, Any>>(e.contentUTF8())
+        jsonContent.remove("path")
         return when {
             e.status() in 400..499 -> {
-                ResponseEntity(e.contentUTF8(), HttpStatus.valueOf(e.status()))
+                ResponseEntity(jsonContent, HttpStatus.valueOf(e.status()))
             }
             else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
         }
