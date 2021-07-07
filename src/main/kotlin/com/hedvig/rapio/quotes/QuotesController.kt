@@ -16,7 +16,6 @@ import com.hedvig.rapio.quotes.web.dto.QuoteRequestDTO
 import com.hedvig.rapio.quotes.web.dto.SignBundleRequestDTO
 import com.hedvig.rapio.quotes.web.dto.SignRequestDTO
 import com.hedvig.rapio.util.SwedishPersonalNumberValidator
-import com.hedvig.rapio.util.notAccepted
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
@@ -69,10 +68,7 @@ class QuotesController @Autowired constructor(
             is DanishAccidentQuoteRequestData -> request
         }
 
-        return@logRequestId quoteService.createQuote(requestData, partner).bimap(
-            { left -> notAccepted(left) },
-            { right -> ok(right) }
-        ).getOrHandle { it }
+        return@logRequestId ok(quoteService.createQuote(requestData, partner))
     }
 
     @PostMapping("/bundle")

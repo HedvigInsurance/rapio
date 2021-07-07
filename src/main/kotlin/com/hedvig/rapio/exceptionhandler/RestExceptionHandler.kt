@@ -3,6 +3,7 @@ package com.hedvig.rapio.exceptionhandler
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.hedvig.rapio.comparison.web.dto.ExternalErrorResponseDTO
+import feign.FeignException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -83,6 +84,16 @@ class RestExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler
     fun handle(e: Exception): ResponseEntity<ExternalErrorResponseDTO> {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ExternalErrorResponseDTO(e.message ?: ""))
+    }
+
+    @ExceptionHandler
+    fun handle(e: FeignException): ResponseEntity<Any> {
+        return when {
+            e.status() in 400..499 -> {
+                ResponseEntity(e.contentUTF8(), HttpStatus.valueOf(e.status()))
+            }
+            else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+        }
     }
 
     @ExceptionHandler

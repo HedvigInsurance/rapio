@@ -15,7 +15,7 @@ import java.util.UUID
 import javax.money.MonetaryAmount
 
 interface Underwriter {
-    fun createQuote(data: IncompleteQuoteDTO): Either<ErrorResponse, CompleteQuoteReference>
+    fun createQuote(data: IncompleteQuoteDTO): CompleteQuoteReference
     fun quoteBundle(request: QuoteBundleRequestDto): Either<ErrorResponse, QuoteBundleResponseDto>
     fun signQuote(
         id: String,

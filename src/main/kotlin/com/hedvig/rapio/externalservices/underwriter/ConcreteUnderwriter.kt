@@ -33,32 +33,15 @@ class ConcreteUnderwriter(
     private val client: UnderwriterClient,
     private val objectMapper: ObjectMapper
 ) : Underwriter {
-    override fun createQuote(data: IncompleteQuoteDTO): Either<ErrorResponse, CompleteQuoteReference> {
-        try {
-            val result = client.createQuote(data)
-            val body = result.body!!
+    override fun createQuote(data: IncompleteQuoteDTO): CompleteQuoteReference {
+        val result = client.createQuote(data)
+        val body = result.body!!
 
-            return Either.Right(
-                CompleteQuoteReference(
-                    id = body.id,
-                    price = Money.of(body.price, body.currency),
-                    validTo = Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
-                )
-            )
-        } catch (ex: FeignException) {
-            logger.warn { "Failed to create quote calling Underwriter: $ex" }
-
-            if (ex.status() == 422) {
-                val error = objectMapper.readValue<ErrorResponse>(ex.contentUTF8())
-                return Either.Left(error)
-            }
-
-            if (ex is FeignException.InternalServerError) {
-                return Either.Left(ErrorResponse(ErrorCodes.UNKNOWN_ERROR_CODE, "Underwriter error"))
-            }
-
-            throw ex
-        }
+        return CompleteQuoteReference(
+            id = body.id,
+            price = Money.of(body.price, body.currency),
+            validTo = Instant.now().atZone(ZoneId.of("Europe/Stockholm")).plusMonths(1).toInstant()
+        )
     }
 
     override fun quoteBundle(request: QuoteBundleRequestDto): Either<ErrorResponse, QuoteBundleResponseDto> {
@@ -89,7 +72,14 @@ class ConcreteUnderwriter(
         try {
             val response = this.client.signQuote(
                 id,
-                SignQuoteRequest(SignQuoteRequest.Name(firstName, lastName), ssn, startsAt, insuranceCompany, email, memberId)
+                SignQuoteRequest(
+                    SignQuoteRequest.Name(firstName, lastName),
+                    ssn,
+                    startsAt,
+                    insuranceCompany,
+                    email,
+                    memberId
+                )
             )
             return Either.right(response.body!!)
         } catch (ex: FeignException) {
