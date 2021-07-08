@@ -50,7 +50,7 @@ class QuoteServiceImpl(
     val apiGateway: ApiGateway
 ) : QuoteService {
 
-    override fun createQuote(requestDTO: QuoteRequestDTO, partner: Partner): Either<String, QuoteResponseDTO> {
+    override fun createQuote(requestDTO: QuoteRequestDTO, partner: Partner): QuoteResponseDTO {
         val quoteData = requestDTO.quoteData
 
         val requestQuoteData = when (quoteData) {
@@ -176,16 +176,11 @@ class QuoteServiceImpl(
 
         val completeQuote = underwriter.createQuote(request)
 
-        return completeQuote.bimap(
-            { it.errorMessage },
-            {
-                QuoteResponseDTO(
-                    requestDTO.requestId,
-                    it.id,
-                    it.validTo.epochSecond,
-                    it.price
-                )
-            }
+        return QuoteResponseDTO(
+            requestDTO.requestId,
+            completeQuote.id,
+            completeQuote.validTo.epochSecond,
+            completeQuote.price
         )
     }
 
@@ -234,7 +229,13 @@ class QuoteServiceImpl(
                 val completionUrlMaybe: String? = apiGateway.setupPaymentLink(response.memberId, response.market)
                 val partner = getCurrentlyAuthenticatedPartner()
                 val externalMember =
-                    member ?: externalMemberRepository.save(ExternalMember(UUID.randomUUID(), response.memberId, partner))
+                    member ?: externalMemberRepository.save(
+                        ExternalMember(
+                            UUID.randomUUID(),
+                            response.memberId,
+                            partner
+                        )
+                    )
 
                 SignResponseDTO(
                     requestId = request.requestId,
@@ -280,7 +281,13 @@ class QuoteServiceImpl(
                 val completionUrlMaybe: String? = apiGateway.setupPaymentLink(response.memberId, response.market)
                 val partner = getCurrentlyAuthenticatedPartner()
                 val externalMember =
-                    member ?: externalMemberRepository.save(ExternalMember(UUID.randomUUID(), response.memberId, partner))
+                    member ?: externalMemberRepository.save(
+                        ExternalMember(
+                            UUID.randomUUID(),
+                            response.memberId,
+                            partner
+                        )
+                    )
 
                 SignBundleResponseDTO(
                     requestId = request.requestId,

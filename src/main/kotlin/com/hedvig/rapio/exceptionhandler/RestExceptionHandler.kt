@@ -1,8 +1,11 @@
 package com.hedvig.rapio.exceptionhandler
 
 import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.rapio.comparison.web.dto.ExternalErrorResponseDTO
+import feign.FeignException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -17,9 +20,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
+import java.lang.reflect.InvocationTargetException
 
 @ControllerAdvice
-class RestExceptionHandler : ResponseEntityExceptionHandler() {
+class RestExceptionHandler(
+    private val mapper: ObjectMapper
+) : ResponseEntityExceptionHandler() {
 
     override fun handleHttpMessageNotReadable(
         e: HttpMessageNotReadableException,
@@ -83,6 +89,24 @@ class RestExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler
     fun handle(e: Exception): ResponseEntity<ExternalErrorResponseDTO> {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ExternalErrorResponseDTO(e.message ?: ""))
+    }
+
+    @ExceptionHandler(FeignException::class)
+    fun handle(e: FeignException): ResponseEntity<Any> {
+        val content = try {
+            val jsonContent = mapper.readValue<MutableMap<String, Any>>(e.contentUTF8())
+            jsonContent.apply {
+                remove("path")
+            }
+        } catch (parseException: Exception) {
+            e.contentUTF8()
+        }
+        return when {
+            e.status() in 400..499 -> {
+                ResponseEntity(content, HttpStatus.valueOf(e.status()))
+            }
+            else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+        }
     }
 
     @ExceptionHandler

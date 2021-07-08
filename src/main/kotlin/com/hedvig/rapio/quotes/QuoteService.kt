@@ -13,7 +13,7 @@ import com.hedvig.rapio.quotes.web.dto.SignResponseDTO
 import java.util.UUID
 
 interface QuoteService {
-    fun createQuote(requestDTO: QuoteRequestDTO, partner: Partner): Either<String, QuoteResponseDTO>
+    fun createQuote(requestDTO: QuoteRequestDTO, partner: Partner): QuoteResponseDTO
     fun bundleQuotes(request: BundleQuotesRequestDTO): Either<String, BundleQuotesResponseDTO>
     fun signQuote(quoteId: UUID, request: SignRequestDTO): Either<String, SignResponseDTO>
     fun signBundle(request: SignBundleRequestDTO): Either<String, SignBundleResponseDTO>

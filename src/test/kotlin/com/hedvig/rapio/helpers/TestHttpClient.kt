@@ -73,6 +73,10 @@ class TestHttpClient(
             return this
         }
 
+        fun status() : HttpStatus {
+            return entity.statusCode
+        }
+
         inline fun <reified T> body(): T {
             return body(object : TypeReference<T>() {})
         }

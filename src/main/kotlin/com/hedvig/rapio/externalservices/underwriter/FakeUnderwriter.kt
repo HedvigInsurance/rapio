@@ -21,8 +21,8 @@ import java.util.UUID
 @Component
 class FakeUnderwriter : Underwriter {
 
-    override fun createQuote(data: IncompleteQuoteDTO): Either<ErrorResponse, CompleteQuoteReference> {
-        return Right(CompleteQuoteReference("someId", Money.of(10, "SEK"), Instant.now()))
+    override fun createQuote(data: IncompleteQuoteDTO): CompleteQuoteReference {
+        return CompleteQuoteReference("someId", Money.of(10, "SEK"), Instant.now())
     }
 
     override fun quoteBundle(request: QuoteBundleRequestDto): Either<ErrorResponse, QuoteBundleResponseDto> {

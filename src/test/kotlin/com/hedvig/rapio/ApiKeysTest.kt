@@ -88,7 +88,7 @@ class ApiKeysTest {
     @Test
     fun `succeed to access v1 quotes if the role is ROLE_COMPARISON`() {
 
-        every { quoteService.createQuote(any(), any()) } returns Right(quoteResponse)
+        every { quoteService.createQuote(any(), any()) } returns quoteResponse
 
         mvc
             .perform(
@@ -104,7 +104,7 @@ class ApiKeysTest {
     @Test
     fun `succeed to access v1 quotes if the role is ROLE_DISTRIBUTION`() {
 
-        every { quoteService.createQuote(any(), any()) } returns Right(quoteResponse)
+        every { quoteService.createQuote(any(), any()) } returns quoteResponse
 
         mvc
             .perform(
