@@ -91,25 +91,7 @@ class RestExceptionHandler(
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ExternalErrorResponseDTO(e.message ?: ""))
     }
 
-    @ExceptionHandler(
-        FeignException::class,
-        FeignException.BadRequest::class,
-        FeignException.Unauthorized::class,
-        FeignException.Forbidden::class,
-        FeignException.NotFound::class,
-        FeignException.MethodNotAllowed::class,
-        FeignException.NotAcceptable::class,
-        FeignException.Conflict::class,
-        FeignException.Gone::class,
-        FeignException.UnsupportedMediaType::class,
-        FeignException.TooManyRequests::class,
-        FeignException.UnprocessableEntity::class,
-        FeignException.InternalServerError::class,
-        FeignException.NotImplemented::class,
-        FeignException.BadGateway::class,
-        FeignException.ServiceUnavailable::class,
-        FeignException.GatewayTimeout::class
-    )
+    @ExceptionHandler(FeignException::class)
     fun handle(e: FeignException): ResponseEntity<Any> {
         val content = try {
             val jsonContent = mapper.readValue<MutableMap<String, Any>>(e.contentUTF8())
