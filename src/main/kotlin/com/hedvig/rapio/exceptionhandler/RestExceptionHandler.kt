@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.hedvig.logging.calls.LogExceptions
 import com.hedvig.rapio.comparison.web.dto.ExternalErrorResponseDTO
 import feign.FeignException
 import org.springframework.http.HttpHeaders
@@ -20,8 +21,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
-import java.lang.reflect.InvocationTargetException
 
+@LogExceptions
 @ControllerAdvice
 class RestExceptionHandler(
     private val mapper: ObjectMapper
