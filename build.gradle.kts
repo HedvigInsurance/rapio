@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.hedvig.libs", "logging", "1.0.2")
+    implementation("com.hedvig.libs", "logging", "1.1.0")
 
     implementation(platform("org.jdbi:jdbi3-bom:${property("jdbiVersion")}"))
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}"))
