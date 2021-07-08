@@ -73,12 +73,12 @@ class ConcreteUnderwriter(
             val response = this.client.signQuote(
                 id,
                 SignQuoteRequest(
-                    SignQuoteRequest.Name(firstName, lastName),
-                    ssn,
-                    startsAt,
-                    insuranceCompany,
-                    email,
-                    memberId
+                    name = SignQuoteRequest.Name(firstName.trim(), lastName.trim()),
+                    ssn = ssn?.trim(),
+                    startDate = startsAt,
+                    insuranceCompany = insuranceCompany,
+                    email = email.trim(),
+                    memberId = memberId
                 )
             )
             return Either.right(response.body!!)
@@ -113,10 +113,10 @@ class ConcreteUnderwriter(
             val response = client.signQuoteBundle(
                 SignQuoteBundleRequest(
                     quoteIds = ids,
-                    name = SignQuoteBundleRequest.Name(firstName, lastName),
-                    ssn = ssn,
+                    name = SignQuoteBundleRequest.Name(firstName.trim(), lastName.trim()),
+                    ssn = ssn?.trim(),
                     startDate = startsAt,
-                    email = email,
+                    email = email.trim(),
                     price = price,
                     currency = currency,
                     memberId = memberId
