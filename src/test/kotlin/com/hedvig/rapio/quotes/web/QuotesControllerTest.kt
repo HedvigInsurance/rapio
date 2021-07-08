@@ -1,6 +1,5 @@
 package com.hedvig.rapio.quotes.web
 
-import arrow.core.Left
 import arrow.core.Right
 import com.hedvig.rapio.quotes.QuoteService
 import com.hedvig.rapio.quotes.QuotesController
@@ -44,7 +43,7 @@ internal class QuotesControllerTest {
     @WithMockUser("COMPRICER")
     fun create_apartment_quote() {
 
-        every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+        every { quoteService.createQuote(any(), any()) } returns quoteResponse
 
         val request = post("/v1/quotes")
             .with(user("compricer"))
@@ -63,7 +62,7 @@ internal class QuotesControllerTest {
     @WithMockUser("COMPRICER")
     fun create_deprecated_apartment_quote() {
 
-        every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+        every { quoteService.createQuote(any(), any()) } returns quoteResponse
 
         val request = post("/v1/quotes")
             .with(user("compricer"))
@@ -98,29 +97,9 @@ internal class QuotesControllerTest {
 
     @Test
     @WithMockUser("COMPRICER")
-    @Throws
-    fun create_breaching_uw_apartment_quote() {
-
-        every { quoteService.createQuote(any(), any()) } returns (Left("Testing"))
-
-        val request = post("/v1/quotes")
-            .with(user("compricer"))
-            .content(createApartmentRequestJson)
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-
-        val result = mockMvc.perform(request)
-
-        result
-            .andExpect(status().isUnprocessableEntity)
-            .andExpect(jsonPath("$.errorMessage", Matchers.equalTo("Testing")))
-    }
-
-    @Test
-    @WithMockUser("COMPRICER")
     fun create_student_rent_apartment_quote() {
 
-        every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+        every { quoteService.createQuote(any(), any()) } returns quoteResponse
 
         val request = post("/v1/quotes")
             .with(user("compricer"))
@@ -139,7 +118,7 @@ internal class QuotesControllerTest {
     @WithMockUser("COMPRICER")
     fun create_student_brf_apartment_quote() {
 
-        every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+        every { quoteService.createQuote(any(), any()) } returns quoteResponse
 
         val request = post("/v1/quotes")
             .with(user("compricer"))
@@ -158,7 +137,7 @@ internal class QuotesControllerTest {
     @WithMockUser("COMPRICER")
     fun create_house_quote() {
 
-        every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+        every { quoteService.createQuote(any(), any()) } returns quoteResponse
 
         val request = post("/v1/quotes")
             .with(user("compricer"))
@@ -177,7 +156,7 @@ internal class QuotesControllerTest {
     @WithMockUser("COMPRICER")
     fun validateBlankRequestIdWorks() {
 
-        every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+        every { quoteService.createQuote(any(), any()) } returns quoteResponse
 
         val requestJson = createHouseRequestJson.replace("1231a", "")
 
@@ -198,7 +177,7 @@ internal class QuotesControllerTest {
     @WithMockUser("COMPRICER")
     fun create_deprecated_house_quote() {
 
-        every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+        every { quoteService.createQuote(any(), any()) } returns quoteResponse
 
         val request = post("/v1/quotes")
             .with(user("compricer"))
@@ -217,7 +196,7 @@ internal class QuotesControllerTest {
     @WithMockUser("COMPRICER")
     fun create_norwegian_travel_quote() {
 
-        every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+        every { quoteService.createQuote(any(), any()) } returns quoteResponse
 
         val request = post("/v1/quotes")
             .with(user("compricer"))
@@ -236,7 +215,7 @@ internal class QuotesControllerTest {
     @WithMockUser("COMPRICER")
     fun create_norwegian_home_content_quote() {
 
-        every { quoteService.createQuote(any(), any()) } returns (Right(quoteResponse))
+        every { quoteService.createQuote(any(), any()) } returns quoteResponse
 
         val request = post("/v1/quotes")
             .with(user("compricer"))

@@ -6,6 +6,8 @@ import com.hedvig.rapio.external.ExternalMemberRepository
 import com.hedvig.rapio.externalservices.underwriter.transport.SignQuoteRequest
 import com.hedvig.rapio.externalservices.underwriter.transport.SignedQuoteResponseDto
 import com.hedvig.rapio.helpers.IntegrationTest
+import com.hedvig.rapio.quotes.util.QuoteData
+import feign.FeignException
 import io.mockk.CapturingSlot
 import io.mockk.every
 import io.mockk.slot
@@ -68,6 +70,40 @@ class QuotesControllerIntegrationTest : IntegrationTest() {
             externalMemberRepository.findByMemberId("mid2")?.id
         ).isEqualTo(externalMemberId)
         assertThat(slot.captured.memberId).isEqualTo("mid2")
+    }
+
+    @Test
+    fun `Breaching guidelines returns error from underwriter when body is not json`() {
+
+        every { underwriterClient.createQuote(any()) } throws FeignException.UnprocessableEntity(
+            "TestMessage",
+            "TestBody".toByteArray()
+        )
+
+        val result = client.post(
+            uri = "/v1/quotes",
+            body = QuoteData.createApartmentRequestJson,
+            headers = mapOf("Content-Type" to "Application/json")
+        )
+        assertThat(result.status()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
+        assertThat(result.body<String>()).isEqualTo("TestBody")
+    }
+
+    @Test
+    fun `Breaching guidelines returns error from underwriter when body is json and path is removed`() {
+
+        every { underwriterClient.createQuote(any()) } throws FeignException.UnprocessableEntity(
+            "TestMessage",
+            """{"testKey":"testValue", "path":"this will be removed"}""".toByteArray()
+        )
+
+        val result = client.post(
+            uri = "/v1/quotes",
+            body = QuoteData.createApartmentRequestJson,
+            headers = mapOf("Content-Type" to "Application/json")
+        )
+        assertThat(result.status()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
+        assertThat(result.body<Map<String, Any>>()).isEqualTo(mapOf("testKey" to "testValue"))
     }
 
     @Test
