@@ -104,20 +104,20 @@ class MemberService(
     private fun NewMemberInfo.toUpdateMemberRequest(
         language: CountryCode
     ) = UpdateMemberRequest(
-        firstName,
-        lastName,
-        personalNumber,
-        language,
-        UpdateMemberRequest.Address(
-            address.street,
-            address.city,
-            address.zipCode,
-            address.apartmentNo,
-            address.floor
+        firstName = firstName,
+        lastName = lastName,
+        ssn = personalNumber,
+        countryCode = language,
+        address = UpdateMemberRequest.Address(
+            street = address.street,
+            city = address.city,
+            zipCode = address.zipCode,
+            apartmentNo = address.apartmentNo,
+            floor = address.floor
         ),
-        email,
-        phoneNumber,
-        birthDate
+        email = email,
+        phoneNumber = phoneNumber,
+        birthDate = birthDate
     )
 
     companion object {
