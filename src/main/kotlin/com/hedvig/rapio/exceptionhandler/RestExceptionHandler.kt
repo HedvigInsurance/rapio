@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
-import java.lang.reflect.InvocationTargetException
+import org.springframework.web.util.WebUtils
 
 @ControllerAdvice
 class RestExceptionHandler(
@@ -33,7 +33,6 @@ class RestExceptionHandler(
         status: HttpStatus,
         request: WebRequest
     ): ResponseEntity<Any> {
-
         val message = when (val cause = e.cause) {
             is MissingKotlinParameterException -> {
                 // handle RequestBody and Valid non nullable request parameter, with out @NotNull
@@ -47,7 +46,7 @@ class RestExceptionHandler(
                 e.message
         }
 
-        return super.handleExceptionInternal(e, message, headers, status, request)
+        return handleExceptionInternal(e, message, headers, status, request)
     }
 
     override fun handleMethodArgumentNotValid(
@@ -64,17 +63,7 @@ class RestExceptionHandler(
             it.key to it.value.mapNotNull { it.defaultMessage }
         }.toMap().toString()
 
-        return super.handleExceptionInternal(e, message, headers, status, request)
-    }
-
-    @ExceptionHandler(IllegalArgumentException::class)
-    fun handleIllegalArgumentException(e: Exception): ResponseEntity<ExternalErrorResponseDTO> {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExternalErrorResponseDTO(e.message ?: ""))
-    }
-
-    @ExceptionHandler(AccessDeniedException::class)
-    fun handle(e: AccessDeniedException): ResponseEntity<ExternalErrorResponseDTO> {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ExternalErrorResponseDTO(e.message ?: ""))
+        return handleExceptionInternal(e, message, headers, status, request)
     }
 
     override fun handleMissingServletRequestParameter(
@@ -82,17 +71,53 @@ class RestExceptionHandler(
         headers: HttpHeaders,
         status: HttpStatus,
         request: WebRequest
+    ): ResponseEntity<Any> =
+        handleExceptionInternal(
+            ex = e,
+            body = ExternalErrorResponseDTO(e.message),
+            headers = HttpHeaders.EMPTY,
+            status = HttpStatus.BAD_REQUEST,
+            request = request
+        )
+
+    override fun handleExceptionInternal(
+        ex: Exception,
+        body: Any?,
+        headers: HttpHeaders,
+        status: HttpStatus,
+        request: WebRequest
     ): ResponseEntity<Any> {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExternalErrorResponseDTO(e.message))
+        when {
+            status.is5xxServerError -> logger.error(ex.localizedMessage, ex)
+            status.is4xxClientError -> logger.info(ex.localizedMessage, ex)
+            else -> logger.warn(ex.localizedMessage, ex)
+        }
+
+        return ResponseEntity(body, headers, status)
     }
 
-    @ExceptionHandler
-    fun handle(e: Exception): ResponseEntity<ExternalErrorResponseDTO> {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ExternalErrorResponseDTO(e.message ?: ""))
-    }
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleIllegalArgumentException(e: Exception, request: WebRequest): ResponseEntity<Any> =
+        handleExceptionInternal(
+            ex = e,
+            body = ExternalErrorResponseDTO(e.message ?: ""),
+            headers = HttpHeaders.EMPTY,
+            status = HttpStatus.BAD_REQUEST,
+            request = request
+        )
+
+    @ExceptionHandler(AccessDeniedException::class)
+    fun handle(e: AccessDeniedException, request: WebRequest): ResponseEntity<Any> =
+        handleExceptionInternal(
+            ex = e,
+            body = ExternalErrorResponseDTO(e.message ?: ""),
+            headers = HttpHeaders.EMPTY,
+            status = HttpStatus.FORBIDDEN,
+            request = request
+        )
 
     @ExceptionHandler(FeignException::class)
-    fun handle(e: FeignException): ResponseEntity<Any> {
+    fun handle(e: FeignException, request: WebRequest): ResponseEntity<Any> {
         val content = try {
             val jsonContent = mapper.readValue<MutableMap<String, Any>>(e.contentUTF8())
             jsonContent.apply {
@@ -103,19 +128,51 @@ class RestExceptionHandler(
         }
         return when {
             e.status() in 400..499 -> {
-                ResponseEntity(content, HttpStatus.valueOf(e.status()))
+                handleExceptionInternal(
+                    ex = e,
+                    body = content,
+                    headers = HttpHeaders.EMPTY,
+                    status = HttpStatus.valueOf(e.status()),
+                    request = request
+                )
             }
-            else -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+            else -> handleExceptionInternal(
+                ex = e,
+                body = null,
+                headers = HttpHeaders.EMPTY,
+                status = HttpStatus.INTERNAL_SERVER_ERROR,
+                request = request
+            )
         }
     }
 
     @ExceptionHandler
-    fun handle(e: HttpServerErrorException): ResponseEntity<ExternalErrorResponseDTO> {
-        return ResponseEntity.status(e.statusCode).body(ExternalErrorResponseDTO(e.responseBodyAsString))
-    }
+    fun handle(e: HttpServerErrorException, request: WebRequest): ResponseEntity<Any> =
+        handleExceptionInternal(
+            ex = e,
+            body = ExternalErrorResponseDTO(e.responseBodyAsString),
+            headers = HttpHeaders.EMPTY,
+            status = e.statusCode,
+            request = request
+        )
 
     @ExceptionHandler(MissingRequestHeaderException::class)
-    fun handle(e: MissingRequestHeaderException): ResponseEntity<ExternalErrorResponseDTO> {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExternalErrorResponseDTO(e.message))
-    }
+    fun handle(e: MissingRequestHeaderException, request: WebRequest): ResponseEntity<Any> =
+        handleExceptionInternal(
+            ex = e,
+            body = ExternalErrorResponseDTO(e.message),
+            headers = HttpHeaders.EMPTY,
+            status = HttpStatus.BAD_REQUEST,
+            request = request
+        )
+
+    @ExceptionHandler
+    fun handle(e: Exception, request: WebRequest): ResponseEntity<Any> =
+        handleExceptionInternal(
+            ex = e,
+            body = ExternalErrorResponseDTO(e.message ?: ""),
+            headers = HttpHeaders.EMPTY,
+            status = HttpStatus.INTERNAL_SERVER_ERROR,
+            request = request
+        )
 }
